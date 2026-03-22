@@ -53,12 +53,6 @@ def build_graph():
     graph.add_node("extract_docs", extract_secondary_documents)
     graph.add_node("enforce_rag", enforce_rag_node)
     
-    # Define system prompt inject logic
-    def inject_system_prompt(state: TurboRefiState):
-        if not state.get("messages") or not isinstance(state["messages"][0], SystemMessage):
-            state["messages"].insert(0, SystemMessage(content=LOA_SYSTEM_PROMPT))
-        return state
-    
     # Add start logic
     graph.set_entry_point("extract_initial_docs")
     graph.add_edge("extract_initial_docs", "loa_call")

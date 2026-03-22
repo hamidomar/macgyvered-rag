@@ -1,10 +1,16 @@
-import json
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from src.state import TurboRefiState
 
 def loa_call(state: TurboRefiState) -> dict:
     from src.graph.builder import llm_with_tools 
+    from src.prompts.loa_system_prompt import LOA_SYSTEM_PROMPT
+    
     messages = state["messages"]
+    
+    # Prepend the system prompt if not present to ensure persona
+    if not messages or getattr(messages[0], "type", "") != "system":
+        messages = [SystemMessage(content=LOA_SYSTEM_PROMPT)] + messages
+        
     response = llm_with_tools.invoke(messages)
     return {"messages": [response]}
 
