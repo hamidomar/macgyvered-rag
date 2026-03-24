@@ -1,0 +1,40 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.2, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\omrha\Desktop\Projects\RAG_Loan_Refinance
+plugins: anyio-4.12.1, langsmith-0.7.22
+collected 8 items / 2 errors
+
+=================================== ERRORS ====================================
+__________________ ERROR collecting tests/test_extraction.py __________________
+tests\test_extraction.py:3: in <module>
+    from src.tools.extraction import extract_document
+src\tools\extraction.py:6: in <module>
+    client = OpenAI()
+             ^^^^^^^^
+venv\Lib\site-packages\openai\_client.py:139: in __init__
+    raise OpenAIError(
+E   openai.OpenAIError: The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
+__________________ ERROR collecting tests/test_graph_uc1.py ___________________
+tests\test_graph_uc1.py:2: in <module>
+    from src.graph.builder import build_graph
+src\graph\builder.py:6: in <module>
+    from src.graph.nodes import (
+src\graph\nodes.py:13: in <module>
+    from src.tools.extraction import extract_document
+src\tools\extraction.py:6: in <module>
+    client = OpenAI()
+             ^^^^^^^^
+venv\Lib\site-packages\openai\_client.py:139: in __init__
+    raise OpenAIError(
+E   openai.OpenAIError: The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
+============================== warnings summary ===============================
+venv\Lib\site-packages\langchain_core\_api\deprecation.py:25
+  C:\Users\omrha\Desktop\Projects\RAG_Loan_Refinance\venv\Lib\site-packages\langchain_core\_api\deprecation.py:25: UserWarning: Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.
+    from pydantic.v1.fields import FieldInfo as FieldInfoV1
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+ERROR tests/test_extraction.py - openai.OpenAIError: The api_key client optio...
+ERROR tests/test_graph_uc1.py - openai.OpenAIError: The api_key client option...
+!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!
+======================== 1 warning, 2 errors in 1.62s =========================

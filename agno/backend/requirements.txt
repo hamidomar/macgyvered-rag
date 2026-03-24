@@ -1,0 +1,10 @@
+agno
+ag-ui-protocol
+openai
+fastapi[standard]
+uvicorn
+python-multipart
+pydantic>=2.0
+python-dotenv
+pypdf
+sqlalchemy
