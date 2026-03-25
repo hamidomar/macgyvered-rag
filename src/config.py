@@ -22,11 +22,16 @@ from guide_tool import GuideTool
 OPENAI_MODEL = "gpt-4o"
 OPENAI_EXTRACTION_MODEL = "gpt-4o"
 
-# Loaded Tool Instances
-try:
-    fnma_guide = GuideTool(FNMA_INDEX_DIR)
-    fhlmc_guide = GuideTool(FHLMC_INDEX_DIR)
-except Exception as e:
-    print(f"Warning: Could not load GuideTool instances. {e}")
-    fnma_guide = None
-    fhlmc_guide = None
+# Loaded Tool Instances - Fail Fast RAG Health Checks
+print("Initializing GuideTool instances...")
+fnma_guide = GuideTool(FNMA_INDEX_DIR)
+fhlmc_guide = GuideTool(FHLMC_INDEX_DIR)
+
+# Smoke test - ensure tools didn't load silently empty (e.g., bad paths)
+assert getattr(fnma_guide, "sections", None) or hasattr(fnma_guide, "get_section"), f"FNMA guide loaded improperly from {FNMA_INDEX_DIR}"
+assert getattr(fhlmc_guide, "sections", None) or hasattr(fhlmc_guide, "get_section"), f"FHLMC guide loaded improperly from {FHLMC_INDEX_DIR}"
+
+# Validate a core FNMA income section exists as a sanity check
+test_result = fnma_guide.get_section("B3-3.1-01")
+assert test_result and "text" in test_result, "FNMA B3-3.1-01 lookup failed — index may be corrupt."
+print("GuideTool instances loaded successfully and smoke tested.")

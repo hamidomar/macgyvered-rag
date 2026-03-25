@@ -1,6 +1,9 @@
 import json
 from langchain_core.tools import tool
 from src.config import fnma_guide, fhlmc_guide
+from src.logger import get_logger
+
+logger = get_logger("rag_tools")
 
 @tool
 def get_guideline_section(section_id: str, gse: str) -> str:
@@ -12,8 +15,10 @@ def get_guideline_section(section_id: str, gse: str) -> str:
                     FHLMC examples: "1.3", "17.2", "1.3.a"
         gse: Which guide to search — "fnma" or "fhlmc"
     """
+    logger.info(f"[TOOL: get_guideline_section] Requesting section: {section_id} from {gse.upper()}")
     guide = fnma_guide if gse == "fnma" else fhlmc_guide
     if guide is None:
+        logger.error(f"[TOOL] GuideTool for {gse.upper()} is not loaded.")
         return json.dumps({"error": f"GuideTool for {gse.upper()} is not loaded."})
     
     result = guide.get_section(section_id)
@@ -27,6 +32,7 @@ def search_guideline_titles(query: str, gse: str) -> str:
         query: Space-separated keywords (AND logic). E.g. "income verification W2"
         gse: "fnma" or "fhlmc"
     """
+    logger.info(f"[TOOL: search_guideline_titles] Searching for '{query}' in {gse.upper()}")
     guide = fnma_guide if gse == "fnma" else fhlmc_guide
     if guide is None:
         return json.dumps({"error": f"GuideTool for {gse.upper()} is not loaded."})
@@ -44,6 +50,7 @@ def list_guide_contents(path: str, gse: str) -> str:
               FHLMC examples: "01", "1.3"
         gse: "fnma" or "fhlmc"
     """
+    logger.info(f"[TOOL: list_guide_contents] Browsing path: '{path}' in {gse.upper()}")
     guide = fnma_guide if gse == "fnma" else fhlmc_guide
     if guide is None:
         return json.dumps({"error": f"GuideTool for {gse.upper()} is not loaded."})
@@ -59,6 +66,7 @@ def get_section_with_references(section_id: str, gse: str) -> str:
         section_id: The section to expand
         gse: "fnma" or "fhlmc"
     """
+    logger.info(f"[TOOL: get_section_with_references] Expanding references for: {section_id} in {gse.upper()}")
     guide = fnma_guide if gse == "fnma" else fhlmc_guide
     if guide is None:
         return json.dumps({"error": f"GuideTool for {gse.upper()} is not loaded."})

@@ -1,5 +1,9 @@
 from langchain_core.messages import HumanMessage, SystemMessage
 from src.state import TurboRefiState
+from src.logger import get_logger
+import re
+
+logger = get_logger("orchestrator")
 
 def loa_call(state: TurboRefiState) -> dict:
     from src.graph.builder import llm_with_tools 
@@ -12,6 +16,14 @@ def loa_call(state: TurboRefiState) -> dict:
         messages = [SystemMessage(content=LOA_SYSTEM_PROMPT)] + messages
         
     response = llm_with_tools.invoke(messages)
+    
+    # Trace Goal Logging: Parse and extract the agent's thought framework
+    thought_match = re.search(r"<thought>(.*?)</thought>", response.content, re.DOTALL)
+    if thought_match:
+        logger.info(f"[AGENT THOUGHT]: {thought_match.group(1).strip()}")
+    else:
+        logger.debug("[AGENT THOUGHT]: Proceeded directly without explicit <thought> wrapper.")
+        
     return {"messages": [response]}
 
 def should_continue(state: TurboRefiState) -> str:
@@ -19,16 +31,18 @@ def should_continue(state: TurboRefiState) -> str:
     last_message = messages[-1]
 
     if getattr(last_message, "tool_calls", None):
+        logger.info("[ROUTING] Next Step: Agent elected to invoke TOOLS.")
         return "tools"
         
     # Enforced Iterative RAG Routing logic
-    # If the agent attempts to output the final struct but hasn't called tools, intercept it.
     if "borrower_name" in last_message.content and "qualifying_monthly_income" in last_message.content:
         # Count tool calls in history
         tool_call_count = sum(1 for m in messages if hasattr(m, "tool_calls") and getattr(m, "tool_calls"))
         if tool_call_count < 2:
+            logger.warning("[ROUTING INTERCEPT] Agent halted attempting premature conclusion without necessary guide traversal.")
             return "enforce_rag"
 
+    logger.info("[ROUTING] Assessment concluding. Returning to user.")
     return "__end__"
 
 def extract_mortgage_statement(state: TurboRefiState) -> dict:

@@ -54,16 +54,25 @@ with st.sidebar:
         doc_type = st.selectbox("Document Type", ["paystub", "w2", "schedule_c"])
         uploaded_file = st.file_uploader(f"Upload {doc_type}", type=["pdf", "jpg", "png"])
         
-        if uploaded_file and st.button("Send Document"):
+        if uploaded_file and st.button("Upload Document to Mem"):
             with st.spinner(f"Extracting {doc_type}..."):
                 files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
                 data = {"doc_type": doc_type}
                 resp = requests.post(f"{API_URL}/session/{st.session_state.session_id}/upload", files=files, data=data)
                 if resp.status_code == 200:
+                    st.success("Document parsed and saved! Upload more or conclude.")
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.error(f"Error: {resp.text}")
+                    
+        if st.button("✅ Done Uploading: Begin Assessment"):
+            with st.spinner("Agent is analyzing documents and performing RAG verification..."):
+                resp = requests.post(f"{API_URL}/session/{st.session_state.session_id}/resume")
+                if resp.status_code == 200:
                     result = resp.json()
                     st.session_state.messages.append({"role": "assistant", "content": result["response"]})
                     st.session_state.current_phase = result.get("current_phase", st.session_state.current_phase)
-                    st.success("Document uploaded and processed!")
                     st.rerun()
                 else:
                     st.error(f"Error: {resp.text}")
