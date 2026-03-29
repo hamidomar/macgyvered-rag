@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env*
+
+# Databases and Local Storage
+*.db
+*.sqlite3
+agno/backend/tmp/
+agno/backend/output/
+
+# Application Specific
+data/
+output/
+git_status.txt
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+.antigravity/
+.gemini/
+
+# OS
+.DS_Store
+Thumbs.db

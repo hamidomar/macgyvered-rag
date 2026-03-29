@@ -11,6 +11,7 @@ from src.config import AGNO_DB_FILE, AGNO_HISTORY_LENGTH, AGNO_STORAGE_TABLE, OP
 from src.prompts.loa_system_prompt import LOA_SYSTEM_PROMPT
 from src.state import build_session_state
 from src.tools.calculators import calc_ltv, calc_pmi_savings, calc_se_income, calc_w2_income
+from src.prompts.rag_system_prompt import RAG_SYSTEM_PROMPT
 from src.tools.guide_tools import (
     get_guideline_section,
     get_section_with_references,
@@ -101,6 +102,11 @@ def get_loa_agent() -> Agent:
         "session_state": build_session_state(),
         "markdown": True,
     }
+    if "show_tool_calls" in agent_params:
+        kwargs["show_tool_calls"] = True
+    if "debug_mode" in agent_params:
+        kwargs["debug_mode"] = True
+
     kwargs.update(_build_storage_kwargs(agent_params))
 
     if "id" in agent_params:
@@ -131,5 +137,51 @@ def get_loa_agent() -> Agent:
 
     if "add_session_state_to_context" in agent_params:
         kwargs["add_session_state_to_context"] = True
+
+    return Agent(**kwargs)
+
+
+RAG_TOOLS = [
+    list_guide_contents,
+    get_guideline_section,
+    search_guideline_titles,
+    get_section_with_references,
+]
+
+
+@lru_cache(maxsize=1)
+def get_rag_agent() -> Agent:
+    agent_params = inspect.signature(Agent).parameters
+    kwargs = {
+        "name": "Guide Expert (RAG)",
+        "model": _build_model(),
+        "description": "Agent for querying FNMA and FHLMC guidelines directly. Explores the TOC and fetches guidelines.",
+        "instructions": [RAG_SYSTEM_PROMPT],
+        "tools": RAG_TOOLS,
+        "markdown": True,
+    }
+    if "show_tool_calls" in agent_params:
+        kwargs["show_tool_calls"] = True
+
+    kwargs.update(_build_storage_kwargs(agent_params))
+
+    if "id" in agent_params:
+        kwargs["id"] = "guide-expert-rag"
+    elif "agent_id" in agent_params:
+        kwargs["agent_id"] = "guide-expert-rag"
+
+    if "store_history_messages" in agent_params:
+        kwargs["store_history_messages"] = True
+
+    if "add_history_to_messages" in agent_params:
+        kwargs["add_history_to_messages"] = True
+        if "num_history_responses" in agent_params:
+            kwargs["num_history_responses"] = AGNO_HISTORY_LENGTH
+        elif "num_history_runs" in agent_params:
+            kwargs["num_history_runs"] = AGNO_HISTORY_LENGTH
+    elif "add_history_to_context" in agent_params:
+        kwargs["add_history_to_context"] = True
+        if "num_history_runs" in agent_params:
+            kwargs["num_history_runs"] = AGNO_HISTORY_LENGTH
 
     return Agent(**kwargs)
