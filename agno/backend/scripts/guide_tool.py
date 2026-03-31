@@ -232,18 +232,36 @@ class GuideTool:
             Dict with section data + cross-references, or error dict.
         """
         section = self.sections.get(section_id)
-        if section is None:
-            # Try fuzzy
-            candidates = [k for k in self.sections if section_id.lower() in k.lower()]
-            if candidates:
-                suggestion = ", ".join(candidates[:5])
-                return {"error": f"Section '{section_id}' not found. Did you mean: {suggestion}?"}
-            return {"error": f"Section '{section_id}' not found."}
+        if section is not None:
+            result = {**section}
+            result["references"] = self.xrefs.get(section_id, [])
+            result["cited_by"] = self._reverse_xrefs.get(section_id, [])
+            return result
 
-        result = {**section}
-        result["references"] = self.xrefs.get(section_id, [])
-        result["cited_by"] = self._reverse_xrefs.get(section_id, [])
-        return result
+        # NEW: if the ID is a non-leaf node in the tree, return its children
+        node = self._node_index.get(section_id)
+        if node is None:
+            node = self._fuzzy_find(section_id)
+        if node is not None and node.get("children"):
+            children = []
+            for child in node["children"]:
+                children.append({
+                    "id": child.get("nav_id", self._node_id(child)),
+                    "title": child.get("title", ""),
+                    "type": child.get("node_type", ""),
+                    "has_children": bool(child.get("children")),
+                })
+            return {
+                "note": f"'{section_id}' is not a leaf section. Here are its children — drill deeper or call get_guideline_section on a leaf ID.",
+                "children": children,
+            }
+
+        # Existing fuzzy fallback for truly unknown IDs
+        candidates = [k for k in self.sections if section_id.lower() in k.lower()]
+        if candidates:
+            suggestion = ", ".join(candidates[:5])
+            return {"error": f"Section '{section_id}' not found. Did you mean: {suggestion}?"}
+        return {"error": f"Section '{section_id}' not found."}
 
     def get_sections(self, section_ids: list[str]) -> list[dict]:
         """
