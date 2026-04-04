@@ -106,6 +106,12 @@ class GuideTool:
         if sid:
             return sid
 
+        # If the preprocessor stored an explicit "id" (e.g. "5304", "5000"),
+        # use it directly — this is the primary fix for FHLMC intermediate nodes.
+        explicit_id = node.get("id", "")
+        if explicit_id:
+            return explicit_id
+
         title = node.get("title", "")
         node_type = node.get("node_type", "")
 
@@ -151,8 +157,12 @@ class GuideTool:
             for i, node in enumerate(nodes):
                 raw_id = self._node_id(node)
 
-                # Handle nodes without meaningful IDs (groups, cover pages)
-                if not raw_id or raw_id == node.get("title", ""):
+                # Handle nodes without *any* meaningful ID.
+                # We only fall back to a synthetic ID if raw_id is empty.
+                # Do NOT replace it just because raw_id == title — the
+                # preprocessor intentionally stores the node name as both
+                # "id" and "title" for segment-level nodes.
+                if not raw_id:
                     node_type = node.get("node_type", "node")
                     raw_id = f"{node_type}:{i}"
                     if parent_prefix:
