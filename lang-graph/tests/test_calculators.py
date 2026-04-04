@@ -2,7 +2,7 @@ import json
 from src.tools.calculators import calc_ltv, calc_w2_income, calc_pmi_savings, calc_se_income
 
 def test_calc_ltv():
-    res = calc_ltv.invoke({"loan_amount": 80000, "property_value": 100000})
+    res = calc_ltv.invoke({"loan_amount": 80000, "property_value": 100000, "gse": "fnma"})
     assert isinstance(res, str)
     data = json.loads(res)
     assert "ltv_ratio" in data
@@ -16,7 +16,7 @@ def test_calc_w2_income():
     assert "monthly_qualifying" in data
 
 def test_calc_pmi_savings():
-    res = calc_pmi_savings.invoke({"current_pmi_monthly": 100, "years_remaining": 10})
+    res = calc_pmi_savings.invoke({"current_pmi_monthly": 100, "years_remaining": 10, "gse": "fnma"})
     data = json.loads(res)
     assert "total_savings" in data
     assert "monthly_savings" in data

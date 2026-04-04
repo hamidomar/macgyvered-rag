@@ -40,8 +40,8 @@ def get_guideline_section(section_id: str, gse: str, agent=None, run_context=Non
     Args:
         section_id: The section identifier.
                     FNMA examples: "B3-3.1-01", "B2-1.3-01"
-                    FHLMC examples: "1.3", "17.2", "1.3.a"
-        gse: Which guide to search — "fnma" or "fhlmc"
+                    FHLMC examples: "5302.2", "1101.1"
+        gse: "fnma" or "fhlmc"
     """
     guide = fnma_guide if gse == "fnma" else fhlmc_guide
     if guide is None:
@@ -102,7 +102,7 @@ def list_guide_contents(path: str, gse: str, agent=None, run_context=None) -> st
     Args:
         path: A nav_id to drill into, or empty string for top level.
               FNMA examples: "A", "A2", "A2-1"
-              FHLMC examples: "01", "1.3"
+              FHLMC examples: "1000", "5300", "5302"
         gse: "fnma" or "fhlmc"
     """
     guide = fnma_guide if gse == "fnma" else fhlmc_guide

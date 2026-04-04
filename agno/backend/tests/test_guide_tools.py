@@ -18,7 +18,7 @@ def test_search_guideline_titles():
     assert isinstance(data, (list, dict))
 
 def test_list_guide_contents():
-    res = list_guide_contents(path="", gse="fhlmc")
+    res = list_guide_contents(path="", gse="fnma")
     data = json.loads(res)
     assert isinstance(data, (list, dict))
 

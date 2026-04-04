@@ -10,7 +10,7 @@ def test_calc_ltv():
     assert data["ltv_percent"] == 80.0
 
 def test_calc_w2_income():
-    res = calc_w2_income(gross_monthly=5000, pay_frequency="monthly", gse="fnma")
+    res = calc_w2_income(gross_monthly=5000, pay_frequency="monthly")
     data = json.loads(res)
     assert "annual_income" in data
     assert "monthly_qualifying" in data
@@ -22,6 +22,6 @@ def test_calc_pmi_savings():
     assert "monthly_savings" in data
 
 def test_calc_se_income():
-    res = calc_se_income(yr1_net=50000, yr2_net=60000, depreciation=5000, depletion=0, gse="fnma")
+    res = calc_se_income(yr1_net=50000, yr2_net=60000, depreciation=5000, depletion=0)
     data = json.loads(res)
     assert "qualifying_monthly" in data

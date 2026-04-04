@@ -18,7 +18,7 @@ EXTRACTION_PROMPTS = {
             "loan_balance": <number>,
             "servicer_name": "<string>",
             "loan_number": "<string>",
-            "gse_owner": "<fnma | fhlmc | unknown>",
+            "gse_owner": "<fnma | unknown>",
             "monthly_pi": <number>,
             "monthly_pmi": <number or null>,
             "original_property_value": <number or null>

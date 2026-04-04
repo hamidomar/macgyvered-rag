@@ -8,7 +8,7 @@ load_dotenv()
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 FNMA_INDEX_DIR = ROOT_DIR / "output" / "selling_guide_preprocessed"
-FHLMC_INDEX_DIR = ROOT_DIR / "output" / "mf_guide_index"
+FHLMC_INDEX_DIR = ROOT_DIR / "output" / "sf_guide_index"
 
 TMP_DIR = ROOT_DIR / "tmp"
 TMP_DIR.mkdir(parents=True, exist_ok=True)

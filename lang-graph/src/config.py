@@ -9,7 +9,7 @@ load_dotenv()
 # Paths
 ROOT_DIR = Path(__file__).parent.parent
 FNMA_INDEX_DIR = ROOT_DIR / "output" / "selling_guide_preprocessed"
-FHLMC_INDEX_DIR = ROOT_DIR / "output" / "mf_guide_index"
+FHLMC_INDEX_DIR = ROOT_DIR / "output" / "sf_guide_index"
 
 # Add scripts directory to path to import GuideTool
 scripts_dir = ROOT_DIR / "scripts"

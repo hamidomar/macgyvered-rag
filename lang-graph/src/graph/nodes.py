@@ -67,5 +67,5 @@ def extract_secondary_documents(state: TurboRefiState) -> dict:
 
 def enforce_rag_node(state: TurboRefiState) -> dict:
     """Forces the LLM to traverse the guide instead of hallucinating."""
-    msg = "[SYSTEM: Orchestration Enforcement]\nYou attempted to conclude without calling the required retrieval tools (list_guide_contents, get_guideline_section). DO NOT GUESS. You must traverse the guides to find explicit FNMA and FHLMC rules before concluding."
+    msg = "[SYSTEM: Orchestration Enforcement]\nYou attempted to conclude without calling the required retrieval tools (list_guide_contents, get_guideline_section). DO NOT GUESS. You must traverse the guides to find explicit FNMA rules before concluding."
     return {"messages": [HumanMessage(content=msg)]}

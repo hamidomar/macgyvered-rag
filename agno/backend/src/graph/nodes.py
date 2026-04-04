@@ -60,7 +60,7 @@ def build_enforce_rag_message() -> str:
         "[SYSTEM: Orchestration Enforcement]\n"
         "You attempted to conclude without calling the required retrieval tools "
         "(list_guide_contents, get_guideline_section). DO NOT GUESS. You must traverse "
-        "the guides to find explicit FNMA and FHLMC rules before concluding."
+        "the guides to find explicit FNMA rules before concluding."
     )
 
 

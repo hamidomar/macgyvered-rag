@@ -42,7 +42,7 @@ def _extract_json_block(content: str) -> dict[str, Any] | None:
             continue
         if isinstance(packet, dict) and (
             {"borrower_name", "qualifying_monthly_income"}.issubset(packet.keys())
-            or {"borrower_name", "use_case", "fnma_eligible", "fhlmc_eligible"}.issubset(packet.keys())
+            or {"borrower_name", "use_case", "fnma_eligible"}.issubset(packet.keys())
         ):
             return packet
     return None
@@ -101,7 +101,7 @@ def _build_missing_documents_message(state: TurboRefiState, missing_documents: l
     return (
         f"{prefix}I cannot proceed to eligibility yet. "
         f"For a salaried/W-2 borrower, I still need {_format_missing_documents(missing_documents)} "
-        "before assessment, per FNMA B3-3.2-01 and FHLMC 5302.2. "
+        "before assessment, per FNMA B3-3.2-01. "
         "Please upload the remaining required documents and then I’ll continue."
     )
 
@@ -152,8 +152,6 @@ def _packet_validation_errors(packet: dict[str, Any], state: TurboRefiState) -> 
     retrieved_gses = _explicit_retrieval_gses(state)
     if "fnma" not in retrieved_gses:
         errors.append("Missing an explicit FNMA guideline retrieval via get_guideline_section or get_section_with_references.")
-    if "fhlmc" not in retrieved_gses:
-        errors.append("Missing an explicit FHLMC guideline retrieval via get_guideline_section or get_section_with_references.")
 
     borrower_name = state.get("borrower_name")
     if borrower_name and packet.get("borrower_name") != borrower_name:
