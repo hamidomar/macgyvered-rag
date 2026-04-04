@@ -34,6 +34,8 @@ agno/backend/output/
 # Application Specific
 data/
 output/
+tmp/
+*.txt
 git_status.txt
 
 # IDEs
