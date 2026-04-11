@@ -1,0 +1,56 @@
+{
+  "case_id": "uc2_james_wilson",
+  "borrower_name": "James Wilson",
+  "use_case": "uc2_pmi_removal",
+  "income_type": "w2",
+  "borrower_facts": {
+    "employer_name": "Lakewood City School District",
+    "hire_date": "2018-08-20",
+    "annual_income": 75000,
+    "current_property_value": 400000,
+    "property_value_source": "borrower_estimate",
+    "target_rate_percent": 6.0
+  },
+  "documents": {
+    "mortgage_statement": {
+      "current_rate_percent": 7.25,
+      "loan_balance": 290000,
+      "servicer_name": "US Bank",
+      "loan_number": "2021-45219",
+      "gse_owner": "fhlmc",
+      "monthly_pi": 1978,
+      "monthly_pmi": 185,
+      "original_property_value": 350000
+    },
+    "paystubs": [
+      {
+        "employer_name": "Lakewood City School District",
+        "gross_this_period": 6250,
+        "pay_frequency": "monthly",
+        "ytd_gross": 6250,
+        "pay_period_end_date": "2026-01-31"
+      },
+      {
+        "employer_name": "Lakewood City School District",
+        "gross_this_period": 6250,
+        "pay_frequency": "monthly",
+        "ytd_gross": 12500,
+        "pay_period_end_date": "2026-02-28"
+      }
+    ],
+    "w2s": [
+      {
+        "employer_name": "Lakewood City School District",
+        "wages_box1": 75000,
+        "tax_year": 2025
+      }
+    ],
+    "schedule_c": [],
+    "additional_documents": {}
+  },
+  "notes": [
+    "UC2 fixture with monthly PMI still present",
+    "Freddie-owned path requires future Freddie source support"
+  ]
+}
+

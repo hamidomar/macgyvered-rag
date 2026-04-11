@@ -1,0 +1,56 @@
+{
+  "case_id": "uc1_sarah_chen",
+  "borrower_name": "Sarah Chen",
+  "use_case": "uc1_rate_term_refi",
+  "income_type": "w2",
+  "borrower_facts": {
+    "employer_name": "Microsoft Corp",
+    "hire_date": "2020-01-15",
+    "annual_income": 150000,
+    "current_property_value": 600000,
+    "property_value_source": "borrower_stated",
+    "target_rate_percent": 6.0
+  },
+  "documents": {
+    "mortgage_statement": {
+      "current_rate_percent": 7.5,
+      "loan_balance": 450000,
+      "servicer_name": "Wells Fargo",
+      "loan_number": "2019-88431",
+      "gse_owner": "fnma",
+      "monthly_pi": 3146,
+      "monthly_pmi": 0,
+      "original_property_value": 600000
+    },
+    "paystubs": [
+      {
+        "employer_name": "Microsoft Corp",
+        "gross_this_period": 12500,
+        "pay_frequency": "monthly",
+        "ytd_gross": 12500,
+        "pay_period_end_date": "2026-01-31"
+      },
+      {
+        "employer_name": "Microsoft Corp",
+        "gross_this_period": 12500,
+        "pay_frequency": "monthly",
+        "ytd_gross": 25000,
+        "pay_period_end_date": "2026-02-28"
+      }
+    ],
+    "w2s": [
+      {
+        "employer_name": "Microsoft Corp",
+        "wages_box1": 150000,
+        "tax_year": 2025
+      }
+    ],
+    "schedule_c": [],
+    "additional_documents": {}
+  },
+  "notes": [
+    "Baseline UC1 fixture",
+    "FNMA-owned loan with full W-2 documentation"
+  ]
+}
+

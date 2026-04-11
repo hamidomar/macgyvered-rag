@@ -1,0 +1,47 @@
+{
+  "case_id": "uc3_maria_garcia",
+  "borrower_name": "Maria Garcia",
+  "use_case": "uc3_se_rate_term",
+  "income_type": "self_employed",
+  "borrower_facts": {
+    "business_name": "Garcia Design LLC",
+    "years_in_business": 4,
+    "current_property_value": 520000,
+    "property_value_source": "borrower_stated",
+    "target_rate_percent": 6.0
+  },
+  "documents": {
+    "mortgage_statement": {
+      "current_rate_percent": 6.75,
+      "loan_balance": 380000,
+      "servicer_name": "PennyMac",
+      "loan_number": "2020-71033",
+      "gse_owner": "fnma",
+      "monthly_pi": 2464,
+      "monthly_pmi": 0,
+      "original_property_value": 520000
+    },
+    "paystubs": [],
+    "w2s": [],
+    "schedule_c": [
+      {
+        "tax_year": 2023,
+        "net_profit_loss": 95000,
+        "depreciation": 4000,
+        "business_name": "Garcia Design LLC"
+      },
+      {
+        "tax_year": 2024,
+        "net_profit_loss": 110000,
+        "depreciation": 4000,
+        "business_name": "Garcia Design LLC"
+      }
+    ],
+    "additional_documents": {}
+  },
+  "notes": [
+    "UC3 fixture for self-employed underwriting",
+    "Schedule C data already normalized"
+  ]
+}
+
