@@ -13,8 +13,8 @@ This is not a full rewrite. The existing app already has the right outer shape:
 - session orchestration in `src/turborefi/services/session_service.py`
 - persistent JSON session state under `runtime/sessions/`
 - extraction service in `src/turborefi/extraction/` for supporting documents
-- deterministic packet builder and verifier services
-- Agno LOA/verifier agents
+- deterministic packet builder and compliance/TCS services
+- Agno LOA agent
 - guideline retrieval adapter over `retrival/`
 - frontend session, upload, chat, and result plumbing
 
@@ -29,11 +29,17 @@ The parts that must change are the mortgage-domain core:
 - state machine S0-S7 does not exist
 - UC4, UC5, and UC6 are not implemented
 - UC2 uses the old PMI/LTV logic, not the new 75% screening threshold
-- verification currently rebuilds the same deterministic packet instead of producing an independent LARS/compliance audit
+- current verifier-agent behavior is not part of the new docs and should be
+  removed or replaced by the Compliance Agent/TCS path
 
 Recommended approach: keep the app shell and replace the domain layer in phases.
 Do not make mortgage-statement OCR part of the critical path. The primary entry
 point should accept the provided received JSON directly.
+
+Target-scope decision: the new docs do not define a Verifier Agent. They define
+LOA, Compliance Agent/TCS, audit trail, and human LO handoff. The current
+`verifier_agent` and `verification_service` can be skipped in the target
+implementation unless they are temporarily useful during migration tests.
 
 ## Source Documents Used
 
@@ -41,6 +47,8 @@ Specification files:
 
 - `new_docs/TurboRefi_Engineering_DataSpec Share.docx`
 - `new_docs/TurboRefi_Formula_CheatSheet.docx`
+- `new_docs/TurboRefi_Engineer_Spec.docx`
+- `new_docs/TurboRefi_Expert_Review_v2.docx`
 
 Sample received-data payloads:
 
@@ -50,12 +58,13 @@ Sample received-data payloads:
 - `example_json_inputs/High Rate FHA.json`
 - `example_json_inputs/Near Payoff.json`
 
-The engineering spec references additional documents that are not present in this
-repository, including Engineer's Technical Spec v1, Expert Review Guide v2,
-Compliance Agent Architecture, UW Training Guidelines, a Use Case document, and
-a Field-UseCase Mapping spreadsheet. This plan uses the available two docs plus
-the sample JSON inputs as the source of truth and leaves explicit extension
-points for the missing specs.
+The DataSpec references additional documents that are not present in this
+repository, including Compliance Agent Architecture, UW Training Guidelines, a
+Use Case document, and a Field-UseCase Mapping spreadsheet. The Engineer Spec is
+source of truth for LARS, RAG targets, the information firewall, the state
+machine, and human handoff schema. The Expert Review Guide is source of truth
+for borrower-facing question order, document request wording, preliminary-result
+language, and human LO handoff instructions.
 
 ## Important Doc Issues To Confirm
 
@@ -162,6 +171,95 @@ Primary ingestion endpoint should be JSON-first:
 - optional legacy upload/OCR endpoints can remain, but should not be required
   for the new workflow
 
+## Expert Review Conversation Requirements
+
+The Expert Review Guide provides exact borrower-facing flow expectations for all
+six use cases. These should become deterministic conversation plans that the LOA
+agent follows; they should not be left to free-form prompting.
+
+Global requirements:
+
+- First borrower message confirms pre-loaded received data instead of asking for
+  rate, balance, or address from scratch.
+- Include a soft statement-recency ask using `statement.statementDate` or
+  `statement.statementDateRaw`: if the borrower has a newer statement, it helps,
+  but an older statement is not a referral trigger by itself.
+- State screening limitations clearly: no credit report is pulled, employment is
+  not automatically verified, appraisals are not ordered, FICO is
+  borrower-reported, property values are public-data estimates, and results are
+  preliminary.
+- Present property value and LTV range before document collection when available.
+- If LARS/referral is triggered, continue collecting remaining data and tell the
+  borrower at handoff that the LO will receive what was already collected so the
+  borrower does not repeat it.
+
+Use-case question order from Expert Review:
+
+- UC1 W2 rate-term:
+  1. confirm received rate/balance/address and soft statement recency
+  2. request 2 paystubs and 2 W-2s
+  3. ask employment tenure
+  4. ask if this is the only income source
+  5. ask FICO range
+  6. ask property type
+  7. request tax bill and insurance declaration for PITIA
+- UC2 PMI removal:
+  1. confirm received rate/balance/PMI and LTV position
+  2. confirm PMI amount/type, or ask if PMI is separate/built into rate if not visible
+  3. ask original purchase price and down payment
+  4. ask second-lien/HELOC question
+  5. continue UC1 income, FICO, property, tax, and insurance flow
+- UC3 self-employed:
+  1. confirm received mortgage/property data
+  2. request 2 years complete tax returns with schedules and current P&L
+  3. ask entity/filing type
+  4. ask stable/growing/declining business income trend
+  5. ask whether this is the only business
+  6. ask business operating history
+  7. ask FICO range
+  8. collect ID, tax bill, and insurance
+- UC4 gig worker:
+  1. confirm received mortgage/property data
+  2. ask platform names
+  3. ask platform tenure
+  4. ask whether this is the only income source
+  5. request 1099, tax returns/Schedule C, and platform dashboard export
+  6. ask FICO range
+  7. collect ID, tax bill, and insurance
+- UC5 VA IRRRL:
+  1. confirm received VA loan type, rate, and balance
+  2. present no-income/no-appraisal streamline framing
+  3. ask payments made/seasoning
+  4. ask rate-reduction-only vs cash-out
+  5. ask disability rating for funding fee waiver
+  6. request COE/electronic pull and ID
+  7. never ask for income, credit, property valuation, or appraisal for true IRRRL
+- UC6 W2 + rental:
+  1. confirm received primary-residence mortgage/property data
+  2. ask rental property count
+  3. ask occupied/signed lease
+  4. ask tenant relationship
+  5. ask rental ownership duration
+  6. ask rental PITIA or request rental mortgage statement
+  7. request Schedule E, lease, rental mortgage statement, and rental tax/insurance
+  8. continue UC1 W2 income, FICO, ID, primary tax, and insurance flow
+
+Special UC5 cash-out behavior:
+
+- If a VA borrower wants cash out, log U5.3 and refer because it is not an
+  IRRRL. The conversation may collect income, employment, and FICO after that
+  only as a handoff-preparation path for a human LO's VA cash-out/full-doc
+  review. This should be represented as a referred/rerouted path, not as normal
+  UC5 IRRRL automation.
+
+Human handoff requirements:
+
+- Handoff output must include `already_collected_do_not_reask`.
+- Handoff output must include `missing_data` scoped to the actual gap.
+- Handoff output must include factor-code-derived `human_action_items`.
+- Borrower-facing handoff message should explain that collected information is
+  being passed over so the borrower does not repeat it.
+
 ## Current Codebase Structure
 
 ```text
@@ -182,7 +280,9 @@ src/turborefi/
     Fixture runner for local regression and AgentOS runner workflows.
 
   prompts.py
-    LOA, verifier, and runner agent instructions.
+    LOA, verifier, and runner agent instructions. Target implementation should
+    remove verifier-specific prompt usage unless repurposed for Compliance
+    Agent/TCS.
 
   config.py
     Settings and runtime paths.
@@ -200,8 +300,8 @@ src/turborefi/
   services/
     session_service.py
       Main product orchestrator. Creates sessions from mortgage data, accepts
-      supporting docs, resolves intake messages, builds packets, verifies, saves
-      session state, and syncs Agno session state.
+      supporting docs, resolves intake messages, builds packets, saves session
+      state, and syncs Agno session state.
     session_state.py
       Infers income type/use case and refreshes current phase and missing docs.
     intake_service.py
@@ -212,9 +312,11 @@ src/turborefi/
       Deterministic recommendation packet construction. Currently calculates
       income, LTV, PMI savings, basic eligibility, citations, and reasoning.
     verification_service.py
-      Rebuilds the deterministic packet and compares fields.
+      Existing verifier-specific service. Not a target new-doc component; remove
+      or leave as migration-only test helper.
     compliance.py
-      Basic compliance score from verifier field matches.
+      Basic compliance score from verifier field matches. Target should become
+      TCS/compliance scoring.
     retrieval_service.py
       Adapter around `retrival/scripts/guide_tool.py`.
     retrieval_policy.py
@@ -247,7 +349,9 @@ src/turborefi/
     loan_officer.py
       Builds Agno LOA agent.
     verifier.py
-      Builds Agno verifier agent.
+      Builds current Agno verifier agent. Not in new docs; skip in target or
+      replace with a Compliance Agent only after Compliance Agent Architecture is
+      supplied.
     common.py
       Agno model/storage compatibility layer.
 
@@ -329,31 +433,66 @@ with tests:
 
 ### LARS Referral System
 
-The app must start at score 100, deduct factor weights, log events, keep
+The app must start at score 100, deduct factor weights only, cap at a floor of
+0, log immutable factor events, recalculate after every new data point, keep
 collecting data after RED, and produce auto/human referral decisions.
 
-The docs define baseline factors B1-B15 and use-case factors U1.1-U6.7.
+The Engineer Spec defines baseline factors B1-B15 and use-case factors
+U1.1-U6.7. LARS >= 70 means automated. LARS < 70 means human referral. A TCS
+compliance score below 60 overrides LARS and forces referral.
 
 Current app has no LARS model, no factor event schema, and no handoff package.
 
 ### State Machine
 
-The engineering spec references S0-S7 deterministic conversation states from a
-missing Engineer's Technical Spec v1. Because that document is unavailable, this
-implementation should introduce an internal state machine aligned to the data
-spec:
+Use the Engineer Spec S0-S7 state machine:
 
-- S0 received data loaded
-- S1 pre-conversation property/API checks complete
-- S2 use case identified
-- S3 intake questions pending
-- S4 required document collection pending
-- S5 deterministic calculation ready
-- S6 recommendation/handoff ready
-- S7 verified/audited
+- S0 INIT: classify use case and run OFAC screen
+- S1 IDENTITY: collect ID and verify name/DOB/SSN consistency
+- S2 DOCS: request documents per UC checklist and run OCR on uploads
+- S3 INCOME: extract income and ask clarifying questions
+- S4 CREDIT: ask for borrower-reported FICO range
+- S5 PROPERTY: collect address, use property values, calculate LTV range
+- S6 CALC: calculate DTI and run dual-GSE or VA eligibility
+- S7 DECISION: present automated result or generate handoff package
 
-The names can change after the missing spec is supplied, but the state machine
-should be explicit and testable.
+When `referral_triggered == true`, the system still continues through remaining
+states and defers borrower-facing referral messaging until data collection is
+substantially complete. UC5 skips income docs, income extraction, and credit
+states; entering those states for UC5 logs U5.5 as a system bug.
+
+### RAG Retrieval
+
+Use the existing deterministic retrieval implementation in `retrival/`, exposed
+through `retrival/scripts/guide_tool.py` and wrapped by
+`src/turborefi/services/retrieval_service.py` plus
+`src/turborefi/tools/guideline_tools.py`. Do not redesign the RAG substrate into
+a new vector store. The plan should build around `guide_tool` operations:
+
+- `list_contents`
+- `get_section`
+- `search_titles`
+- `get_section_with_references`
+
+The Engineer Spec gives exact FNMA/FHLMC section targets per use case. Retrieval
+tests should assert the deterministic guide traversal reaches those section
+families. FNMA and FHLMC must be queried and evaluated separately so rules from
+one GSE are never applied to the other.
+
+### Information Firewall
+
+The Engineer Spec requires a two-stream architecture:
+
+- LOA stream: tokenized borrower ID only, no borrower name or protected-class
+  fields in prompt context
+- Compliance stream: full borrower identity and protected-class fields for
+  fairness monitoring
+
+For the current localhost app, implement this as explicit serialization
+boundaries first. For production, enforce with separate DB/schema permissions,
+not application filtering alone. Property address may be available to the LOA
+for valuation and underwriting, but protected demographic fields must never be
+included in LOA prompts or LOA-visible session state.
 
 ## Keep, Refactor, Replace
 
@@ -379,8 +518,8 @@ should be explicit and testable.
   and should use a real use-case router.
 - `src/turborefi/rules/document_requirements.py` should become use-case-aware,
   not only income-type-aware.
-- `src/turborefi/services/verification_service.py` should independently
-  recalculate required outputs and compare LARS events, formulas, and citations.
+- `src/turborefi/services/compliance.py` should become the TCS/compliance
+  scoring service described by the new docs.
 - frontend types must support the expanded document list and LARS/referral data.
 
 ### Replace
@@ -391,7 +530,8 @@ should be explicit and testable.
 - current self-employed income calculation that averages net plus combined
   depreciation without trend/loss logic
 - current monthly savings proxy based on rate delta ratio
-- current verifier that simply rebuilds the same packet and compares a few fields
+- current verifier agent/service with Compliance Agent/TCS scope or remove it
+  from the target path
 
 ## Target Backend Structure
 
@@ -411,21 +551,25 @@ src/turborefi/
     packet.py
     lars.py
     handoff.py
-    verification.py
+    conversation.py
+    firewall.py
+    compliance.py
 
   services/
     session_service.py
     state_machine.py
     use_case_router.py
+    conversation_flows.py
     received_input.py
+    information_firewall.py
     property_valuation.py
     intake_service.py
     packet_builder.py
-    verification_service.py
     compliance.py
     audit_log.py
     retrieval_service.py
     retrieval_policy.py
+    rag_validation.py
     guideline_research.py
     guide_traversal.py
 
@@ -445,6 +589,8 @@ src/turborefi/
   rules/
     document_requirements.py
     lars_factors.py
+    handoff_actions.py
+    conversation_requirements.py
     use_case_requirements.py
     guideline_map.py
 
@@ -463,7 +609,7 @@ src/turborefi/
 
   agents/
     loan_officer.py
-    verifier.py
+    compliance.py
     common.py
 ```
 
@@ -668,21 +814,33 @@ Models:
   - trigger_summary
   - severity
 - `LarsEvent`
-  - code
-  - label
-  - deduction
-  - triggered
-  - inputs
-  - explanation
-  - data_category
-  - source_fields
-  - created_at
+  - `factor_code`
+  - `factor_name`
+  - `condition_met`
+  - `deduction`
+  - `data`
+  - `timestamp`
+  - `score_after`
+  - `hard_red`
 - `LarsScore`
   - starting_score = 100
   - events
   - final_score
   - decision: `AUTO` if final_score >= 70 else `REFER`
+  - `referral_triggered`
   - referral_reasons
+  - `tcs_override`
+
+Rules:
+
+- deductions only; never add points back
+- cap final score at a floor of 0
+- recalculate after every new document, borrower answer, or API/received-data
+  update
+- append immutable factor events; do not update/delete old events
+- set `referral_triggered = true` when score falls below 70, but continue
+  collecting remaining data
+- force referral if TCS/compliance score is below 60
 
 ### `src/turborefi/schemas/handoff.py`
 
@@ -693,15 +851,79 @@ Model:
 
 - `HumanHandoffPackage`
   - borrower_id
-  - session_id
   - use_case
-  - final_lars_score
+  - lars_score
   - lars_events
   - referral_reasons
+  - tcs_score
+  - already_collected_do_not_reask
   - collected_data
+  - collected_data.income
+  - collected_data.property
+  - collected_data.credit
+  - collected_data.docs
   - missing_data
   - human_action_items
-  - generated_at
+  - conversation_transcript
+  - gse_analysis
+
+Notes:
+
+- `borrower_id` should contain the tokenized LOA ID; human/compliance stream may
+  resolve full name through the compliance-authorized lookup.
+- `human_action_items` are generated from factor-code mappings.
+- `already_collected_do_not_reask` should be rendered prominently in the human
+  LO interface to avoid borrower repetition.
+
+### `src/turborefi/schemas/conversation.py`
+
+Purpose: model deterministic borrower-facing conversation plans from the Expert
+Review Guide.
+
+Models:
+
+- `ConversationStep`
+  - state
+  - use_case
+  - prompt_key
+  - required_before_step
+  - fields_collected
+  - documents_requested
+  - lars_factors_evaluated
+  - referral_behavior
+- `ConversationPlan`
+  - use_case
+  - opening_template
+  - steps
+  - preliminary_result_template
+  - handoff_template
+- `BorrowerFacingLimitation`
+  - no_credit_pull
+  - no_employment_auto_verification
+  - no_appraisal_ordered
+  - fico_is_borrower_reported
+  - property_values_are_estimates
+
+### `src/turborefi/schemas/firewall.py`
+
+Purpose: model LOA-safe and compliance-safe views of a session.
+
+Models:
+
+- `BorrowerToken`
+  - tokenized_id
+  - hash_algorithm
+  - salt_version
+- `LoaVisibleSession`
+  - tokenized borrower ID
+  - underwriting fields only
+  - no borrower name
+  - no protected-class fields
+- `ComplianceVisibleSession`
+  - full borrower identity
+  - underwriting fields
+  - protected-class fields when provided
+  - fairness-monitoring fields such as census tract
 
 ### `src/turborefi/schemas/packet.py`
 
@@ -736,16 +958,18 @@ Purpose: update `SessionState`.
 Fields:
 
 - `state_machine_state`: S0-S7
+- `borrower_token`
 - `received`
 - `uploaded`
 - `calculated`
 - `documents`
 - `borrower_answers`
 - `lars_score`
+- `referral_triggered`
 - `handoff_package`
 - `current_phase` for backward-compatible frontend display
 - `loa_output`
-- `verifier_output`
+- `compliance_output`
 - `retrieval_events`
 - `tool_calls`
 - `conversation`
@@ -984,11 +1208,26 @@ Implementation notes:
 
 - Keep factor definitions declarative.
 - Trigger functions should be simple and directly tied to calculator outputs.
+- Use the exact Engineer Spec deductions and conditions, including:
+  - U1.3 multiple employers
+  - U2.4 purchase price unknown
+  - U3.4 entity changed
+  - U3.5 large one-time deduction
+  - U3.7 P&L deviation
+  - U4.4 platform 12-23 months
+  - U5.5 unnecessary docs requested as a system bug
+  - U6.3 multiple rentals
+  - U6.5 rental less than 2 years owned
 - Every LARS event should include input values for auditability.
 - Missing-doc B5 is per missing required doc.
 - B4 should be triggered by explicit uncertainty in borrower answers, not by
   parser failure alone.
 - B7 should use OCR confidence when the extraction service provides it.
+- B13 OFAC belongs in S0, B14 identity mismatch in S1, and B15 DTI in S6.
+- LARS events are append-only. Recalculation may add a new event snapshot, but
+  it must not mutate prior audit events.
+- Add a TCS/compliance override path: if TCS < 60, final decision is referral
+  regardless of LARS.
 
 ### `src/turborefi/rules/use_case_requirements.py`
 
@@ -1006,24 +1245,60 @@ Content:
 This should replace scattered logic in `document_requirements.py`,
 `session_state.py`, and `packet_builder.py`.
 
+### `src/turborefi/rules/conversation_requirements.py`
+
+Purpose: encode the Expert Review Guide's exact question order and document
+request order by use case.
+
+Content:
+
+- opening confirmation templates that use received rate, balance, address,
+  statement date, property value range, LTV range, PMI, and VA loan type when
+  available
+- ordered question lists for UC1-UC6
+- ordered document request lists for UC1-UC6
+- borrower-facing preliminary result templates
+- referral message templates that avoid asking the borrower to repeat collected
+  information
+- UC5 cash-out reroute/referral conversation path
+
+### `src/turborefi/rules/handoff_actions.py`
+
+Purpose: map LARS factor codes and referral scenarios to LO action items from
+the Expert Review Guide.
+
+Examples:
+
+- B5 missing W-2: help borrower locate W-2s, order VOE if unavailable, verify
+  via IRS transcripts if needed
+- B4 uncertain income: verify income history and request LOE where appropriate
+- U2.1 LTV straddles 75: order formal appraisal and evaluate PMI alternatives
+- U3.1 declining self-employed income: evaluate temporary vs. continuing decline,
+  request LOE, use lower-year income if required
+- U4.6 1099/Schedule C mismatch: reconcile discrepancy and determine platform
+  aggregation treatment
+- U5.3 cash-out requested: transition to VA cash-out/full-documentation pathway
+- U6.7 rental PITIA unknown: obtain rental mortgage statement before final DTI
+
 ### `src/turborefi/rules/document_requirements.py`
 
 Purpose: update from income-type requirements to use-case-aware requirements.
 
 Requirements from the new docs:
 
-- UC1: mortgage statement, property APIs, 2 paystubs, 2 W-2s, tax bill,
+- UC1: received JSON/property values, 2 paystubs, 2 W-2s, tax bill,
   insurance declaration, ID
-- UC2: UC1 docs plus PMI statement/PMI type, purchase price, down payment,
-  second-lien answer
-- UC3: mortgage statement, property APIs, 2 years tax returns/Schedule C, P&L,
-  tax bill, insurance, ID
-- UC4: mortgage statement, property APIs, 1099, tax returns/Schedule C, platform
+- UC2: UC1 docs plus PMI statement only if PMI is not visible in received JSON,
+  PMI type, purchase price, down payment, second-lien answer, original closing
+  disclosure/HUD-1 if available
+- UC3: received JSON/property values, 2 years tax returns/Schedule C, P&L,
+  tax bill, insurance, ID, business license or CPA letter as helpful/supporting
+- UC4: received JSON/property values, 1099, tax returns/Schedule C, platform
   dashboard, tax bill, insurance, ID
-- UC5: mortgage statement showing/confirming VA, COE/electronic pull, ID, verbal
+- UC5: received JSON showing/confirming VA, COE/electronic pull, ID, verbal
   VA answers; no income docs, no credit, no property value APIs
 - UC6: UC1 docs plus Schedule E, lease, rental mortgage statement, rental tax and
-  insurance, rental verbal answers
+  insurance, property management statements if applicable, rental verbal answers
 
 Output:
 
@@ -1088,6 +1363,32 @@ Validation/warning rules:
 - If loan type is `fha`, keep it as received data but route according to the
   current use-case router unless FHA-specific requirements are later supplied.
 
+### `src/turborefi/services/information_firewall.py`
+
+Purpose: enforce LOA/compliance stream separation before data reaches prompts,
+tools, packets, or logs.
+
+Functions:
+
+- `tokenize_borrower(name: str, salt: str) -> BorrowerToken`
+- `build_loa_visible_session(state) -> LoaVisibleSession`
+- `build_compliance_visible_session(state) -> ComplianceVisibleSession`
+- `assert_no_protected_fields(payload) -> None`
+- `redact_for_loa_prompt(payload) -> dict`
+
+Rules:
+
+- LOA prompt context gets tokenized ID only, not borrower name.
+- LOA prompt context must exclude race, ethnicity, sex, age, marital status,
+  national origin, language, disability status, and borrower name.
+- Property address may remain in LOA context because it is needed for valuation
+  and underwriting.
+- Compliance context may include full identity and protected-class fields for
+  fairness monitoring.
+- Local JSON storage can keep both streams during development, but the serializer
+  boundary must make the separation explicit now. Production should move to
+  separate DB/schema permissions.
+
 ### `src/turborefi/services/property_valuation.py`
 
 Purpose: encapsulate property API lookup and deterministic range calculations.
@@ -1124,7 +1425,7 @@ Purpose: deterministic use-case detection.
 
 Inputs:
 
-- loan type detected from mortgage statement
+- loan type detected from received JSON
 - pmi line item
 - borrower income type answer
 - borrower rental answers
@@ -1154,14 +1455,35 @@ Purpose: explicit deterministic workflow transitions.
 
 States:
 
-- `S0_RECEIVED_LOADED`
-- `S1_PRECHECK_COMPLETE`
-- `S2_USE_CASE_IDENTIFIED`
-- `S3_INTAKE_PENDING`
-- `S4_DOC_COLLECTION_PENDING`
-- `S5_CALCULATION_READY`
-- `S6_RECOMMENDATION_READY`
-- `S7_VERIFIED`
+- `S0_INIT`
+  - classify use case
+  - run OFAC screen
+  - evaluate B13
+- `S1_IDENTITY`
+  - collect/verify ID
+  - evaluate B14
+- `S2_DOCS`
+  - request documents per UC checklist
+  - run OCR on uploads
+  - evaluate B5 and B7
+- `S3_INCOME`
+  - extract income
+  - ask clarifying questions
+  - evaluate B4, B6, and UC-specific income factors
+- `S4_CREDIT`
+  - ask for borrower-reported FICO range
+  - evaluate B1, B2, B3
+- `S5_PROPERTY`
+  - collect/use address and property values
+  - calculate LTV range
+  - evaluate B10, B11, B12
+- `S6_CALC`
+  - calculate DTI
+  - run dual-GSE eligibility or VA path
+  - evaluate B15
+- `S7_DECISION`
+  - if LARS >= 70 and TCS >= 60, present automated screening result
+  - if LARS < 70 or TCS < 60, generate handoff package
 
 Functions:
 
@@ -1169,15 +1491,24 @@ Functions:
 - `missing_inputs_for_state(session_state)`
 - `can_calculate(session_state)`
 - `should_continue_collecting_after_referral(session_state)`
+- `states_to_skip_for_use_case(use_case)`
+- `log_system_bug_if_forbidden_state_entered(state, use_case)`
 
 Frontend mapping:
 
-- S0/S1 -> `extraction`
-- S2/S3 -> `awaiting_intake`
-- S4 -> `awaiting_docs`
-- S5 -> `assessment`
-- S6 -> `complete`
-- S7 -> `verified`
+- S0/S1 -> `intake`
+- S2 -> `awaiting_docs`
+- S3/S4/S5 -> `awaiting_intake`
+- S6 -> `assessment`
+- S7 -> `complete` or `handoff`
+
+Rules:
+
+- `referral_triggered` does not stop state progression.
+- Referral is communicated to the borrower only at S7 or when data collection is
+  substantially complete.
+- UC5 skips income docs, income extraction, and credit states. If the system
+  requests income, credit, or appraisal for UC5, log U5.5.
 
 ### `src/turborefi/services/packet_builder.py`
 
@@ -1188,14 +1519,16 @@ Flow:
 1. Validate required inputs for current use case.
 2. Run all applicable calculators.
 3. Evaluate LARS factors.
-4. Retrieve required guideline citations.
+4. Retrieve required guideline citations through the existing deterministic
+   `guide_tool` path.
 5. Build pathway results:
    - FNMA/FHLMC for UC1, UC2, UC3, UC4, UC6
    - VA for UC5
    - both FNMA and FHLMC rental treatment for UC6
 6. Build documentation status.
-7. Build handoff package if LARS <70 or hard-fail conditions apply.
-8. Return `PacketBuildResult`.
+7. Apply TCS/compliance override if score is below 60.
+8. Build handoff package if LARS <70, TCS <60, or hard-fail conditions apply.
+9. Return `PacketBuildResult`.
 
 Do not:
 
@@ -1204,29 +1537,25 @@ Do not:
 - collapse FNMA/FHLMC rental results into one number
 - silently skip unavailable required fields
 
-### `src/turborefi/services/verification_service.py`
+### `src/turborefi/services/compliance.py`
 
-Purpose after refactor: independent deterministic audit.
+Purpose after refactor: compute the TCS/compliance score, support the Compliance
+Agent stream, and produce audit data required by the new docs.
+
+This replaces the current verifier-agent target. It may reuse deterministic
+recalculation helpers internally, but the product component should be named and
+shaped as Compliance/TCS, not Verifier.
 
 Flow:
 
-1. Take raw received/uploaded data and LOA packet.
-2. Re-run every applicable calculator.
-3. Re-run LARS factor evaluation.
-4. Re-run document checklist.
-5. Re-run guideline focus retrieval.
-6. Compare:
-   - calculated fields
-   - LARS events and final score
-   - referral decision
-   - recommended pathway
-   - document status
-   - citations
-7. Produce `VerificationReport` with mismatches and compliance score.
-
-### `src/turborefi/services/compliance.py`
-
-Purpose after refactor: score more than field equality.
+1. Consume the compliance-visible session view.
+2. Re-run or inspect deterministic calculated outputs needed for TCS.
+3. Re-run LARS factor evaluation or validate stored immutable LARS events.
+4. Re-run document checklist completeness.
+5. Re-run deterministic `guide_tool` retrieval target validation for audit.
+6. Compute TCS and override referral when TCS < 60.
+7. Produce `ComplianceReport` with TCS score, fairness/audit notes, target
+   validation, and override decision.
 
 Components:
 
@@ -1236,8 +1565,13 @@ Components:
 - LARS/Referral Accuracy
 - Audit Trail Integrity
 
+Rules:
+
+- TCS < 60 is RED and forces human referral regardless of LARS.
+- Fairness monitoring requires the compliance stream, not the LOA stream.
+
 Later when missing Compliance Agent Architecture doc is available, extend this
-with TCS scoring, fairness monitors, streaming regression, and CUSUM charts.
+with detailed fairness monitors, streaming regression, and CUSUM charts.
 
 ### `src/turborefi/extraction/prompts.py`
 
@@ -1340,6 +1674,33 @@ Changes:
 - route JSON payloads through the same session update path as uploads
 - only build final packet when required data is complete enough for that UC
 - expose LARS/tool traces to frontend messages
+- use `conversation_flows.py` to choose the next borrower-facing question or
+  document request rather than letting the LOA improvise the order
+
+### `src/turborefi/services/conversation_flows.py`
+
+Purpose: turn Expert Review Guide flows into deterministic next-step logic.
+
+Functions:
+
+- `conversation_plan_for_use_case(use_case) -> ConversationPlan`
+- `next_conversation_step(state) -> ConversationStep`
+- `build_opening_message(state) -> str`
+- `build_document_request(state, step) -> str`
+- `build_preliminary_result_message(packet) -> str`
+- `build_handoff_message(handoff_package) -> str`
+- `build_uc5_cash_out_reroute_message(state) -> str`
+
+Rules:
+
+- Never ask for rate, balance, or address when they are already present in
+  received JSON; confirm them instead.
+- Include statement recency as a soft ask, not a hard requirement.
+- Include preliminary-screening limitations in borrower-facing copy.
+- If referral is triggered early, continue the Expert Review question sequence
+  and delay final handoff messaging until the case is substantially complete.
+- For UC5 IRRRL, do not ask income, credit, or appraisal questions unless the
+  borrower requests cash out and the flow has already become referred/rerouted.
 
 ### `src/turborefi/services/intake_service.py`
 
@@ -1381,13 +1742,53 @@ Changes:
 
 Changes:
 
+- build on the existing deterministic `guide_tool` flow, not a new RAG/vector
+  stack
 - define retrieval focuses per use case and calculation category
+- store exact target section families from Engineer Spec:
+  - UC1 W2 income: FNMA B3-3.1, FHLMC Ch.5302
+  - UC1 LTV/refi limits: FNMA B2-1.3, FHLMC Refi Possible
+  - UC1 DTI: FNMA B3-6, FHLMC Ch.5401
+  - UC1 Credit: FNMA B3-5.1, FHLMC Ch.5201
+  - UC2 PMI: FNMA B7-1, FHLMC Ch.4701
+  - UC2 appraisal/valuation: FNMA B4-1.3, FHLMC ACE waiver rules
+  - UC3 self-employed income: FNMA B3-3.2, FHLMC Ch.5303
+  - UC3 add-backs: FNMA B3-3.2 subsection, FHLMC 5303.1(c)(i)
+  - UC4 gig/rideshare exception: FNMA SEL-2025-01, no FHLMC equivalent
+  - UC4 self-employed baseline: FNMA B3-3.2, FHLMC Ch.5303
+  - UC6 rental income: FNMA B3-3.5, FHLMC Ch.5305
+  - UC6 W2 income: FNMA B3-3.1, FHLMC Ch.5302
+- run FNMA and FHLMC retrieval as separate calls or with explicit `gse`
+  metadata; never merge section evidence before pathway evaluation
+- validation should accept descendant/leaf section IDs under the target family
+  when `guide_tool` returns leaf sections, for example B3-3.1-01 can satisfy
+  target family B3-3.1
 - UC5 should retrieve VA references only if available; current retrieval backend
   may only contain FNMA/FHLMC, so build this with graceful unavailable-source
   results
 - UC6 should retrieve both FNMA B3-3.5 and FHLMC Chapter 5305 support
 - UC4 should retrieve FNMA SEL-2025-01 if available; otherwise log missing
   source and cite fallback B3-3.2 only where appropriate
+
+### `src/turborefi/services/rag_validation.py`
+
+Purpose: test and audit deterministic `guide_tool` retrieval accuracy.
+
+Functions:
+
+- `expected_sections_for_use_case(use_case) -> list[RetrievalTarget]`
+- `validate_retrieval_targets(use_case, retrieval_events) -> RetrievalValidationReport`
+- `log_top_k_for_query(use_case, focus_key, gse, query, k=5)`
+
+Rules:
+
+- For each use case/focus, top retrieved sections must include the Engineer Spec
+  target section family.
+- If UC1 W2 income retrieves self-employed B3-3.2 instead of B3-3.1, mark it as
+  retrieval failure.
+- UC4 must explicitly report whether SEL-2025-01 is present in the local corpus.
+- UC5 must suppress FNMA/FHLMC retrieval for VA eligibility and log VA knowledge
+  source unavailable unless a VA corpus is added.
 
 ### `src/turborefi/tools/calculators.py`
 
@@ -1433,18 +1834,28 @@ Changes:
 Update LOA instructions:
 
 - explicitly state RECEIVED/UPLOADED/CALCULATED taxonomy
+- use only LOA-visible/tokenized session state; never request or expose
+  protected-class fields or borrower name in LOA context
+- follow the deterministic Expert Review conversation plan for question order
+  and document request order
+- confirm pre-loaded rate, balance, address, PMI, property value range, and VA
+  loan type when present; do not ask for them from scratch
+- include statement-recency soft ask and preliminary-screening limitations in
+  the opening flow
 - CALCULATED values must only come from tool outputs
 - LARS score must only come from LARS tool/service
 - after LARS RED, continue collecting required docs unless the state machine says stop
+- use deterministic `guide_tool` wrappers for FNMA/FHLMC citations and keep GSE
+  pathways separate
 - UC5 must not request income, credit, or LTV/property valuation
 - UC6 must present FNMA and FHLMC rental calculations separately
 - all borrower-facing claims involving FICO must say borrower-reported range
 
-Update verifier instructions:
+Compliance Agent note:
 
-- independently rerun calculators and LARS
-- compare UC6 dual-path rental outputs
-- flag forbidden UC5 data requests
+- Do not keep a separate Verifier Agent in the target plan. If/when the
+  Compliance Agent Architecture doc is available, add a Compliance Agent that
+  consumes compliance-visible session state and TCS/fairness data.
 
 ### `frontend/src/types/turborefi.ts`
 
@@ -1455,10 +1866,11 @@ Changes:
   - LARS score
   - LARS event
   - handoff package
+  - already collected/do-not-reask handoff data
   - calculated outputs summary
   - use case
   - referral decision
-  - verification report
+  - compliance/TCS report
 
 ### `frontend/src/api/turborefi.ts`
 
@@ -1466,7 +1878,7 @@ Changes:
 
 - add JSON session/document endpoints
 - allow all new document types
-- fetch verification/handoff data if displayed separately
+- fetch compliance/handoff data if displayed separately
 
 ### `frontend/src/hooks/useTurboRefiSession.ts`
 
@@ -1474,7 +1886,7 @@ Changes:
 
 - update document labels
 - store LARS score/referral/handoff data
-- support JSON input path if the app starts from structured mortgage statement JSON
+- support JSON input path if the app starts from upstream received JSON
 - show new tool traces from calculator/LARS services
 
 ### `frontend/src/store.ts`
@@ -1488,8 +1900,9 @@ Changes:
   - `referralDecision`
   - `referralReasons`
   - `handoffPackage`
+  - `alreadyCollectedDoNotReask`
   - `calculatedOutputs`
-  - `verificationReport`
+  - `complianceReport`
 
 ## Implementation Phases
 
@@ -1537,6 +1950,7 @@ Tasks:
 
 - expand use cases and document models
 - add `ReceivedInputPayload` and received JSON adapter models
+- add LOA/compliance view schemas and borrower token model
 - update extraction prompts and normalizers
 - update `DocumentSet`
 - update document requirements by use case
@@ -1546,14 +1960,18 @@ Deliverables:
 
 - app can load the exact `example_json_inputs/` payloads
 - app can store all UC1-UC6 uploaded fields
+- LOA-visible serialization excludes borrower name and protected fields
 - document checklist tests pass
 
-### Phase 3: LARS Engine
+### Phase 3: Information Firewall and LARS Engine
 
-Goal: implement referral scoring as a deterministic service.
+Goal: implement LOA/compliance stream boundaries and referral scoring as
+deterministic services.
 
 Tasks:
 
+- create `schemas/firewall.py`
+- create `services/information_firewall.py`
 - create `rules/lars_factors.py`
 - create `schemas/lars.py`
 - create evaluator functions for base and use-case factors
@@ -1562,8 +1980,10 @@ Tasks:
 
 Deliverables:
 
+- LOA prompt/session context uses tokenized ID and excludes protected fields
 - LARS starts at 100 and deducts correct factors
 - LARS <70 produces `REFER`
+- TCS <60 forces referral even when LARS >=70
 - handoff package is generated
 - Test Case 4 scores according to the corrected expected result
 
@@ -1573,26 +1993,35 @@ flag the doc mismatch.
 
 ### Phase 4: State Machine and Use-Case Router
 
-Goal: replace implicit UC1-UC3 inference with deterministic routing and state.
+Goal: replace implicit UC1-UC3 inference with deterministic routing, state, and
+Expert Review conversation ordering.
 
 Tasks:
 
 - create `state_machine.py`
 - create `use_case_router.py`
+- create `schemas/conversation.py`
+- create `rules/conversation_requirements.py`
+- create `services/conversation_flows.py`
+- create `rules/handoff_actions.py`
 - update `session_state.py`
 - update `session_service.py` to transition through S0-S7
 - make UC5 skip property valuation and income requests
+- add UC5 cash-out referred/rerouted path
 - continue document collection after referral
 
 Deliverables:
 
 - session phase behavior is deterministic
+- next borrower question follows Expert Review order
+- handoff includes already-collected/do-not-reask and factor-derived LO actions
 - route tests cover all six use cases
 - UC5 forbidden-doc guard is tested
 
-### Phase 5: Packet Builder and Verification Refactor
+### Phase 5: Packet Builder and Compliance/TCS Refactor
 
-Goal: produce the new recommendation packet and independent verification.
+Goal: produce the new recommendation packet and doc-aligned Compliance/TCS
+output.
 
 Tasks:
 
@@ -1600,14 +2029,14 @@ Tasks:
 - update `build_deterministic_loan_packet`
 - build all use-case-specific calculated output groups
 - add dual FNMA/FHLMC UC6 pathway output
-- update verifier comparisons
-- update compliance score components
+- replace verifier comparisons with compliance/TCS report generation
+- update compliance score components and TCS override handling
 
 Deliverables:
 
 - recommendation packet includes received/uploaded/calculated/LARS/handoff data
-- verifier catches calculation/LARS mismatches
-- compliance score reflects calculation, guideline, docs, LARS, and audit trail
+- compliance report reflects calculation, guideline, docs, LARS, TCS, and audit trail
+- TCS <60 forces referral in packet and handoff output
 
 ### Phase 6: Extraction and API Expansion
 
@@ -1638,6 +2067,7 @@ Tasks:
 - show use case and state
 - show LARS score/referral decision
 - show missing docs and handoff reasons
+- show already-collected/do-not-reask handoff data for LO view
 - show calculated outputs in result drawer/detail view
 - keep chat flow unchanged where possible
 
@@ -1648,11 +2078,12 @@ Deliverables:
 
 ### Phase 8: Guideline Retrieval Expansion
 
-Goal: align retrieval focuses with all six use cases.
+Goal: align deterministic `guide_tool` retrieval focuses with all six use cases.
 
 Tasks:
 
-- expand retrieval policies
+- expand retrieval policies around existing `guide_tool`
+- add retrieval target validation from Engineer Spec
 - add fake retrieval coverage for tests
 - map required sections for UC4/UC5/UC6 as available
 - gracefully report missing VA/SEL sources
@@ -1662,6 +2093,8 @@ Tasks:
 Deliverables:
 
 - citations are present for available FNMA/FHLMC sections
+- FNMA and FHLMC retrieval events remain separated by `gse`
+- retrieval validation reports target-section hits/misses
 - missing guideline source is explicit, not silently ignored
 
 ## Testing Plan
@@ -1671,6 +2104,7 @@ Deliverables:
 Add tests:
 
 - `tests/test_received_input.py`
+- `tests/test_information_firewall.py`
 - `tests/test_income_calculations.py`
 - `tests/test_variable_income_calculations.py`
 - `tests/test_self_employed_calculations.py`
@@ -1684,6 +2118,9 @@ Add tests:
 - `tests/test_lars_factors.py`
 - `tests/test_use_case_router.py`
 - `tests/test_state_machine.py`
+- `tests/test_conversation_flows.py`
+- `tests/test_handoff_actions.py`
+- `tests/test_rag_validation.py`
 
 ### Integration Tests
 
@@ -1699,16 +2136,21 @@ Update/add:
 - `tests/test_session_service.py`
   - JSON mortgage statement start path
   - continue collecting after LARS RED
+  - next question follows Expert Review order
   - UC5 forbidden docs not requested
+  - UC5 cash-out reroutes to referred/full-doc handoff collection
   - handoff package generated
+  - handoff package includes already-collected/do-not-reask
 - `tests/test_api.py`
   - `/session/from-json` creates a session from each `example_json_inputs/` file
   - expanded upload types
   - JSON endpoints
   - status includes LARS/referral fields
-- `tests/test_verification_service.py`
-  - verifier catches modified calculator output
-  - verifier catches modified LARS score
+- `tests/test_compliance_service.py`
+  - TCS below 60 forces referral
+  - compliance report includes LARS, retrieval-target, documentation, and audit data
+- `tests/test_retrieval_service.py`
+  - Engineer Spec target-section validation for FNMA/FHLMC through guide_tool
 - `tests/test_extraction_service.py`
   - document type inference for Schedule E, 1099, lease, tax bill, insurance, VA
 
@@ -1750,24 +2192,30 @@ data/mock_cases/new_docs/
 - updating session state transitions without breaking the current frontend
 - keeping Agno session-state sync compatible with expanded state payloads
 - retrieval availability for all required guideline sections
+- implementing the information firewall cleanly while still supporting localhost
+  JSON session storage
+- keeping the Expert Review conversation order deterministic while still allowing
+  borrower corrections and reroutes
 
 ### High Risk
 
 - real property valuation API integration
 - OCR confidence and field confidence if the extractor cannot provide reliable confidence
 - UC5 VA guideline retrieval if local VA guide source is absent
-- exact compliance architecture because referenced compliance docs are missing
-- exact S0-S7 behavior because referenced Engineer's Technical Spec v1 is missing
+- UC4 SEL-2025-01 retrieval if the announcement is not in the local corpus
+- detailed compliance/fairness architecture because Compliance Agent Architecture
+  is still missing
 
 ## Recommended Delivery Order
 
 1. Build calculators and tests first.
 2. Add schemas/document requirements and JSON input support.
-3. Add LARS scoring and handoff package.
-4. Add state machine/use-case router.
-5. Refactor packet builder and verifier.
+3. Add information firewall, LARS scoring, and handoff package.
+4. Add Engineer Spec state machine, use-case router, and Expert Review
+   conversation flows.
+5. Refactor packet builder and compliance/TCS output.
 6. Expand extraction/API/frontend.
-7. Expand retrieval focuses.
+7. Expand and validate deterministic guide_tool retrieval focuses.
 
 This order keeps most work deterministic and testable before touching the
 conversation/UI layer.
@@ -1777,13 +2225,21 @@ conversation/UI layer.
 The app should be modified, not rewritten. The current architecture is a good
 host for the new system, but the domain implementation is too narrow and should
 be reworked around the new taxonomy, six use cases, formula package, LARS engine,
-and explicit state machine.
+Engineer Spec state machine, information firewall, and deterministic guide_tool
+retrieval targets. The Expert Review Guide adds a deterministic borrower
+conversation layer and LO handoff-action layer that should be implemented as
+rules/services, not only prompt text.
 
 After reviewing `example_json_inputs/`, the first implementation should be
 JSON-first. Mortgage statement extraction should not be built as a required
 step. Instead, add a received-input adapter that accepts the upstream
 `core/profile/statement/raw/formDecisions/propertyLookup` payload and starts the
 workflow from that normalized received data.
+
+For RAG, build around the existing deterministic FNMA/FHLMC retrieval layer
+provided through `guide_tool`. Do not introduce a separate retrieval framework
+unless the local corpus later needs VA or SEL announcement sources that
+`guide_tool` cannot represent.
 
 Expected effort is a moderate-to-large refactor:
 
@@ -1792,5 +2248,5 @@ Expected effort is a moderate-to-large refactor:
 - add broad test coverage before changing the session flow
 
 The most important engineering rule is to move all calculations and referral
-decisions into deterministic, unit-tested services before letting the LOA or
-Verifier agents summarize anything.
+decisions into deterministic, unit-tested services before letting the LOA or any
+future Compliance Agent summarize anything.
