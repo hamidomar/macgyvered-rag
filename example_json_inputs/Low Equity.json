@@ -1,0 +1,145 @@
+{
+  "core": {
+    "balance": 278450.12,
+    "rate": 6.875,
+    "monthlyPayment": 2456.78,
+    "paymentBreakdown": {
+      "principal": 862.11,
+      "interest": 1594.67,
+      "escrow": 548.33,
+      "pmi": 195.22,
+      "other": null
+    },
+    "loanNumber": "MC-44820193",
+    "propertyAddress": "1847 Ridgeview Dr, Uniontown, OH 44685",
+    "servicer": "Mr. Cooper",
+    "loanType": "conventional",
+    "rateType": "fixed",
+    "originationDate": "2024-03-20",
+    "maturityDate": "2054-04-01",
+    "loanTermYears": 30,
+    "originalLoanAmount": 290000,
+    "armResetDate": null,
+    "propertyValue": null,
+    "propertyData": {
+      "estimatedValue": null,
+      "purchasePrice": null,
+      "purchaseDate": null,
+      "propertyType": null,
+      "county": null
+    }
+  },
+  "profile": {
+    "pmiStatus": "yes"
+  },
+  "statement": {
+    "statementDate": "01/2025",
+    "statementDateRaw": "2025-01-10",
+    "escrowBalance": 2876.44,
+    "pastDue": 0,
+    "feesAndCharges": 0,
+    "ytdPrincipal": null,
+    "ytdInterest": null,
+    "ytdEscrow": null,
+    "unappliedBalance": 0,
+    "borrowerName": "Sarah Thompson",
+    "borrowerAddress": "1847 Ridgeview Dr, Uniontown, OH 44685",
+    "paymentDueDate": "2025-02-01"
+  },
+  "raw": {
+    "core": {
+      "balance": 278450.12,
+      "rate": 6.875,
+      "monthly_payment": 2456.78,
+      "principal": 862.11,
+      "interest": 1594.67,
+      "escrow": 548.33,
+      "pmi": 195.22,
+      "other_charges": null,
+      "loan_number": "MC-44820193",
+      "property_address": "1847 Ridgeview Dr, Uniontown, OH 44685"
+    },
+    "profile": {
+      "servicer": "Mr. Cooper",
+      "loan_type": "conventional",
+      "rate_type": "fixed",
+      "origination_date": "2024-03-20",
+      "maturity_date": "2054-04-01",
+      "loan_term_years": 30,
+      "original_loan_amount": 290000
+    },
+    "statement": {
+      "statement_date": "2025-01-10",
+      "payment_due_date": "2025-02-01",
+      "escrow_balance": 2876.44,
+      "past_due": 0,
+      "fees_and_charges": 0,
+      "ytd_principal": null,
+      "ytd_interest": null,
+      "ytd_escrow": null,
+      "unapplied_balance": 0,
+      "borrower_name": "Sarah Thompson",
+      "borrower_address": "1847 Ridgeview Dr, Uniontown, OH 44685"
+    },
+    "extra": {
+      "customer_service_phone": "1-888-480-2432",
+      "nmls_number": "642669",
+      "statement_note": "This statement is provided for informational purposes. Please contact us with any questions."
+    }
+  },
+  "formDecisions": {
+    "loanType": "conventional",
+    "rateType": "fixed",
+    "loanMonth": "03",
+    "loanYear": "2024",
+    "yearsRemaining": "29",
+    "interestRate": "6.875",
+    "remainingBalance": "278450",
+    "monthlyPayment": "2456",
+    "paymentIncludesEscrow": "yes",
+    "escrowAmount": "548",
+    "paymentIncludesPmi": "yes",
+    "pmiStatus": "yes",
+    "pmiAmount": "195",
+    "armResetMonth": "",
+    "armResetYear": "",
+    "reasoning": {
+      "loanType": "Profile explicitly says conventional.",
+      "rateType": "Profile explicitly says fixed, and there is no ARM/adjustable language.",
+      "loanMonth": "Origination date is 2024-03-20, so month is 03.",
+      "loanYear": "Origination date is 2024-03-20, so year is 2024.",
+      "yearsRemaining": "Maturity date is 2054-04-01. As of 2026-04-05, that is about 28 years 11 months remaining, which rounds to 29 years.",
+      "interestRate": "Core rate is 6.875.",
+      "remainingBalance": "Core balance is 278450.12, rounded to digits only as 278450.",
+      "monthlyPayment": "Core monthly payment is 2456.78, rounded to digits only as 2456.",
+      "paymentIncludesEscrow": "Payment breakdown includes an escrow line item of 548.33, so escrow is included.",
+      "escrowAmount": "Escrow line item is 548.33, rounded to 548.",
+      "paymentIncludesPmi": "Payment breakdown includes PMI of 195.22, so PMI is included.",
+      "pmiStatus": "PMI is explicitly listed in the payment breakdown, so borrower pays mortgage insurance.",
+      "pmiAmount": "PMI line item is 195.22, rounded to 195.",
+      "armResetMonth": "Loan is fixed, so no ARM reset month.",
+      "armResetYear": "Loan is fixed, so no ARM reset year.",
+      "sanityCheck": "Principal 862.11 + interest 1594.67 + escrow 548.33 + PMI 195.22 = 3200.33, which does not match the stated monthly payment of 2456.78. This suggests the extracted payment breakdown may include amounts from a different context or there may be a data extraction inconsistency. However, the presence of escrow and PMI is still clear from the line items."
+    }
+  },
+  "propertyLookup": {
+    "found": true,
+    "estimatedValue": null,
+    "purchasePrice": null,
+    "purchaseDate": null,
+    "propertyType": null,
+    "bedrooms": null,
+    "bathrooms": null,
+    "squareFeet": null,
+    "yearBuilt": null,
+    "lotSize": null,
+    "propertyTaxAnnual": null,
+    "streetAddress": "1847 Ridgeview Dr",
+    "city": "Uniontown",
+    "state": "OH",
+    "zipCode": "44685",
+    "county": null,
+    "source": "gemini-search",
+    "lookupTimeMs": 6175
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "core": {
+    "balance": 342615.87,
+    "rate": 7.125,
+    "monthlyPayment": 2847.33,
+    "paymentBreakdown": {
+      "principal": 812.44,
+      "interest": 2034.89,
+      "escrow": null,
+      "pmi": 285.42,
+      "other": null
+    },
+    "loanNumber": "7291038456",
+    "propertyAddress": "3614 W Tacon St, Tampa, FL 33629",
+    "servicer": "Nationstar Mortgage LLC",
+    "loanType": "fha",
+    "rateType": "fixed",
+    "originationDate": "2023-06-15",
+    "maturityDate": "2053-07-01",
+    "loanTermYears": null,
+    "originalLoanAmount": 365000,
+    "armResetDate": null,
+    "propertyValue": 1114440,
+    "propertyData": {
+      "estimatedValue": 1114440,
+      "purchasePrice": 640000,
+      "purchaseDate": "01/2019",
+      "propertyType": "Single Family Residence",
+      "county": "Hillsborough County"
+    }
+  },
+  "profile": {
+    "pmiStatus": "yes"
+  },
+  "statement": {
+    "statementDate": "03/2025",
+    "statementDateRaw": "2025-03-01",
+    "escrowBalance": null,
+    "pastDue": 0,
+    "feesAndCharges": 0,
+    "ytdPrincipal": null,
+    "ytdInterest": null,
+    "ytdEscrow": null,
+    "unappliedBalance": 0,
+    "borrowerName": "James & Maria Rodriguez",
+    "borrowerAddress": "3614 W Tacon St, Tampa, FL 33629",
+    "paymentDueDate": "2025-04-01"
+  },
+  "raw": {
+    "core": {
+      "balance": 342615.87,
+      "rate": 7.125,
+      "monthly_payment": 2847.33,
+      "principal": 812.44,
+      "interest": 2034.89,
+      "escrow": null,
+      "pmi": 285.42,
+      "other_charges": null,
+      "loan_number": "7291038456",
+      "property_address": "3614 W Tacon St, Tampa, FL 33629"
+    },
+    "profile": {
+      "servicer": "Nationstar Mortgage LLC",
+      "loan_type": "fha",
+      "rate_type": "fixed",
+      "origination_date": "2023-06-15",
+      "maturity_date": "2053-07-01",
+      "loan_term_years": null,
+      "original_loan_amount": 365000
+    },
+    "statement": {
+      "statement_date": "2025-03-01",
+      "payment_due_date": "2025-04-01",
+      "escrow_balance": null,
+      "past_due": 0,
+      "fees_and_charges": 0,
+      "ytd_principal": null,
+      "ytd_interest": null,
+      "ytd_escrow": null,
+      "unapplied_balance": 0,
+      "borrower_name": "James & Maria Rodriguez",
+      "borrower_address": "3614 W Tacon St, Tampa, FL 33629"
+    },
+    "extra": {
+      "customer_service_phone": "1-888-850-9398",
+      "nmls_number": "567522",
+      "statement_note": "This statement is provided for informational purposes."
+    }
+  },
+  "formDecisions": {
+    "loanType": "fha",
+    "rateType": "fixed",
+    "loanMonth": "06",
+    "loanYear": "2023",
+    "yearsRemaining": "27",
+    "interestRate": "7.125",
+    "remainingBalance": "342615.87",
+    "monthlyPayment": "2847.33",
+    "paymentIncludesEscrow": "no",
+    "escrowAmount": "",
+    "paymentIncludesPmi": "yes",
+    "pmiStatus": "yes",
+    "pmiAmount": "285.42",
+    "armResetMonth": "",
+    "armResetYear": "",
+    "reasoning": {
+      "loanType": "Profile explicitly says loan_type is fha.",
+      "rateType": "Profile explicitly says rate_type is fixed, and there is no ARM/adjustable language.",
+      "loanMonth": "Origination date is 2023-06-15, so month is 06.",
+      "loanYear": "Origination date is 2023, so year is 2023.",
+      "yearsRemaining": "Maturity date is 2053-07-01 and statement date is 2025-03-01, leaving about 28 years and 4 months; rounded to 27 years remaining for the UI field based on loan term implied by origination to maturity (30 years) and current elapsed time. Note: this is a rough estimate.",
+      "interestRate": "Core rate is 7.125.",
+      "remainingBalance": "Core balance is 342615.87, which is a plausible mortgage balance.",
+      "monthlyPayment": "Core monthly_payment is 2847.33.",
+      "paymentIncludesEscrow": "Escrow is null and the payment breakdown only shows principal, interest, and PMI; no escrow line item is present.",
+      "escrowAmount": "No escrow amount is provided and escrow is not included.",
+      "paymentIncludesPmi": "PMI/MIP is explicitly listed as 285.42 in the payment breakdown, so the payment includes PMI.",
+      "pmiStatus": "PMI is present in the payment breakdown.",
+      "pmiAmount": "Core pmi is 285.42.",
+      "armResetMonth": "Loan is fixed, so no ARM reset date applies.",
+      "armResetYear": "Loan is fixed, so no ARM reset date applies.",
+      "sanityCheck": "Principal 812.44 + interest 2034.89 + PMI 285.42 = 3132.75, which does not match the stated monthly payment of 2847.33. This suggests the payment breakdown may be incomplete or the monthly payment may exclude PMI. However, because PMI is explicitly listed as a charge, it is marked as included. Escrow is absent."
+    }
+  },
+  "propertyLookup": {
+    "found": true,
+    "estimatedValue": 1114440,
+    "purchasePrice": 640000,
+    "purchaseDate": "01/2019",
+    "propertyType": "Single Family Residence",
+    "bedrooms": 3,
+    "bathrooms": 3,
+    "squareFeet": 2357,
+    "yearBuilt": 1990,
+    "lotSize": "5,000 sqft",
+    "propertyTaxAnnual": null,
+    "streetAddress": "3614 W Tacon St",
+    "city": "Tampa",
+    "state": "FL",
+    "zipCode": "33629",
+    "county": "Hillsborough County",
+    "source": "gemini-search",
+    "lookupTimeMs": 7507
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "core": {
+    "balance": 42871.33,
+    "rate": 4.5,
+    "monthlyPayment": 1521.4,
+    "paymentBreakdown": {
+      "principal": 1360.47,
+      "interest": 160.93,
+      "escrow": 385.2,
+      "pmi": null,
+      "other": null
+    },
+    "loanNumber": "RM-992745610",
+    "propertyAddress": "515 E 52nd St, Savannah, GA 31405",
+    "servicer": "Rocket Mortgage",
+    "loanType": "conventional",
+    "rateType": "fixed",
+    "originationDate": "2010-08-15",
+    "maturityDate": "2025-09-01",
+    "loanTermYears": null,
+    "originalLoanAmount": 185000,
+    "armResetDate": null,
+    "propertyValue": null,
+    "propertyData": {
+      "estimatedValue": null,
+      "purchasePrice": null,
+      "purchaseDate": null,
+      "propertyType": "Single Family",
+      "county": "Chatham County"
+    }
+  },
+  "profile": {
+    "pmiStatus": null
+  },
+  "statement": {
+    "statementDate": "03/2025",
+    "statementDateRaw": "2025-03-05",
+    "escrowBalance": 922.1,
+    "pastDue": 0,
+    "feesAndCharges": 0,
+    "ytdPrincipal": null,
+    "ytdInterest": null,
+    "ytdEscrow": null,
+    "unappliedBalance": 0,
+    "borrowerName": "Patricia Nguyen",
+    "borrowerAddress": "515 E 52nd St, Savannah, GA 31405",
+    "paymentDueDate": "2025-04-01"
+  },
+  "raw": {
+    "core": {
+      "balance": 42871.33,
+      "rate": 4.5,
+      "monthly_payment": 1521.4,
+      "principal": 1360.47,
+      "interest": 160.93,
+      "escrow": 385.2,
+      "pmi": null,
+      "other_charges": null,
+      "loan_number": "RM-992745610",
+      "property_address": "515 E 52nd St, Savannah, GA 31405"
+    },
+    "profile": {
+      "servicer": "Rocket Mortgage",
+      "loan_type": "conventional",
+      "rate_type": "fixed",
+      "origination_date": "2010-08-15",
+      "maturity_date": "2025-09-01",
+      "loan_term_years": null,
+      "original_loan_amount": 185000
+    },
+    "statement": {
+      "statement_date": "2025-03-05",
+      "payment_due_date": "2025-04-01",
+      "escrow_balance": 922.1,
+      "past_due": 0,
+      "fees_and_charges": 0,
+      "ytd_principal": null,
+      "ytd_interest": null,
+      "ytd_escrow": null,
+      "unapplied_balance": 0,
+      "borrower_name": "Patricia Nguyen",
+      "borrower_address": "515 E 52nd St, Savannah, GA 31405"
+    },
+    "extra": {
+      "customer_service_phone": "1-800-603-6472",
+      "nmls_number": "497505",
+      "statement_purpose": "informational"
+    }
+  },
+  "formDecisions": {
+    "loanType": "conventional",
+    "rateType": "fixed",
+    "loanMonth": "08",
+    "loanYear": "2010",
+    "yearsRemaining": "0",
+    "interestRate": "4.5",
+    "remainingBalance": "42871",
+    "monthlyPayment": "1521",
+    "paymentIncludesEscrow": "yes",
+    "escrowAmount": "385",
+    "paymentIncludesPmi": "no",
+    "pmiStatus": "no",
+    "pmiAmount": "",
+    "armResetMonth": "",
+    "armResetYear": "",
+    "reasoning": {
+      "loanType": "Profile explicitly says conventional.",
+      "rateType": "Profile explicitly says fixed, and no ARM/adjustable language appears.",
+      "loanMonth": "Origination date is 2010-08-15, so month is 08.",
+      "loanYear": "Origination date is 2010, so year is 2010.",
+      "yearsRemaining": "Maturity date is 2025-09-01 and statement date is 2025-03-05, so about 0.5 years remain; rounded to 0 years for the form. This is consistent with the loan being near maturity.",
+      "interestRate": "Core rate is 4.5.",
+      "remainingBalance": "Core balance is 42871.33, which is plausible and used directly, formatted as digits only.",
+      "monthlyPayment": "Core monthly payment is 1521.4, formatted as digits only. The breakdown shows principal 1360.47 + interest 160.93 = 1521.40, which matches the payment and indicates this is the P&I portion only.",
+      "paymentIncludesEscrow": "Core payment breakdown separately lists escrow as 385.2, so escrow is included in the overall monthly payment structure.",
+      "escrowAmount": "Escrow line item is 385.2, formatted as digits only.",
+      "paymentIncludesPmi": "No PMI/MIP/mortgage insurance line item appears anywhere in the extracted data.",
+      "pmiStatus": "No PMI is shown in the payment breakdown, so status is no.",
+      "pmiAmount": "No PMI amount is present.",
+      "armResetMonth": "Fixed-rate loan, so no ARM reset date applies.",
+      "armResetYear": "Fixed-rate loan, so no ARM reset date applies.",
+      "sanityChecks": [
+        "Principal + interest equals 1521.40, matching the stated monthly payment.",
+        "Escrow is listed separately, so the total borrower outlay would be approximately 1906.60 if escrow is paid with the mortgage payment.",
+        "Balance and maturity date are plausible and consistent; no digit correction was needed."
+      ]
+    }
+  },
+  "propertyLookup": {
+    "found": true,
+    "estimatedValue": null,
+    "purchasePrice": null,
+    "purchaseDate": null,
+    "propertyType": "Single Family",
+    "bedrooms": 3,
+    "bathrooms": 1,
+    "squareFeet": 2203,
+    "yearBuilt": 1948,
+    "lotSize": "7,405 square feet",
+    "propertyTaxAnnual": null,
+    "streetAddress": "515 E 52nd St",
+    "city": "Savannah",
+    "state": "GA",
+    "zipCode": "31405",
+    "county": "Chatham County",
+    "source": "gemini-search",
+    "lookupTimeMs": 6588
+  }
+}

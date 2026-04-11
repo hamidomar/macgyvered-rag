@@ -1,0 +1,146 @@
+{
+  "core": {
+    "balance": 195320.45,
+    "rate": 3.25,
+    "monthlyPayment": 1687.9,
+    "paymentBreakdown": {
+      "principal": 1158.52,
+      "interest": 529.38,
+      "escrow": 412.8,
+      "pmi": null,
+      "other": null
+    },
+    "loanNumber": "VA-8837201",
+    "propertyAddress": "2745 Rossmere St, Colorado Springs, CO 80919",
+    "servicer": "PenFed Credit Union",
+    "loanType": "va",
+    "rateType": "fixed",
+    "originationDate": "2021-02-10",
+    "maturityDate": "2051-03-01",
+    "loanTermYears": null,
+    "originalLoanAmount": 280000,
+    "armResetDate": null,
+    "propertyValue": null,
+    "propertyData": {
+      "estimatedValue": null,
+      "purchasePrice": null,
+      "purchaseDate": null,
+      "propertyType": null,
+      "county": "El Paso County"
+    }
+  },
+  "profile": {
+    "pmiStatus": null
+  },
+  "statement": {
+    "statementDate": "02/2025",
+    "statementDateRaw": "2025-02-28",
+    "escrowBalance": 1845.6,
+    "pastDue": 0,
+    "feesAndCharges": 0,
+    "ytdPrincipal": null,
+    "ytdInterest": null,
+    "ytdEscrow": null,
+    "unappliedBalance": 0,
+    "borrowerName": "Michael & Lisa Patterson",
+    "borrowerAddress": "2745 Rossmere St, Colorado Springs, CO 80919",
+    "paymentDueDate": "2025-04-01"
+  },
+  "raw": {
+    "core": {
+      "balance": 195320.45,
+      "rate": 3.25,
+      "monthly_payment": 1687.9,
+      "principal": 1158.52,
+      "interest": 529.38,
+      "escrow": 412.8,
+      "pmi": null,
+      "other_charges": null,
+      "loan_number": "VA-8837201",
+      "property_address": "2745 Rossmere St, Colorado Springs, CO 80919"
+    },
+    "profile": {
+      "servicer": "PenFed Credit Union",
+      "loan_type": "va",
+      "rate_type": "fixed",
+      "origination_date": "2021-02-10",
+      "maturity_date": "2051-03-01",
+      "loan_term_years": null,
+      "original_loan_amount": 280000
+    },
+    "statement": {
+      "statement_date": "2025-02-28",
+      "payment_due_date": "2025-04-01",
+      "escrow_balance": 1845.6,
+      "past_due": 0,
+      "fees_and_charges": 0,
+      "ytd_principal": null,
+      "ytd_interest": null,
+      "ytd_escrow": null,
+      "unapplied_balance": 0,
+      "borrower_name": "Michael & Lisa Patterson",
+      "borrower_address": "2745 Rossmere St, Colorado Springs, CO 80919"
+    },
+    "extra": {
+      "customer_service_phone": "1-800-247-5626",
+      "nmls_number": "500062",
+      "loan_type_label": "VA",
+      "statement_purpose": "informational"
+    }
+  },
+  "formDecisions": {
+    "loanType": "va",
+    "rateType": "fixed",
+    "loanMonth": "02",
+    "loanYear": "2021",
+    "yearsRemaining": "25",
+    "interestRate": "3.25",
+    "remainingBalance": "195320",
+    "monthlyPayment": "1687",
+    "paymentIncludesEscrow": "yes",
+    "escrowAmount": "412",
+    "paymentIncludesPmi": "no",
+    "pmiStatus": "no",
+    "pmiAmount": "",
+    "armResetMonth": "",
+    "armResetYear": "",
+    "reasoning": {
+      "loanType": "Explicitly labeled as VA in both profile.loan_type and extra.loan_type_label, so loanType = va.",
+      "rateType": "profile.rate_type is fixed and there are no ARM/adjustable indicators, so rateType = fixed.",
+      "loanMonth": "origination_date is 2021-02-10, so the loan originated in February => 02.",
+      "loanYear": "origination_date is 2021-02-10, so loanYear = 2021.",
+      "yearsRemaining": "maturity_date is 2051-03-01. From the current date context (2026-04-05), about 24 years 11 months remain, which rounds to 25 years.",
+      "interestRate": "core.rate is 3.25, so interestRate = 3.25.",
+      "remainingBalance": "core.balance is 195320.45, a plausible mortgage balance. Rounded to digits only => 195320.",
+      "monthlyPayment": "core.monthly_payment is 1687.9, rounded to digits only => 1687.",
+      "paymentIncludesEscrow": "The payment breakdown includes an escrow line item of 412.8, so paymentIncludesEscrow = yes.",
+      "escrowAmount": "core.escrow is 412.8, rounded to digits only => 412.",
+      "paymentIncludesPmi": "No PMI/MIP/mortgage insurance line item is present in the payment breakdown, so paymentIncludesPmi = no.",
+      "pmiStatus": "No PMI/MIP is shown anywhere in the statement data, so pmiStatus = no.",
+      "pmiAmount": "No PMI amount is provided because no PMI is indicated.",
+      "armResetMonth": "Loan is fixed, so no ARM reset month applies.",
+      "armResetYear": "Loan is fixed, so no ARM reset year applies.",
+      "sanityCheck": "Principal 1158.52 + interest 529.38 + escrow 412.80 = 2100.70, which does not match the stated monthly_payment 1687.90. This suggests the extracted monthly_payment likely reflects only principal+interest (1158.52 + 529.38 = 1687.90), while escrow is listed separately. Therefore the UI monthlyPayment field should be prefilled with the total borrower payment as shown in the statement breakdown only if the form expects bundled payment; however based on the provided monthly_payment value, it is 1687.90 and escrow is separately identified."
+    }
+  },
+  "propertyLookup": {
+    "found": true,
+    "estimatedValue": null,
+    "purchasePrice": null,
+    "purchaseDate": null,
+    "propertyType": null,
+    "bedrooms": null,
+    "bathrooms": null,
+    "squareFeet": null,
+    "yearBuilt": null,
+    "lotSize": null,
+    "propertyTaxAnnual": null,
+    "streetAddress": "2745 Rossmere St",
+    "city": "Colorado Springs",
+    "state": "CO",
+    "zipCode": "80919",
+    "county": "El Paso County",
+    "source": "gemini-search",
+    "lookupTimeMs": 3769
+  }
+}
