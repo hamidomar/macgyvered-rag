@@ -101,7 +101,7 @@ def _build_missing_documents_message(state: TurboRefiState, missing_documents: l
     return (
         f"{prefix}I cannot proceed to eligibility yet. "
         f"For a salaried/W-2 borrower, I still need {_format_missing_documents(missing_documents)} "
-        "before assessment, per FNMA B3-3.2-01. "
+        "before assessment, per FNMA B3-3.1-02. "
         "Please upload the remaining required documents and then I’ll continue."
     )
 

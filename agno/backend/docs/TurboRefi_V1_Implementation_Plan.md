@@ -16,7 +16,7 @@ These are already built and working. The implementation should import and wrap t
 
 | Asset | Location | What It Does |
 |---|---|---|
-| `guide_tool.py` | `scripts/guide_tool.py` | `GuideTool` class — `list_contents()`, `get_section()`, `get_sections()`, `get_section_with_references()`, `search_titles()` |
+| `guide_tool.py` | `scripts/guide_tool.py` | `GuideTool` class — `list_contents()`, `get_section()`, `get_sections()`, `get_section_with_references()` |
 | FNMA index | `output/selling_guide_preprocessed/` | `hierarchy_tree.json`, `structured_sections.json`, `cross_references.json` — 403 leaf sections |
 | FHLMC index | `output/mf_guide_index/` | Same structure — 2,603 leaf sections |
 | `explore_guide.py` | `scripts/explore_guide.py` | Interactive CLI for testing retrieval (reference only, not used at runtime) |
@@ -180,18 +180,7 @@ def get_guideline_section(section_id: str, gse: str) -> str:
     return json.dumps(result, indent=2)
 
 
-@tool
-def search_guideline_titles(query: str, gse: str) -> str:
-    """Search section titles by keyword across a guide.
-
-    Args:
-        query: Space-separated keywords (AND logic). E.g. "income verification W2"
-        gse: "fnma" or "fhlmc"
-    """
-    guide = fnma_guide if gse == "fnma" else fhlmc_guide
-    results = guide.search_titles(query)
-    import json
-    return json.dumps(results[:20], indent=2)  # cap at 20 results
+  # cap at 20 results
 
 
 @tool
@@ -380,14 +369,14 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from src.state import TurboRefiState
 from src.prompts.loa_system_prompt import LOA_SYSTEM_PROMPT
 from src.tools.guide_tools import (
-    get_guideline_section, search_guideline_titles,
+    get_guideline_section,
     list_guide_contents, get_section_with_references,
 )
 from src.tools.calculators import calc_ltv, calc_w2_income, calc_pmi_savings, calc_se_income
 
 # Collect all tools into a list
 ALL_TOOLS = [
-    get_guideline_section, search_guideline_titles,
+    get_guideline_section,
     list_guide_contents, get_section_with_references,
     calc_ltv, calc_w2_income, calc_pmi_savings, calc_se_income,
 ]

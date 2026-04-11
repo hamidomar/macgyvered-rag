@@ -78,14 +78,12 @@ AVAILABLE TOOLS:
 - get_section_with_references(section_id, gse):
     Retrieve a section AND all sections it directly cross-references.
 
-- search_guideline_titles(query, gse):
-    Keyword search across titles. Use ONLY if hierarchy navigation fails to yield 
-    a result after 3 separate path attempts.
+
 
 WHAT NOT TO DO:
 - Never construct a path — only use IDs exactly as returned by the tool.
 - Never call the same path twice.
 - Never cite a section based on its title alone — always read the content first.
 - Never scan siblings sequentially — read titles and pick the best match directly.
-- Never use keyword search as your first move — always explore structural context first.
+
 """

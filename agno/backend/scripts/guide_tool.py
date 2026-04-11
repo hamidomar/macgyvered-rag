@@ -322,38 +322,7 @@ class GuideTool:
             "total_text_length": sum(s.get("text_length", 0) for s in all_sections),
         }
 
-    def search_titles(self, query: str) -> list[dict]:
-        """
-        Deterministic keyword search across all section titles.
-        Like Ctrl+F on the table of contents — no embeddings, no ranking.
 
-        Args:
-            query: Space-separated keywords. ALL must match (AND logic).
-
-        Returns:
-            List of matching sections (id, title, date, chapter).
-        """
-        terms = query.lower().split()
-        if not terms:
-            return []
-
-        results = []
-        for sid, section in self.sections.items():
-            title_lower = section.get("title", "").lower()
-            full_title_lower = section.get("full_title", "").lower()
-            # Match against both clean title and full title
-            searchable = f"{title_lower} {full_title_lower}"
-            if all(term in searchable for term in terms):
-                results.append({
-                    "section_id": sid,
-                    "title": section.get("title", ""),
-                    "date": section.get("date", ""),
-                    "chapter": section.get("chapter", ""),
-                    "node_type": section.get("node_type", ""),
-                    "text_length": section.get("text_length", 0),
-                })
-
-        return results
 
     # ------------------------------------------------------------------
     # Internal helpers

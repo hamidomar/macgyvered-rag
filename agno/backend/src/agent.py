@@ -16,7 +16,6 @@ from src.tools.guide_tools import (
     get_guideline_section,
     get_section_with_references,
     list_guide_contents,
-    search_guideline_titles,
 )
 
 try:
@@ -38,7 +37,7 @@ except ImportError:
 TOOLS = [
     list_guide_contents,
     get_guideline_section,
-    search_guideline_titles,
+
     get_section_with_references,
     calc_w2_income,
     calc_ltv,
@@ -144,7 +143,7 @@ def get_loa_agent() -> Agent:
 RAG_TOOLS = [
     list_guide_contents,
     get_guideline_section,
-    search_guideline_titles,
+
     get_section_with_references,
 ]
 

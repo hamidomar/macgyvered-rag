@@ -74,19 +74,7 @@ def get_guideline_section(section_id: str, gse: str) -> dict:
     return guide.get_section(section_id)
 
 
-def search_guideline_titles(query: str, gse: str) -> list[dict]:
-    """
-    Search section titles by keyword across a guide.
-    
-    Args:
-        query: keyword string, e.g. "self employed income averaging"
-        gse: "fnma" or "fhlmc"
-    
-    Returns:
-        List of { "section_id", "title", "text_length" } sorted by relevance
-    """
-    guide = fnma_guide if gse == "fnma" else fhlmc_guide
-    return guide.search_titles(query)
+
 
 
 def get_section_with_references(section_id: str, gse: str) -> dict:
@@ -157,7 +145,7 @@ CORE RULES:
 
 TOOLS AVAILABLE:
 - get_guideline_section(section_id, gse) — retrieve full text of a section
-- search_guideline_titles(query, gse) — search section titles by keyword
+
 - get_section_with_references(section_id, gse) — retrieve section + its refs
 - calc_w2_income(gross_monthly, pay_frequency, gse)
 - calc_ltv(loan_amount, property_value)
@@ -178,7 +166,7 @@ Turn 1 — Mortgage statement data provided:
 
 Turn 2 — Secondary documents received:
   - Acknowledge receipt
-  - Call get_guideline_section or search_guideline_titles for relevant sections
+  - Call get_guideline_section for relevant sections
   - Begin eligibility assessment
 
 Turn 3 — Assessment:

@@ -22,7 +22,7 @@ COMMANDS:
     read <id>     Read full text of a section (even if it has children)
     refs <id>     Show cross-references for a section
     expand <id>   Fetch section + all its references (1 hop)
-    search <q>    Keyword search across section titles
+
     stats         Show index statistics
     switch        Switch between loaded guides (if multiple)
     help          Show this help
@@ -190,22 +190,7 @@ def print_expand(tool: GuideTool, section_id: str):
     print()
 
 
-def print_search(tool: GuideTool, query: str):
-    """Search titles and display results."""
-    results = tool.search_titles(query)
 
-    print()
-    if not results:
-        print(f"  No sections found matching '{query}'")
-    else:
-        print(f"  Found {len(results)} sections matching '{query}':")
-        print(SEPARATOR)
-        for r in results[:30]:
-            ch = f"  (Ch {r['chapter']})" if r.get("chapter") else ""
-            print(f"  [{r['section_id']}]  {r['title']}{ch}  — {r['text_length']:,} chars")
-        if len(results) > 30:
-            print(f"  ... and {len(results) - 30} more")
-    print()
 
 
 def print_help():
@@ -220,9 +205,7 @@ def print_help():
     refs <id>         Show cross-references (forward + reverse)
     expand <id>       Fetch section + all sections it references
 
-  SEARCH:
-    search <query>    Keyword search across all section titles
-                      (e.g., 'search refinance cash-out')
+
 
   OTHER:
     stats             Show index statistics
@@ -365,13 +348,7 @@ def main():
             section_id = user_input[7:].strip()
             print_expand(tool, section_id)
 
-        # --- Search ---
-        elif cmd.startswith("search "):
-            query = user_input[7:].strip()
-            if query:
-                print_search(tool, query)
-            else:
-                print("  Usage: search <keywords>")
+
 
         # --- Navigate or read ---
         else:
@@ -419,7 +396,7 @@ def main():
                     print(f"  {SEPARATOR}")
                     print_contents(tool.list_contents(nav_id), nav_id)
                 else:
-                    print(f"  '{target}' not found. Try 'search {target}' or 'help'.")
+                    print(f"  '{target}' not found. Try 'help'.")
 
 
 if __name__ == "__main__":

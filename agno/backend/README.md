@@ -1,7 +1,7 @@
 # TurboRefi Agno Migration
 
 This folder is the Agno-based copy of the original `macgyvered-rag/` application.
-The retrieval indices, extraction prompts, calculator behavior, and LOA system prompt are preserved, but the LangGraph runtime has been replaced with:
+The retrieval indices, extraction prompts, calculator behavior, and LOA system prompt are preserved. The runtime consists of:
 
 - an Agno `Agent` for tool-calling and multi-turn execution
 - an Agno `AgentOS` app with the `AGUI` interface for Agent UI connectivity
@@ -108,7 +108,7 @@ The `scripts/selling_guide_tool.py` contains the `SellingGuideTool` class. This 
 - `list_contents(path)`: Returns the titles/IDs for a specific level of the tree.
 - `get_section(section_id)`: Returns full text, metadata, and references for a topic.
 - `get_section_with_references(section_id, depth)`: Fetches a section and its cited relatives to expand context.
-- `search_titles(query)`: High-speed keyword search across the table of contents.
+
 
 ---
 

@@ -66,34 +66,7 @@ def get_guideline_section(section_id: str, gse: str, agent=None, run_context=Non
     return json.dumps(result, indent=2)
 
 
-def search_guideline_titles(query: str, gse: str, agent=None, run_context=None) -> str:
-    """Search section titles by keyword across a guide.
 
-    Args:
-        query: Space-separated keywords (AND logic). E.g. "income verification W2"
-        gse: "fnma" or "fhlmc"
-    """
-    guide = fnma_guide if gse == "fnma" else fhlmc_guide
-    if guide is None:
-        result = {"error": f"GuideTool for {gse.upper()} is not loaded."}
-        _record_rag_tool(
-            "search_guideline_titles",
-            {"query": query, "gse": gse},
-            result,
-            agent=agent,
-            run_context=run_context,
-        )
-        return json.dumps(result)
-    
-    results = guide.search_titles(query)
-    _record_rag_tool(
-        "search_guideline_titles",
-        {"query": query, "gse": gse},
-        results[:20],
-        agent=agent,
-        run_context=run_context,
-    )
-    return json.dumps(results[:20], indent=2)
 
 
 def list_guide_contents(path: str, gse: str, agent=None, run_context=None) -> str:

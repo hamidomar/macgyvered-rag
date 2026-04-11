@@ -108,22 +108,4 @@ class SellingGuideTool:
             "total_text_length": sum(s.get("text_length", 0) for s in all_sections),
         }
 
-    def search_titles(self, query: str) -> List[Dict[str, Any]]:
-        """
-        Keyword search against all section titles.
-        Returns a list of matching sections (metadata only).
-        """
-        query_lower = query.lower()
-        terms = query_lower.split()
-        results = []
-        
-        for sid, section in self.sections.items():
-            title_lower = section["title"].lower()
-            if all(term in title_lower for term in terms):
-                results.append({
-                    "id": sid,
-                    "title": section["title"],
-                    "date": section["date"],
-                    "part": section["part"],
-                })
-        return results
+
