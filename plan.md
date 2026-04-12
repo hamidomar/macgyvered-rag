@@ -13,7 +13,7 @@ This is not a full rewrite. The existing app already has the right outer shape:
 - session orchestration in `src/turborefi/services/session_service.py`
 - persistent JSON session state under `runtime/sessions/`
 - extraction service in `src/turborefi/extraction/` for supporting documents
-- deterministic packet builder and compliance/TCS services
+- deterministic packet builder, LARS, audit, and handoff services
 - Agno LOA agent
 - guideline retrieval adapter over `retrival/`
 - frontend session, upload, chat, and result plumbing
@@ -25,12 +25,12 @@ The parts that must change are the mortgage-domain core:
   the new integration will provide normalized received JSON up front
 - calculator coverage is too narrow and several formulas do not match the new docs
 - LARS scoring and referral event logging do not exist
-- property value API range handling does not exist
+- single property lookup/value normalization does not exist
 - state machine S0-S7 does not exist
 - UC4, UC5, and UC6 are not implemented
 - UC2 uses the old PMI/LTV logic, not the new 75% screening threshold
 - current verifier-agent behavior is not part of the new docs and should be
-  removed or replaced by the Compliance Agent/TCS path
+  removed or left aside with the deferred Compliance Agent/TCS path
 
 Recommended approach: keep the app shell and replace the domain layer in phases.
 Do not make mortgage-statement OCR part of the critical path. The primary entry
@@ -40,6 +40,22 @@ Target-scope decision: the new docs do not define a Verifier Agent. They define
 LOA, Compliance Agent/TCS, audit trail, and human LO handoff. The current
 `verifier_agent` and `verification_service` can be skipped in the target
 implementation unless they are temporarily useful during migration tests.
+
+Product decision: keep the Compliance Agent/TCS work aside for now. The current
+target should implement LOA, LARS, audit trail, and human handoff. Keep
+Compliance/TCS fields nullable/placeheld where the docs require them, but do not
+build a Compliance Agent in this iteration.
+
+Product decision: use one subject property address and one property
+lookup/value only. Disregard doc language about 2-3 public valuation sources or
+multiple property addresses for the current build. Do not implement API
+spread/B11 scoring as an active referral trigger until multiple independent
+values are available.
+
+Execution decision: the immediate build should focus on UC1 and UC2 only. Keep
+this full plan as the broader migration map, but use `plan_minimal.md` as the
+current implementation checklist and defer UC3, UC4, UC5, and UC6 until UC1/UC2
+stabilize.
 
 ## Source Documents Used
 
@@ -159,11 +175,12 @@ Implementation consequences:
 - Do not blindly trust `monthlyPayment` as total PITIA. In several samples,
   `monthlyPayment` appears to be P&I while escrow/PMI are separately listed.
   Current PITIA should be computed from components when components are present.
-- The new docs mention 2-3 property-value APIs, but the samples usually provide
-  one `propertyLookup.estimatedValue` or no value. The implementation should
-  support one or many estimates. B11 API-spread evaluation should only run when
-  enough independent estimates are available; otherwise log the spread check as
-  unavailable/pending rather than failing the borrower.
+- Product decision: only one subject property address and one property
+  lookup/value will be provided. Treat `propertyLookup.estimatedValue`,
+  `core.propertyValue`, or
+  `core.propertyData.estimatedValue` as the single working estimate. Do not
+  implement multi-API value spread or active B11 API-divergence scoring in the
+  current build. Record B11 as not evaluated due single-source valuation.
 
 Primary ingestion endpoint should be JSON-first:
 
@@ -188,7 +205,7 @@ Global requirements:
   not automatically verified, appraisals are not ordered, FICO is
   borrower-reported, property values are public-data estimates, and results are
   preliminary.
-- Present property value and LTV range before document collection when available.
+- Present property value and LTV estimate before document collection when available.
 - If LARS/referral is triggered, continue collecting remaining data and tell the
   borrower at handoff that the LO will receive what was already collected so the
   borrower does not repeat it.
@@ -419,7 +436,7 @@ with tests:
 - variable income percent, two-year average, decline exclusion
 - Schedule C adjusted income and self-employed GMI
 - gig worker 1099/Schedule C match, expense ratio, platform volatility
-- LTV low/high range and API spread
+- single-source LTV estimate
 - standard amortization
 - old/new P&I
 - PITIA
@@ -438,8 +455,9 @@ The app must start at score 100, deduct factor weights only, cap at a floor of
 collecting data after RED, and produce auto/human referral decisions.
 
 The Engineer Spec defines baseline factors B1-B15 and use-case factors
-U1.1-U6.7. LARS >= 70 means automated. LARS < 70 means human referral. A TCS
-compliance score below 60 overrides LARS and forces referral.
+U1.1-U6.7. LARS >= 70 means automated. LARS < 70 means human referral. The docs
+also define a TCS compliance override, but Compliance/TCS is deferred for the
+current build.
 
 Current app has no LARS model, no factor event schema, and no handoff package.
 
@@ -452,7 +470,7 @@ Use the Engineer Spec S0-S7 state machine:
 - S2 DOCS: request documents per UC checklist and run OCR on uploads
 - S3 INCOME: extract income and ask clarifying questions
 - S4 CREDIT: ask for borrower-reported FICO range
-- S5 PROPERTY: collect address, use property values, calculate LTV range
+- S5 PROPERTY: collect address, use one property value, calculate LTV estimate
 - S6 CALC: calculate DTI and run dual-GSE or VA eligibility
 - S7 DECISION: present automated result or generate handoff package
 
@@ -484,15 +502,18 @@ one GSE are never applied to the other.
 The Engineer Spec requires a two-stream architecture:
 
 - LOA stream: tokenized borrower ID only, no borrower name or protected-class
-  fields in prompt context
-- Compliance stream: full borrower identity and protected-class fields for
-  fairness monitoring
+  fields in prompt context. Also exclude profession, occupation, job title, and
+  other free-text role descriptors unless a later approved underwriting rule
+  requires them.
+- Compliance stream: deferred for now. The docs describe full borrower identity
+  and protected-class fields for fairness monitoring, but this iteration should
+  not build a Compliance Agent.
 
 For the current localhost app, implement this as explicit serialization
-boundaries first. For production, enforce with separate DB/schema permissions,
-not application filtering alone. Property address may be available to the LOA
-for valuation and underwriting, but protected demographic fields must never be
-included in LOA prompts or LOA-visible session state.
+boundaries first. Property address may be available to the LOA for valuation and
+underwriting, but borrower name, profession/occupation/job title, protected
+demographic fields, and compliance-only fields must never be included in LOA
+prompts or LOA-visible session state.
 
 ## Keep, Refactor, Replace
 
@@ -518,8 +539,8 @@ included in LOA prompts or LOA-visible session state.
   and should use a real use-case router.
 - `src/turborefi/rules/document_requirements.py` should become use-case-aware,
   not only income-type-aware.
-- `src/turborefi/services/compliance.py` should become the TCS/compliance
-  scoring service described by the new docs.
+- `src/turborefi/services/compliance.py` should be kept aside for now. It can
+  become TCS/compliance scoring later when that work is prioritized.
 - frontend types must support the expanded document list and LARS/referral data.
 
 ### Replace
@@ -530,8 +551,7 @@ included in LOA prompts or LOA-visible session state.
 - current self-employed income calculation that averages net plus combined
   depreciation without trend/loss logic
 - current monthly savings proxy based on rate delta ratio
-- current verifier agent/service with Compliance Agent/TCS scope or remove it
-  from the target path
+- current verifier agent/service from the target path
 
 ## Target Backend Structure
 
@@ -677,37 +697,24 @@ Models:
   - `payment_breakdown`
   - `ocr_confidence`
 - `PropertyValuationReceived`
-  - `api_value_1`
-  - `api_value_2`
-  - `api_value_3`
   - `estimated_value`
   - `purchase_price`
   - `purchase_date`
   - `property_type`
   - `property_tax_annual`
-  - `source_1`
-  - `source_2`
-  - `source_3`
   - `lookup_source`
   - `lookup_time_ms`
-  - `value_range_low`
-  - `value_range_high`
-  - `api_spread_pct`
-  - `ltv_high`
-  - `ltv_low`
-  - `spread_check_status`
+  - `ltv`
+  - `b11_status = "not_evaluated_single_source"`
   - `address_components`
 
 Notes:
 
-- Property API fields are "received" in the docs, but `value_range_*`,
-  `api_spread_pct`, and `ltv_*` are calculated from API values. Store them in
-  `CalculatedOutputs` as the canonical calculated values and optionally mirror
-  them in the received summary for UI convenience.
-- The sample JSON often provides only one `propertyLookup.estimatedValue`.
-  `api_spread_pct` and B11 require multiple independent values; when only one
-  value is present, record the valuation as usable for LTV but mark spread as
-  unavailable.
+- Product decision: one property lookup/value only. Store one `estimated_value`
+  and one calculated `ltv`. Do not calculate value ranges or API spread in this
+  iteration.
+- B11 API divergence is not evaluated with a single-source valuation. Record
+  `b11_status = "not_evaluated_single_source"` for auditability.
 - UC5 must not call property valuation APIs.
 
 ### `src/turborefi/schemas/uploaded.py`
@@ -829,7 +836,7 @@ Models:
   - decision: `AUTO` if final_score >= 70 else `REFER`
   - `referral_triggered`
   - referral_reasons
-  - `tcs_override`
+  - `tcs_override` as deferred/nullable
 
 Rules:
 
@@ -840,7 +847,8 @@ Rules:
 - append immutable factor events; do not update/delete old events
 - set `referral_triggered = true` when score falls below 70, but continue
   collecting remaining data
-- force referral if TCS/compliance score is below 60
+- leave TCS/compliance override as future/deferred; current decision is based on
+  LARS and hard referral factors
 
 ### `src/turborefi/schemas/handoff.py`
 
@@ -855,7 +863,7 @@ Model:
   - lars_score
   - lars_events
   - referral_reasons
-  - tcs_score
+  - tcs_score as deferred/null for now
   - already_collected_do_not_reask
   - collected_data
   - collected_data.income
@@ -920,10 +928,8 @@ Models:
   - no borrower name
   - no protected-class fields
 - `ComplianceVisibleSession`
-  - full borrower identity
-  - underwriting fields
-  - protected-class fields when provided
-  - fairness-monitoring fields such as census tract
+  - deferred placeholder only
+  - do not build Compliance Agent support in this iteration
 
 ### `src/turborefi/schemas/packet.py`
 
@@ -1062,29 +1068,30 @@ Tests:
 
 ### `src/turborefi/services/calculations/ltv.py`
 
-Purpose: property API ranges and LTV thresholds.
+Purpose: single-source property value LTV and LTV thresholds.
 
 Functions:
 
-- `api_value_range(api_values)`
-- `api_spread_pct(api_values)`
-- `ltv_range(current_balance, value_range_low, value_range_high)`
+- `ltv(current_balance, estimated_value)`
 - `ltv_threshold_for_use_case(use_case)`
-- `ltv_straddles_threshold(ltv_low, ltv_high, threshold)`
+- `b11_status_for_single_source()`
 
 Rules:
 
 - UC2 threshold: 75% for LARS B10/U2.1 screening
 - UC1/UC3/UC4/UC6 threshold: 80%
 - UC5: no LTV calculation and no API query
-- API spread >15% triggers B11
+- Product decision: do not calculate API spread or trigger B11 in this build
+  because only one property value is supplied
+- U2.1 LTV-straddles-75 cannot be evaluated without a range; mark not
+  applicable unless future valuation range support returns
 
 Tests:
 
 - Engineering Spec Test Cases 1, 2, and 3 after resolving doc inconsistencies
 - B10 threshold by use case
-- B11 spread threshold
-- U2.1 straddles 75%
+- B11 marked not evaluated for single-source valuation
+- U2.1 marked not applicable for single-source valuation
 
 ### `src/turborefi/services/calculations/mortgage.py`
 
@@ -1226,8 +1233,8 @@ Implementation notes:
 - B13 OFAC belongs in S0, B14 identity mismatch in S1, and B15 DTI in S6.
 - LARS events are append-only. Recalculation may add a new event snapshot, but
   it must not mutate prior audit events.
-- Add a TCS/compliance override path: if TCS < 60, final decision is referral
-  regardless of LARS.
+- Leave TCS/compliance override as deferred; current decision logic uses LARS
+  and hard referral factors only.
 
 ### `src/turborefi/rules/use_case_requirements.py`
 
@@ -1253,8 +1260,8 @@ request order by use case.
 Content:
 
 - opening confirmation templates that use received rate, balance, address,
-  statement date, property value range, LTV range, PMI, and VA loan type when
-  available
+  statement date, property value estimate, LTV estimate, PMI, and VA loan type
+  when available
 - ordered question lists for UC1-UC6
 - ordered document request lists for UC1-UC6
 - borrower-facing preliminary result templates
@@ -1272,7 +1279,9 @@ Examples:
 - B5 missing W-2: help borrower locate W-2s, order VOE if unavailable, verify
   via IRS transcripts if needed
 - B4 uncertain income: verify income history and request LOE where appropriate
-- U2.1 LTV straddles 75: order formal appraisal and evaluate PMI alternatives
+- B10 single-source LTV over threshold: review valuation and PMI alternatives
+- Future U2.1 LTV straddles 75: only applicable if multi-value/range support is
+  reintroduced later
 - U3.1 declining self-employed income: evaluate temporary vs. continuing decline,
   request LOE, use lower-year income if required
 - U4.6 1099/Schedule C mismatch: reconcile discrepancy and determine platform
@@ -1372,32 +1381,34 @@ Functions:
 
 - `tokenize_borrower(name: str, salt: str) -> BorrowerToken`
 - `build_loa_visible_session(state) -> LoaVisibleSession`
-- `build_compliance_visible_session(state) -> ComplianceVisibleSession`
+- `build_compliance_visible_session(state) -> ComplianceVisibleSession` as a
+  deferred placeholder only
 - `assert_no_protected_fields(payload) -> None`
 - `redact_for_loa_prompt(payload) -> dict`
 
 Rules:
 
 - LOA prompt context gets tokenized ID only, not borrower name.
-- LOA prompt context must exclude race, ethnicity, sex, age, marital status,
-  national origin, language, disability status, and borrower name.
+- LOA prompt context must exclude borrower name, profession/occupation/job
+  title, race, ethnicity, sex, age, marital status, national origin, language,
+  disability status, and other protected or compliance-only fields.
 - Property address may remain in LOA context because it is needed for valuation
   and underwriting.
-- Compliance context may include full identity and protected-class fields for
-  fairness monitoring.
-- Local JSON storage can keep both streams during development, but the serializer
-  boundary must make the separation explicit now. Production should move to
-  separate DB/schema permissions.
+- Compliance Agent/TCS is deferred for now. Do not build a compliance stream in
+  this iteration, but keep the LOA-safe serializer boundary strict.
+- Local JSON storage can keep raw data during development, but any payload sent
+  to the LOA agent must pass `redact_for_loa_prompt`.
 
 ### `src/turborefi/services/property_valuation.py`
 
-Purpose: encapsulate property API lookup and deterministic range calculations.
+Purpose: encapsulate single property-value normalization and optional lookup.
+Range calculations are future work only if multiple independent values return.
 
 Interface:
 
 ```python
 class PropertyValuationProvider(Protocol):
-    def lookup(self, property_address: str) -> list[PropertyValueEstimate]: ...
+    def lookup(self, property_address: str) -> PropertyValueEstimate | None: ...
 ```
 
 Implementations:
@@ -1406,7 +1417,7 @@ Implementations:
   `core.propertyData` values from the received JSON
 - `StaticPropertyValuationProvider` for tests and fixtures
 - `DisabledPropertyValuationProvider` for local/offline mode
-- future real providers for Zillow, Redfin, ATTOM/HouseCanary
+- future single configured provider, if the received payload lacks usable value
 
 Rules:
 
@@ -1414,10 +1425,10 @@ Rules:
 - only call external APIs if configured and the received payload lacks usable
   valuation data
 - do not run for UC5 VA IRRRL
-- compute and persist range/spread/LTV immediately
+- compute and persist one estimated value and one LTV immediately
 - evaluate B10 before conversation starts when a usable value exists
-- evaluate B11 only when multiple independent API values exist; otherwise mark
-  the spread check unavailable/pending
+- mark B11 API divergence as not evaluated because the current product uses only
+  one property lookup/value
 
 ### `src/turborefi/services/use_case_router.py`
 
@@ -1474,16 +1485,18 @@ States:
   - ask for borrower-reported FICO range
   - evaluate B1, B2, B3
 - `S5_PROPERTY`
-  - collect/use address and property values
-  - calculate LTV range
-  - evaluate B10, B11, B12
+  - collect/use address and one property value
+  - calculate LTV estimate
+  - evaluate B10 and B12
+  - mark B11 not evaluated due single-source valuation
 - `S6_CALC`
   - calculate DTI
   - run dual-GSE eligibility or VA path
   - evaluate B15
 - `S7_DECISION`
-  - if LARS >= 70 and TCS >= 60, present automated screening result
-  - if LARS < 70 or TCS < 60, generate handoff package
+  - if LARS >= 70, present automated screening result
+  - if LARS < 70, generate handoff package
+  - TCS override is deferred
 
 Functions:
 
@@ -1526,9 +1539,8 @@ Flow:
    - VA for UC5
    - both FNMA and FHLMC rental treatment for UC6
 6. Build documentation status.
-7. Apply TCS/compliance override if score is below 60.
-8. Build handoff package if LARS <70, TCS <60, or hard-fail conditions apply.
-9. Return `PacketBuildResult`.
+7. Build handoff package if LARS <70 or hard-fail conditions apply.
+8. Return `PacketBuildResult`.
 
 Do not:
 
@@ -1539,25 +1551,24 @@ Do not:
 
 ### `src/turborefi/services/compliance.py`
 
-Purpose after refactor: compute the TCS/compliance score, support the Compliance
-Agent stream, and produce audit data required by the new docs.
+Purpose after refactor: deferred placeholder for future TCS/compliance work.
 
-This replaces the current verifier-agent target. It may reuse deterministic
-recalculation helpers internally, but the product component should be named and
-shaped as Compliance/TCS, not Verifier.
+Current iteration:
 
-Flow:
+- Do not build a Compliance Agent.
+- Do not compute TCS.
+- Keep `tcs_score` and `tcs_override` nullable in schemas only where the docs
+  require the field shape.
+- Keep LOA-safe redaction strict so future compliance work can be added without
+  leaking identity/protected/profession fields into LOA context.
+
+Future flow when Compliance Agent Architecture is prioritized:
 
 1. Consume the compliance-visible session view.
-2. Re-run or inspect deterministic calculated outputs needed for TCS.
-3. Re-run LARS factor evaluation or validate stored immutable LARS events.
-4. Re-run document checklist completeness.
-5. Re-run deterministic `guide_tool` retrieval target validation for audit.
-6. Compute TCS and override referral when TCS < 60.
-7. Produce `ComplianceReport` with TCS score, fairness/audit notes, target
-   validation, and override decision.
+2. Compute TCS and fairness/audit outputs.
+3. Override referral when TCS < 60.
 
-Components:
+Future components:
 
 - Calculation Accuracy
 - Guideline Adherence
@@ -1565,9 +1576,10 @@ Components:
 - LARS/Referral Accuracy
 - Audit Trail Integrity
 
-Rules:
+Future rules:
 
-- TCS < 60 is RED and forces human referral regardless of LARS.
+- TCS < 60 is RED and forces human referral regardless of LARS when TCS is
+  implemented.
 - Fairness monitoring requires the compliance stream, not the LOA stream.
 
 Later when missing Compliance Agent Architecture doc is available, extend this
@@ -1667,8 +1679,8 @@ Changes:
   received-data models
 - inject `PropertyValuationProvider`
 - call use-case router and state machine after every input
-- run pre-conversation LTV/API spread checks after received JSON normalization
-  and embedded/configured property valuation
+- run pre-conversation single-source LTV checks after received JSON
+  normalization and embedded/configured property valuation
 - continue collecting docs even after LARS RED
 - support UC5 forbidden-doc logic
 - route JSON payloads through the same session update path as uploads
@@ -1801,7 +1813,7 @@ Expose tools:
 - `calc_variable_income_tool`
 - `calc_self_employed_income_tool`
 - `calc_gig_income_tool`
-- `calc_ltv_range_tool`
+- `calc_ltv_tool`
 - `calc_monthly_pi_tool`
 - `calc_pitia_tool`
 - `calc_dti_tool`
@@ -1838,7 +1850,7 @@ Update LOA instructions:
   protected-class fields or borrower name in LOA context
 - follow the deterministic Expert Review conversation plan for question order
   and document request order
-- confirm pre-loaded rate, balance, address, PMI, property value range, and VA
+- confirm pre-loaded rate, balance, address, PMI, property value estimate, and VA
   loan type when present; do not ask for them from scratch
 - include statement-recency soft ask and preliminary-screening limitations in
   the opening flow
@@ -1870,7 +1882,7 @@ Changes:
   - calculated outputs summary
   - use case
   - referral decision
-  - compliance/TCS report
+  - audit summary
 
 ### `frontend/src/api/turborefi.ts`
 
@@ -1878,7 +1890,8 @@ Changes:
 
 - add JSON session/document endpoints
 - allow all new document types
-- fetch compliance/handoff data if displayed separately
+- fetch handoff and audit data when displayed
+- do not add Compliance Agent or verifier endpoints in the current target
 
 ### `frontend/src/hooks/useTurboRefiSession.ts`
 
@@ -1902,7 +1915,7 @@ Changes:
   - `handoffPackage`
   - `alreadyCollectedDoNotReask`
   - `calculatedOutputs`
-  - `complianceReport`
+  - `auditSummary`
 
 ## Implementation Phases
 
@@ -1965,8 +1978,8 @@ Deliverables:
 
 ### Phase 3: Information Firewall and LARS Engine
 
-Goal: implement LOA/compliance stream boundaries and referral scoring as
-deterministic services.
+Goal: implement LOA-safe serialization boundaries and referral scoring as
+deterministic services. Compliance Agent/TCS remains deferred.
 
 Tasks:
 
@@ -1983,7 +1996,7 @@ Deliverables:
 - LOA prompt/session context uses tokenized ID and excludes protected fields
 - LARS starts at 100 and deducts correct factors
 - LARS <70 produces `REFER`
-- TCS <60 forces referral even when LARS >=70
+- TCS override remains deferred
 - handoff package is generated
 - Test Case 4 scores according to the corrected expected result
 
@@ -2018,10 +2031,10 @@ Deliverables:
 - route tests cover all six use cases
 - UC5 forbidden-doc guard is tested
 
-### Phase 5: Packet Builder and Compliance/TCS Refactor
+### Phase 5: Packet Builder, Handoff, and Audit Refactor
 
-Goal: produce the new recommendation packet and doc-aligned Compliance/TCS
-output.
+Goal: produce the new recommendation packet, handoff package, and audit output.
+Compliance/TCS remains deferred.
 
 Tasks:
 
@@ -2029,14 +2042,14 @@ Tasks:
 - update `build_deterministic_loan_packet`
 - build all use-case-specific calculated output groups
 - add dual FNMA/FHLMC UC6 pathway output
-- replace verifier comparisons with compliance/TCS report generation
-- update compliance score components and TCS override handling
+- generate handoff package when LARS requires referral
+- emit audit data for calculations, LARS events, and guide retrieval
 
 Deliverables:
 
 - recommendation packet includes received/uploaded/calculated/LARS/handoff data
-- compliance report reflects calculation, guideline, docs, LARS, TCS, and audit trail
-- TCS <60 forces referral in packet and handoff output
+- audit output reflects calculation, guideline, docs, LARS, and retrieval trail
+- no verifier/compliance agent is required for target build
 
 ### Phase 6: Extraction and API Expansion
 
@@ -2048,7 +2061,10 @@ Tasks:
 - add JSON payload endpoints
 - add new upload doc types
 - update API serializers for new fields
-- preserve existing `/ingest`, `/session`, `/status`, `/result`, `/verify`
+- preserve existing `/ingest`, `/session`, `/status`, and `/result` where useful
+  for compatibility
+- do not carry `/verify` into the target path; keep it only as temporary legacy
+  compatibility if removing it would break unrelated local workflows
 - make `/session/from-json` the preferred creation endpoint
 
 Deliverables:
@@ -2146,9 +2162,6 @@ Update/add:
   - expanded upload types
   - JSON endpoints
   - status includes LARS/referral fields
-- `tests/test_compliance_service.py`
-  - TCS below 60 forces referral
-  - compliance report includes LARS, retrieval-target, documentation, and audit data
 - `tests/test_retrieval_service.py`
   - Engineer Spec target-section validation for FNMA/FHLMC through guide_tool
 - `tests/test_extraction_service.py`
@@ -2213,7 +2226,7 @@ data/mock_cases/new_docs/
 3. Add information firewall, LARS scoring, and handoff package.
 4. Add Engineer Spec state machine, use-case router, and Expert Review
    conversation flows.
-5. Refactor packet builder and compliance/TCS output.
+5. Refactor packet builder, handoff, and audit output.
 6. Expand extraction/API/frontend.
 7. Expand and validate deterministic guide_tool retrieval focuses.
 
