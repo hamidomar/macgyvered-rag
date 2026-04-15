@@ -2,7 +2,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from turborefi.config import Settings
-from turborefi.schemas import MortgageStatementData, PaystubData, ScheduleCData, W2Data
+from turborefi.schemas import IdentityDocumentData, MortgageStatementData, PaystubData, ScheduleCData, W2Data
 from turborefi.services.intake_resolver import DeterministicIntakeResolver
 from turborefi.services.session_service import TurboRefiSessionService
 from turborefi.testing.fake_retrieval import FakeHierarchyRetrievalService
@@ -43,6 +43,7 @@ def build_settings(tmp_path: Path) -> Settings:
         playground_host="0.0.0.0",
         playground_port=7777,
         agno_history_length=5,
+        screening_new_rate=6.0,
     )
 
 
@@ -215,6 +216,42 @@ def test_session_service_prompts_for_property_value_when_statement_has_none(tmp_
     assert state.intake_pending == ["income_type", "current_property_value"]
     assert "current property value" in response_text.lower()
     assert trace == []
+
+
+def test_upload_secondary_document_accepts_identity_model_for_uc1_uc2_session(tmp_path):
+    service = TurboRefiSessionService(
+        settings=build_settings(tmp_path),
+        retrieval_service=FakeHierarchyRetrievalService(),
+        loa_agent=FakeAgent("loa"),
+        verifier_agent=FakeAgent("verifier"),
+        intake_resolver=DeterministicIntakeResolver(),
+    )
+
+    session_id, _response_text, _state, _trace = service.create_session_from_received_json(
+        {
+            "core": {
+                "rate": 7.25,
+                "balance": 185000,
+                "monthlyPaymentPI": 1262.14,
+                "monthlyPMI": 95,
+                "propertyAddress": "892 Brookpark Rd, Apt 4B, Parma, OH 44134",
+            },
+            "propertyLookup": {"estimatedValue": 225000},
+        },
+        session_name="Identity Upload Case",
+    )
+
+    response_text, state, _trace = service.upload_secondary_document(
+        session_id,
+        "identity",
+        IdentityDocumentData(document_present=True, document_type="driver_license"),
+        filename="08_Drivers_License.pdf",
+    )
+
+    assert "identity" in state.received_documents
+    assert state.documents.additional_documents["identity"][0]["document_type"] == "driver_license"
+    assert "government id" in response_text.lower()
+    assert "remaining required documents" in response_text.lower()
 
 
 def test_session_service_accepts_standalone_property_value_reply(tmp_path):

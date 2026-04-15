@@ -75,6 +75,10 @@ class DeterministicGuidelineResearcher:
                             section=evidence.section_id,
                             gse=gse,
                             finding=f"{evidence.title} supports {focus.label}.",
+                            focus_key=focus.key,
+                            focus_label=focus.label,
+                            title=evidence.title,
+                            why_selected=evidence.why_selected,
                         )
                     )
 

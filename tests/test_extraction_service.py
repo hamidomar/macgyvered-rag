@@ -2,7 +2,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from turborefi.config import Settings
-from turborefi.extraction.service import DocumentExtractionService
+from turborefi.extraction.service import DocumentExtractionService, UnsupportedDocumentError
 
 
 class FakeOpenAIClient:
@@ -24,6 +24,20 @@ class FakeOpenAIClient:
           "original_property_value": 450000
         }
         ```"""
+        message = SimpleNamespace(content=content)
+        choice = SimpleNamespace(message=message)
+        return SimpleNamespace(choices=[choice])
+
+
+class QueueOpenAIClient:
+    def __init__(self, *contents: str):
+        self.contents = list(contents)
+        self.calls = []
+        self.chat = SimpleNamespace(completions=SimpleNamespace(create=self.create))
+
+    def create(self, **kwargs):
+        self.calls.append(kwargs)
+        content = self.contents.pop(0)
         message = SimpleNamespace(content=content)
         choice = SimpleNamespace(message=message)
         return SimpleNamespace(choices=[choice])
@@ -51,6 +65,7 @@ def build_settings(tmp_path: Path) -> Settings:
         playground_host="0.0.0.0",
         playground_port=7777,
         agno_history_length=5,
+        screening_new_rate=6.0,
     )
 
 
@@ -83,3 +98,77 @@ def test_infer_supporting_doc_type_from_filename(tmp_path):
     )
 
     assert inferred == "w2"
+
+
+def test_infer_supporting_doc_type_from_filename_identity(tmp_path):
+    service = DocumentExtractionService(
+        settings=build_settings(tmp_path),
+        client=FakeOpenAIClient(),
+    )
+
+    inferred = service.infer_supporting_doc_type(
+        b"unused",
+        filename="08_Drivers_License.pdf",
+        mime_type="application/pdf",
+    )
+
+    assert inferred == "identity"
+
+
+def test_extract_upload_identity_pdf_with_no_text_uses_filename_fallback(tmp_path):
+    service = DocumentExtractionService(
+        settings=build_settings(tmp_path),
+        client=FakeOpenAIClient(),
+    )
+    service._extract_pdf_text = lambda _file_bytes: ""
+
+    doc_type, document = service.extract_upload(
+        file_bytes=b"%PDF-1.4",
+        filename="08_Drivers_License.pdf",
+        mime_type="application/pdf",
+        is_new_session=False,
+    )
+
+    assert doc_type == "identity"
+    assert document.document_present is True
+    assert document.document_type == "driver_license"
+
+
+def test_pdf_doc_type_inference_uses_rendered_images_when_text_missing(tmp_path):
+    client = QueueOpenAIClient('{"doc_type": "identity"}')
+    service = DocumentExtractionService(
+        settings=build_settings(tmp_path),
+        client=client,
+    )
+    service._extract_pdf_text = lambda _file_bytes: ""
+    service._pdf_page_images = lambda _file_bytes: ["ZmFrZS1wbmc="]
+
+    inferred = service.infer_supporting_doc_type(
+        b"%PDF-1.4",
+        filename="mystery.pdf",
+        mime_type="application/pdf",
+    )
+
+    assert inferred == "identity"
+    content = client.calls[0]["messages"][0]["content"]
+    assert any(block["type"] == "image_url" for block in content)
+
+
+def test_infer_supporting_doc_type_rejects_unknown_documents(tmp_path):
+    service = DocumentExtractionService(
+        settings=build_settings(tmp_path),
+        client=FakeOpenAIClient(),
+    )
+    service._extract_pdf_text = lambda _file_bytes: ""
+    service._infer_supporting_doc_type_with_model = lambda *args, **kwargs: "unknown"
+
+    try:
+        service.infer_supporting_doc_type(
+            b"%PDF-1.4",
+            filename="mystery.pdf",
+            mime_type="application/pdf",
+        )
+    except UnsupportedDocumentError as exc:
+        assert "could not determine" in str(exc).lower()
+    else:
+        raise AssertionError("Expected UnsupportedDocumentError")

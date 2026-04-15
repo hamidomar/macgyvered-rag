@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 from turborefi.api import build_api
 from turborefi.config import Settings
+from turborefi.extraction.service import UnsupportedDocumentError
 from turborefi.schemas import MortgageStatementData, PaystubData, W2Data
 from turborefi.services.intake_resolver import DeterministicIntakeResolver
 from turborefi.services.session_service import TurboRefiSessionService
@@ -55,6 +56,11 @@ class FakeExtractionService:
                     pay_period_end_date=pay_period_end_date,
                 ),
             )
+        if filename and "driver" in filename.lower():
+            return (
+                "identity",
+                {"document_present": True, "document_type": "driver_license"},
+            )
         return (
             "w2",
             W2Data(
@@ -62,6 +68,18 @@ class FakeExtractionService:
                 wages_box1=96000,
                 tax_year=2025,
             ),
+        )
+
+
+class UnsupportedExtractionService(FakeExtractionService):
+    def extract_upload(self, *, filename, doc_type=None, is_new_session=False, **kwargs):
+        if filename and "mystery" in filename.lower() and not is_new_session:
+            raise UnsupportedDocumentError("Could not determine the supporting document type.")
+        return super().extract_upload(
+            filename=filename,
+            doc_type=doc_type,
+            is_new_session=is_new_session,
+            **kwargs,
         )
 
 
@@ -87,6 +105,7 @@ def build_settings(tmp_path: Path) -> Settings:
         playground_host="0.0.0.0",
         playground_port=7777,
         agno_history_length=5,
+        screening_new_rate=6.0,
     )
 
 
@@ -166,3 +185,59 @@ def test_api_ingest_status_result_and_verify(tmp_path):
     verify_response = client.post(f"/session/{session_id}/verify")
     assert verify_response.status_code == 200
     assert verify_response.json()["verification_status"] == "PASS"
+
+
+def test_api_allows_identity_uploads_in_existing_session(tmp_path):
+    service = TurboRefiSessionService(
+        settings=build_settings(tmp_path),
+        retrieval_service=FakeHierarchyRetrievalService(),
+        extraction_service=FakeExtractionService(),
+        loa_agent=FakeAgent("loa"),
+        verifier_agent=FakeAgent("verifier"),
+        intake_resolver=DeterministicIntakeResolver(),
+    )
+    client = TestClient(build_api(service))
+
+    create_response = client.post(
+        "/ingest",
+        files={"file": ("statement.pdf", b"statement", "application/pdf")},
+    )
+    assert create_response.status_code == 200
+    session_id = create_response.json()["session_id"]
+
+    upload_response = client.post(
+        "/ingest",
+        data={"session_id": session_id},
+        files={"file": ("08_Drivers_License.pdf", b"document", "application/pdf")},
+    )
+
+    assert upload_response.status_code == 200
+    assert upload_response.json()["document_type"] == "identity"
+
+
+def test_api_returns_400_for_unsupported_supporting_document(tmp_path):
+    service = TurboRefiSessionService(
+        settings=build_settings(tmp_path),
+        retrieval_service=FakeHierarchyRetrievalService(),
+        extraction_service=UnsupportedExtractionService(),
+        loa_agent=FakeAgent("loa"),
+        verifier_agent=FakeAgent("verifier"),
+        intake_resolver=DeterministicIntakeResolver(),
+    )
+    client = TestClient(build_api(service))
+
+    create_response = client.post(
+        "/ingest",
+        files={"file": ("statement.pdf", b"statement", "application/pdf")},
+    )
+    assert create_response.status_code == 200
+    session_id = create_response.json()["session_id"]
+
+    upload_response = client.post(
+        "/ingest",
+        data={"session_id": session_id},
+        files={"file": ("mystery.pdf", b"document", "application/pdf")},
+    )
+
+    assert upload_response.status_code == 400
+    assert "could not determine" in upload_response.json()["detail"].lower()

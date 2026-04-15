@@ -23,6 +23,14 @@ const documentLabel = (value: string) =>
 const phaseLabel = (value: string | null) =>
   value ? value.replace(/_/g, ' ') : 'awaiting mortgage statement'
 
+const summarizeDocumentCounts = (documentTypes: string[]) => {
+  const counts = new Map<string, number>()
+  for (const documentType of documentTypes) {
+    counts.set(documentType, (counts.get(documentType) ?? 0) + 1)
+  }
+  return Array.from(counts.entries())
+}
+
 const ChatInput = () => {
   const { chatInputRef } = useStore()
   const { ingestDocument, loadSession, sendMessage, isTurboRefiLoading } =
@@ -36,8 +44,16 @@ const ChatInput = () => {
   const mode = useStore((state) => state.mode)
   const agents = useStore((state) => state.agents)
   const turboRefiSession = useStore((state) => state.turboRefiSession)
+  const turboRefiScreeningRate = useStore(
+    (state) => state.turboRefiScreeningRate
+  )
+  const setTurboRefiScreeningRate = useStore(
+    (state) => state.setTurboRefiScreeningRate
+  )
   const resetTurboRefiSession = useStore((state) => state.resetTurboRefiSession)
-  const selectedAgentDetails = agents.find((agent) => agent.id === selectedAgent)
+  const selectedAgentDetails = agents.find(
+    (agent) => agent.id === selectedAgent
+  )
   const isLoanOfficerSelected = selectedAgent
     ? selectedAgentDetails
       ? isTurboRefiLoanOfficer(selectedAgentDetails.name)
@@ -45,12 +61,10 @@ const ChatInput = () => {
     : false
   const hasActiveTurboRefiSession = Boolean(
     turboRefiSessionId &&
-      (
-        turboRefiSession.currentPhase ||
+      (turboRefiSession.currentPhase ||
         turboRefiSession.documentsReceived.length > 0 ||
         turboRefiSession.documentsPending.length > 0 ||
-        turboRefiSession.intakePending.length > 0
-      )
+        turboRefiSession.intakePending.length > 0)
   )
 
   useEffect(() => {
@@ -112,32 +126,78 @@ const ChatInput = () => {
   }
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+    const files = Array.from(event.target.files ?? [])
     event.target.value = ''
 
-    if (!file) return
+    if (files.length === 0) return
 
-    try {
-      await ingestDocument(
-        file,
-        hasActiveTurboRefiSession ? turboRefiSessionId ?? undefined : undefined
-      )
-      requestAnimationFrame(() => chatInputRef?.current?.focus())
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to upload document'
+    let nextSessionId = hasActiveTurboRefiSession
+      ? (turboRefiSessionId ?? undefined)
+      : undefined
+    let successCount = 0
+
+    for (const file of files) {
+      try {
+        const result = await ingestDocument(file, nextSessionId)
+        nextSessionId = result.session_id
+        successCount += 1
+      } catch (error) {
+        toast.error(
+          `${file.name}: ${
+            error instanceof Error ? error.message : 'Failed to upload document'
+          }`
+        )
+      }
+    }
+
+    if (files.length > 1 && successCount > 0) {
+      toast.success(
+        `Uploaded ${successCount} of ${files.length} selected documents`
       )
     }
+
+    requestAnimationFrame(() => chatInputRef?.current?.focus())
   }
 
-  const receivedDocuments = turboRefiSession.documentsReceived
+  const receivedDocuments = summarizeDocumentCounts(
+    turboRefiSession.documentsReceived
+  )
+  const activeScreeningRate =
+    typeof turboRefiSession.screeningAssumptions?.new_rate === 'number'
+      ? turboRefiSession.screeningAssumptions.new_rate
+      : null
 
   return (
     <div className="mx-auto w-full max-w-2xl font-geist">
       <div className="mb-2 flex flex-wrap items-center gap-2 px-1 text-xs">
-        <span className="rounded-full border border-border bg-background px-3 py-1 text-foreground">
+        <span className="text-foreground rounded-full border border-border bg-background px-3 py-1">
           Phase: {phaseLabel(turboRefiSession.currentPhase)}
         </span>
+        {hasActiveTurboRefiSession ? (
+          <span className="text-muted-foreground rounded-full border border-border bg-background px-3 py-1">
+            Screening rate:{' '}
+            {activeScreeningRate === null
+              ? 'not set'
+              : `${activeScreeningRate.toFixed(3)}%`}
+          </span>
+        ) : (
+          <label className="text-muted-foreground flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1">
+            <span>Screening rate</span>
+            <input
+              type="number"
+              min="0"
+              step="0.125"
+              value={turboRefiScreeningRate ?? ''}
+              onChange={(event) => {
+                const value = event.target.value
+                setTurboRefiScreeningRate(value ? Number(value) : null)
+              }}
+              className="text-foreground w-16 border-0 bg-transparent text-right outline-none"
+              disabled={isTurboRefiLoading || isStreaming}
+            />
+            <span>%</span>
+          </label>
+        )}
         {hasActiveTurboRefiSession ? (
           <>
             {turboRefiSession.intakePending.length > 0 && (
@@ -145,12 +205,13 @@ const ChatInput = () => {
                 Need: {turboRefiSession.intakePending.join(', ')}
               </span>
             )}
-            {receivedDocuments.map((doc) => (
+            {receivedDocuments.map(([doc, count]) => (
               <span
                 key={doc}
-                className="rounded-full border border-border bg-background px-3 py-1 text-muted-foreground"
+                className="text-muted-foreground rounded-full border border-border bg-background px-3 py-1"
               >
                 {documentLabel(doc)}
+                {count > 1 ? ` x${count}` : ''}
               </span>
             ))}
             {turboRefiSession.documentsPending.length > 0 && (
@@ -172,6 +233,7 @@ const ChatInput = () => {
           ref={fileInputRef}
           type="file"
           accept=".pdf,image/*"
+          multiple
           onChange={handleFileChange}
           className="hidden"
           disabled={!canUpload}
@@ -182,7 +244,7 @@ const ChatInput = () => {
           size="sm"
           onClick={handleUploadClick}
           disabled={!canUpload}
-          className="h-10 shrink-0 rounded-xl border-border bg-background px-3 text-foreground hover:bg-accent"
+          className="text-foreground h-10 shrink-0 rounded-xl border-border bg-background px-3 hover:bg-accent"
         >
           <Icon type="plus-icon" size="xs" className="text-foreground" />
           <span>
@@ -208,7 +270,7 @@ const ChatInput = () => {
               handleSubmit()
             }
           }}
-          className="min-h-[40px] border-0 bg-transparent px-2 text-sm text-foreground shadow-none focus-visible:border-transparent focus-visible:ring-0"
+          className="text-foreground min-h-[40px] border-0 bg-transparent px-2 text-sm shadow-none focus-visible:border-transparent focus-visible:ring-0"
           disabled={!canChat}
           ref={chatInputRef}
         />
@@ -216,7 +278,7 @@ const ChatInput = () => {
           onClick={handleSubmit}
           disabled={!canChat || !inputMessage.trim() || isStreaming}
           size="icon"
-          className="rounded-xl bg-primary text-primary-foreground"
+          className="text-primary-foreground rounded-xl bg-primary"
         >
           <Icon type="send" className="text-primary-foreground" />
         </Button>

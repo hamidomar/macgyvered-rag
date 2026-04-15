@@ -53,6 +53,35 @@ export const createTurboRefiSessionAPI = async (
   return response.json()
 }
 
+export const createTurboRefiSessionFromJsonAPI = async (
+  endpoint: string,
+  payload: Record<string, unknown>,
+  options?: {
+    newRate?: number
+    sessionName?: string
+    authToken?: string
+  }
+): Promise<TurboRefiSessionCreateResponse> => {
+  const response = await fetch(`${endpoint}/session/from-json`, {
+    method: 'POST',
+    headers: {
+      ...createHeaders(options?.authToken),
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      payload,
+      new_rate: options?.newRate,
+      session_name: options?.sessionName
+    })
+  })
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response))
+  }
+
+  return response.json()
+}
+
 export const uploadTurboRefiDocumentAPI = async (
   endpoint: string,
   sessionId: string,
@@ -69,6 +98,32 @@ export const uploadTurboRefiDocumentAPI = async (
     headers: createHeaders(authToken),
     body: formData
   })
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response))
+  }
+
+  return response.json()
+}
+
+export const uploadTurboRefiDocumentJsonAPI = async (
+  endpoint: string,
+  sessionId: string,
+  docType: TurboRefiDocumentType,
+  data: Record<string, unknown>,
+  authToken?: string
+): Promise<TurboRefiSessionUploadResponse> => {
+  const response = await fetch(
+    `${endpoint}/session/${sessionId}/document-json`,
+    {
+      method: 'POST',
+      headers: {
+        ...createHeaders(authToken),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ doc_type: docType, data })
+    }
+  )
 
   if (!response.ok) {
     throw new Error(await readErrorMessage(response))
@@ -198,6 +253,11 @@ export const sendTurboRefiMessageAPI = async (
 
   return response.json()
 }
+
+export const getTurboRefiMessageStreamUrl = (
+  endpoint: string,
+  sessionId: string
+) => `${endpoint}/session/${sessionId}/message/stream`
 
 export const getTurboRefiResultAPI = async (
   endpoint: string,

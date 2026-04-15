@@ -1,0 +1,145 @@
+{
+  "core": {
+    "balance": 298000.00,
+    "rate": 7.125,
+    "monthlyPayment": 2832.14,
+    "paymentBreakdown": {
+      "principal": null,
+      "interest": null,
+      "escrow": 650.00,
+      "pmi": 175.00,
+      "other": null
+    },
+    "loanNumber": "MC-2021-339127",
+    "propertyAddress": "4518 Westlake Dr, Westlake, OH 44145",
+    "servicer": "Mr. Cooper",
+    "loanType": "conventional",
+    "rateType": "fixed",
+    "originationDate": "2021-06-01",
+    "maturityDate": "2051-07-01",
+    "loanTermYears": 30,
+    "originalLoanAmount": 335000,
+    "armResetDate": null,
+    "propertyValue": 378000,
+    "propertyData": {
+      "estimatedValue": 378000,
+      "purchasePrice": 345000,
+      "purchaseDate": "06/2021",
+      "propertyType": "single family home",
+      "county": "Cuyahoga County"
+    }
+  },
+  "profile": {
+    "pmiStatus": "borrower_paid"
+  },
+  "statement": {
+    "statementDate": "03/2026",
+    "statementDateRaw": "2026-03-01",
+    "escrowBalance": 1300.00,
+    "pastDue": 0,
+    "feesAndCharges": 0,
+    "ytdPrincipal": null,
+    "ytdInterest": null,
+    "ytdEscrow": null,
+    "unappliedBalance": 0,
+    "borrowerName": "See mortgage statement",
+    "borrowerAddress": "4518 Westlake Dr, Westlake, OH 44145",
+    "paymentDueDate": "2026-04-01"
+  },
+  "raw": {
+    "core": {
+      "balance": 298000.00,
+      "rate": 7.125,
+      "monthly_payment": 2832.14,
+      "principal": null,
+      "interest": null,
+      "escrow": 650.00,
+      "pmi": 175.00,
+      "other_charges": null,
+      "loan_number": "MC-2021-339127",
+      "property_address": "4518 Westlake Dr, Westlake, OH 44145"
+    },
+    "profile": {
+      "servicer": "Mr. Cooper",
+      "loan_type": "conventional",
+      "rate_type": "fixed",
+      "origination_date": "2021-06-01",
+      "maturity_date": "2051-07-01",
+      "loan_term_years": 30,
+      "original_loan_amount": 335000
+    },
+    "statement": {
+      "statement_date": "2026-03-01",
+      "payment_due_date": "2026-04-01",
+      "escrow_balance": 1300.00,
+      "past_due": 0,
+      "fees_and_charges": 0,
+      "ytd_principal": null,
+      "ytd_interest": null,
+      "ytd_escrow": null,
+      "unapplied_balance": 0,
+      "borrower_name": "See mortgage statement",
+      "borrower_address": "4518 Westlake Dr, Westlake, OH 44145"
+    },
+    "extra": {
+      "customer_service_phone": null,
+      "arm_reset_date": null,
+      "arm_index_margin": null,
+      "statement_note": "SIMULATED DOCUMENT — TurboRefi Test Suite"
+    }
+  },
+  "formDecisions": {
+    "loanType": "conventional",
+    "rateType": "fixed",
+    "loanMonth": "06",
+    "loanYear": "2021",
+    "yearsRemaining": "25",
+    "interestRate": "7.125",
+    "remainingBalance": "298000",
+    "monthlyPayment": "2832",
+    "paymentIncludesEscrow": "yes",
+    "escrowAmount": "650",
+    "paymentIncludesPmi": "yes",
+    "pmiStatus": "borrower_paid",
+    "pmiAmount": "175",
+    "armResetMonth": null,
+    "armResetYear": null,
+    "reasoning": {
+      "loanType": "Statement explicitly states CONVENTIONAL.",
+      "rateType": "No ARM language present on statement; rate stated as a fixed 7.125%.",
+      "loanMonth": "Origination date fabricated as 2021-06-01 consistent with loan number year; month is 06.",
+      "loanYear": "Loan number prefix MC-2021 implies 2021 origination.",
+      "yearsRemaining": "Maturity 2051-07, statement date 2026-03-01, approximately 25 years 4 months remaining; integer estimate is 25.",
+      "interestRate": "Statement explicitly states 7.125%.",
+      "remainingBalance": "Unpaid Principal Balance stated as $298,000.00.",
+      "monthlyPayment": "Total Monthly Payment stated as $2,832.14; formatted as 2832.",
+      "paymentIncludesEscrow": "Escrow (Tax + Insurance) line item present at $650.00; consistent with tax bill monthly equivalent of $600 plus insurance portion.",
+      "escrowAmount": "Escrow line item is $650.00; digits only as 650.",
+      "paymentIncludesPmi": "PMI line item explicitly present at $175.00.",
+      "pmiStatus": "Borrower-paid PMI confirmed from payment breakdown.",
+      "pmiAmount": "PMI amount is $175.00; digits only as 175.",
+      "armResetMonth": "No ARM; field is null.",
+      "armResetYear": "No ARM; field is null."
+    }
+  },
+  "propertyLookup": {
+    "found": true,
+    "estimatedValue": 378000,
+    "purchasePrice": 345000,
+    "purchaseDate": "06/2021",
+    "propertyType": "single family home",
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "squareFeet": 1540,
+    "yearBuilt": 1962,
+    "lotSize": "6,800 square feet",
+    "propertyTaxAnnual": 7200,
+    "streetAddress": "4518 Westlake Dr",
+    "city": "Westlake",
+    "state": "OH",
+    "zipCode": "44145",
+    "county": "Cuyahoga County",
+    "source": "gemini-search",
+    "lookupTimeMs": 5340
+  }
+}

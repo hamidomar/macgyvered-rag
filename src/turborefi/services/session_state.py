@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from typing import Any
 
+from pydantic import BaseModel
 from turborefi.rules.document_requirements import get_document_status
 from turborefi.schemas import (
     BorrowerCase,
@@ -14,6 +16,8 @@ from turborefi.schemas import (
     W2Data,
 )
 from turborefi.services.intake_service import get_intake_pending
+from turborefi.services.information_firewall import build_loa_visible_session
+from turborefi.services.minimal_assessment import refresh_minimal_uc1_uc2_assessment
 
 
 def infer_income_type(state: SessionState) -> str:
@@ -53,6 +57,16 @@ def _document_counts(documents: DocumentSet) -> dict[str, int]:
 def refresh_session_state(state: SessionState) -> SessionState:
     documents = state.documents
     state.updated_at = datetime.now(UTC)
+
+    if state.source_mode == "received_json_uc1_uc2":
+        state.income_type = "w2"
+        if state.received_mortgage and state.received_mortgage.pmi_monthly and state.received_mortgage.pmi_monthly > 0:
+            state.use_case = "uc2_pmi_removal"
+        if state.borrower_facts.pmi_type in {"borrower_paid", "lender_paid", "unknown"}:
+            state.use_case = "uc2_pmi_removal"
+        state.borrower_name = "Borrower"
+        return refresh_minimal_uc1_uc2_assessment(state)
+
     state.income_type = infer_income_type(state)
     state.use_case = infer_use_case(state)
 
@@ -123,7 +137,7 @@ def add_document_to_session(
     state: SessionState,
     *,
     doc_type: str,
-    document: MortgageStatementData | PaystubData | W2Data | ScheduleCData,
+    document: MortgageStatementData | PaystubData | W2Data | ScheduleCData | dict[str, Any] | BaseModel,
 ) -> SessionState:
     next_state = state.model_copy(deep=True)
 
@@ -143,10 +157,18 @@ def add_document_to_session(
         next_state.documents.schedule_c.append(document)
         next_state.documents.schedule_c.sort(key=lambda entry: entry.tax_year)
     else:
-        raise ValueError(f"Unsupported document type: {doc_type}")
+        if isinstance(document, BaseModel):
+            payload = document.model_dump(mode="json")
+        elif isinstance(document, dict):
+            payload = document
+        else:
+            raise ValueError(f"Unsupported document type: {doc_type}")
+        next_state.documents.additional_documents.setdefault(doc_type, []).append(payload)
 
     return refresh_session_state(next_state)
 
 
 def session_to_agent_state(state: SessionState) -> dict:
+    if state.source_mode == "received_json_uc1_uc2":
+        return build_loa_visible_session(state)
     return state.model_dump(mode="json")

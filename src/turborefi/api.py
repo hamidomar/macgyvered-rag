@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
+from datetime import UTC, datetime
+from typing import Any
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from turborefi.extraction.service import SECONDARY_DOCUMENT_TYPES
+from turborefi.extraction.service import SECONDARY_DOCUMENT_TYPES, UnsupportedDocumentError
 from turborefi.services.session_service import TurboRefiSessionService
 
 
@@ -15,6 +19,11 @@ logger = logging.getLogger(__name__)
 
 class MessageRequest(BaseModel):
     message: str
+
+
+class DocumentJsonRequest(BaseModel):
+    doc_type: str
+    data: dict[str, Any]
 
 
 def _status_income_docs(state) -> list[dict]:
@@ -34,6 +43,54 @@ def _status_income_docs(state) -> list[dict]:
     return documents
 
 
+def _trace_result_text(result: Any) -> str:
+    if isinstance(result, str):
+        return result
+    if result is None:
+        return ""
+    return json.dumps(result, indent=2, default=str)
+
+
+def _trace_to_tool_payload(trace: dict[str, Any], index: int, *, created_at: int) -> dict[str, Any]:
+    tool_name = str(trace.get("tool") or "tool")
+    arguments = trace.get("arguments") or {}
+    result = trace.get("result")
+    return {
+        "role": "tool",
+        "content": _trace_result_text(result),
+        "tool_call_id": f"{tool_name}-{created_at}-{index}",
+        "tool_name": tool_name,
+        "tool_args": {
+            key: value if isinstance(value, str) else json.dumps(value, default=str)
+            for key, value in arguments.items()
+        },
+        "tool_call_error": isinstance(result, dict) and result.get("status") == "error",
+        "metrics": {"time": 0},
+        "created_at": created_at + index,
+    }
+
+
+def _stream_json_event(payload: dict[str, Any]) -> str:
+    return json.dumps(payload, default=str) + "\n"
+
+
+def _text_stream_chunks(text: str, *, chunk_size: int = 28) -> list[str]:
+    if not text:
+        return [""]
+    chunks: list[str] = []
+    current = ""
+    for word in text.split(" "):
+        next_value = word if not current else f"{current} {word}"
+        if len(next_value) > chunk_size and current:
+            chunks.append(current)
+            current = word
+        else:
+            current = next_value
+    if current:
+        chunks.append(current)
+    return chunks
+
+
 def _serialize_session_summary(state) -> dict:
     return {
         "session_id": state.session_id,
@@ -41,6 +98,10 @@ def _serialize_session_summary(state) -> dict:
         "created_at": int(state.created_at.timestamp()),
         "updated_at": int(state.updated_at.timestamp()),
         "current_phase": state.current_phase,
+        "use_case": state.use_case,
+        "state_machine_state": state.state_machine_state,
+        "referral_decision": state.referral_decision,
+        "full_application_intent": state.full_application_intent,
     }
 
 
@@ -51,6 +112,25 @@ def _serialize_session_detail(state) -> dict:
         "documents_received": state.received_documents,
         "documents_pending": state.pending_documents if state.loa_output is not None else state.missing_documents,
         "borrower_facts": state.borrower_facts.model_dump(mode="json"),
+        "borrower_id_token": state.borrower_id_token,
+        "received_mortgage": (
+            state.received_mortgage.model_dump(mode="json")
+            if state.received_mortgage is not None
+            else None
+        ),
+        "screening_assumptions": state.screening_assumptions.model_dump(mode="json"),
+        "source_data_warnings": state.source_data_warnings,
+        "calculated_outputs": state.calculated_outputs,
+        "lars_result": (
+            state.lars_result.model_dump(mode="json")
+            if state.lars_result is not None
+            else None
+        ),
+        "handoff_package": (
+            state.handoff_package.model_dump(mode="json")
+            if state.handoff_package is not None
+            else None
+        ),
         "mortgage_data": (
             state.documents.mortgage_statement.model_dump(mode="json")
             if state.documents.mortgage_statement
@@ -160,15 +240,19 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
             }
 
         if doc_type and doc_type not in SECONDARY_DOCUMENT_TYPES:
-            raise HTTPException(status_code=400, detail="Supporting uploads must be paystub, w2, or schedule_c")
+            supported = ", ".join(SECONDARY_DOCUMENT_TYPES)
+            raise HTTPException(status_code=400, detail=f"Supporting uploads must be one of: {supported}")
 
-        effective_doc_type, document = service.extraction_service.extract_upload(
-            file_bytes=file_bytes,
-            filename=filename,
-            mime_type=mime_type,
-            doc_type=doc_type,
-            is_new_session=False,
-        )
+        try:
+            effective_doc_type, document = service.extraction_service.extract_upload(
+                file_bytes=file_bytes,
+                filename=filename,
+                mime_type=mime_type,
+                doc_type=doc_type,
+                is_new_session=False,
+            )
+        except UnsupportedDocumentError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
         response_text, state, tool_trace = service.upload_secondary_document(
             session_id,
             effective_doc_type,
@@ -202,6 +286,41 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc))
 
+    @api.post("/session/from-json")
+    async def create_session_from_json(request: dict[str, Any]):
+        try:
+            if "payload" in request:
+                payload = request["payload"]
+                new_rate = request.get("new_rate")
+                assumptions = request.get("screening_assumptions") or {}
+                if new_rate is None:
+                    new_rate = assumptions.get("new_rate")
+            else:
+                payload = request
+                new_rate = request.get("new_rate")
+            if not isinstance(payload, dict):
+                raise HTTPException(status_code=400, detail="payload must be a JSON object")
+            session_id, response_text, state, tool_trace = service.create_session_from_received_json(
+                payload,
+                new_rate=new_rate,
+                session_name=request.get("session_name") if "payload" in request else None,
+            )
+            return {
+                "session_id": session_id,
+                "response": response_text,
+                "current_phase": state.current_phase,
+                "use_case": state.use_case,
+                "state_machine_state": state.state_machine_state,
+                "screening_assumptions": state.screening_assumptions.model_dump(mode="json"),
+                "lars_result": state.lars_result.model_dump(mode="json") if state.lars_result else None,
+                "handoff_package": state.handoff_package.model_dump(mode="json") if state.handoff_package else None,
+                "tool_trace": tool_trace,
+            }
+        except HTTPException:
+            raise
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc))
+
     @api.post("/session/{session_id}/upload")
     async def upload_document(session_id: str, doc_type: str = Form(...), file: UploadFile = File(...)):
         try:
@@ -219,6 +338,27 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
             }
         except HTTPException:
             raise
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc))
+
+    @api.post("/session/{session_id}/document-json")
+    async def upload_document_json(session_id: str, request: DocumentJsonRequest):
+        if not service.session_exists(session_id):
+            raise HTTPException(status_code=404, detail="Session not found")
+        try:
+            response_text, state, tool_trace = service.upload_document_json(
+                session_id,
+                request.doc_type,
+                request.data,
+            )
+            return {
+                "response": response_text,
+                "current_phase": state.current_phase,
+                "state_machine_state": state.state_machine_state,
+                "lars_result": state.lars_result.model_dump(mode="json") if state.lars_result else None,
+                "handoff_package": state.handoff_package.model_dump(mode="json") if state.handoff_package else None,
+                "tool_trace": tool_trace,
+            }
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc))
 
@@ -260,6 +400,105 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc))
 
+    @api.post("/session/{session_id}/message/stream")
+    async def send_message_stream(session_id: str, request: MessageRequest):
+        if not service.session_exists(session_id):
+            raise HTTPException(status_code=404, detail="Session not found")
+
+        async def event_stream():
+            created_at = int(datetime.now(UTC).timestamp())
+            yield _stream_json_event(
+                {
+                    "event": "RunStarted",
+                    "content": "",
+                    "content_type": "str",
+                    "session_id": session_id,
+                    "created_at": created_at,
+                }
+            )
+
+            try:
+                response_text, state, tool_trace = await asyncio.to_thread(
+                    service.send_message,
+                    session_id,
+                    request.message,
+                )
+                tool_payloads = [
+                    _trace_to_tool_payload(trace, index, created_at=created_at + 1)
+                    for index, trace in enumerate(tool_trace)
+                ]
+
+                for index, tool_payload in enumerate(tool_payloads):
+                    started_payload = {
+                        **tool_payload,
+                        "content": "Running",
+                        "tool_call_error": False,
+                    }
+                    yield _stream_json_event(
+                        {
+                            "event": "ToolCallStarted",
+                            "content": "",
+                            "content_type": "str",
+                            "session_id": session_id,
+                            "tool": started_payload,
+                            "created_at": created_at + index + 1,
+                        }
+                    )
+                    await asyncio.sleep(0)
+                    yield _stream_json_event(
+                        {
+                            "event": "ToolCallCompleted",
+                            "content": "",
+                            "content_type": "str",
+                            "session_id": session_id,
+                            "tool": tool_payload,
+                            "created_at": created_at + index + 1,
+                        }
+                    )
+
+                cumulative = ""
+                for chunk in _text_stream_chunks(response_text):
+                    cumulative = chunk if not cumulative else f"{cumulative} {chunk}"
+                    yield _stream_json_event(
+                        {
+                            "event": "RunContent",
+                            "content": cumulative,
+                            "content_type": "str",
+                            "session_id": session_id,
+                            "created_at": int(state.updated_at.timestamp()),
+                        }
+                    )
+                    await asyncio.sleep(0)
+
+                yield _stream_json_event(
+                    {
+                        "event": "RunCompleted",
+                        "content": response_text,
+                        "content_type": "str",
+                        "session_id": session_id,
+                        "tools": tool_payloads,
+                        "event_data": {
+                            "current_phase": state.current_phase,
+                            "use_case": state.use_case,
+                            "state_machine_state": state.state_machine_state,
+                        },
+                        "created_at": int(state.updated_at.timestamp()),
+                    }
+                )
+            except Exception as exc:
+                logger.exception("TurboRefi stream failed for session_id=%s", session_id)
+                yield _stream_json_event(
+                    {
+                        "event": "RunError",
+                        "content": str(exc),
+                        "content_type": "str",
+                        "session_id": session_id,
+                        "created_at": int(datetime.now(UTC).timestamp()),
+                    }
+                )
+
+        return StreamingResponse(event_stream(), media_type="application/x-ndjson")
+
     @api.get("/session/{session_id}/status")
     async def get_status(session_id: str):
         if not service.session_exists(session_id):
@@ -268,9 +507,30 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
         pending = state.pending_documents if state.loa_output is not None else state.missing_documents
         return {
             "current_phase": state.current_phase,
+            "use_case": state.use_case,
+            "state_machine_state": state.state_machine_state,
+            "referral_decision": state.referral_decision,
             "intake_pending": state.intake_pending,
             "documents_received": state.received_documents,
             "documents_pending": pending,
+            "screening_assumptions": state.screening_assumptions.model_dump(mode="json"),
+            "received_mortgage": (
+                state.received_mortgage.model_dump(mode="json")
+                if state.received_mortgage is not None
+                else None
+            ),
+            "calculated_outputs": state.calculated_outputs,
+            "lars_result": (
+                state.lars_result.model_dump(mode="json")
+                if state.lars_result is not None
+                else None
+            ),
+            "handoff_package": (
+                state.handoff_package.model_dump(mode="json")
+                if state.handoff_package is not None
+                else None
+            ),
+            "source_data_warnings": state.source_data_warnings,
             "verification_status": (
                 state.verifier_output.verification_status
                 if state.verifier_output is not None
@@ -318,6 +578,8 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
     async def verify_session(session_id: str):
         if not service.session_exists(session_id):
             raise HTTPException(status_code=404, detail="Session not found")
+        if service.get_state(session_id).source_mode == "received_json_uc1_uc2":
+            raise HTTPException(status_code=400, detail="Verifier is not part of the UC1/UC2 target flow")
         try:
             report, _state = service.verify_session(session_id)
         except ValueError as exc:

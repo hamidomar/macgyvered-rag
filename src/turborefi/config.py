@@ -24,6 +24,7 @@ class Settings:
     playground_host: str
     playground_port: int
     agno_history_length: int
+    screening_new_rate: float | None
 
 
 def _optional_path(value: str | None, base_dir: Path) -> Path | None:
@@ -45,6 +46,12 @@ def _index_path(value: str | None, base_dir: Path, default_relative: str) -> Pat
         return default_path
 
     return configured
+
+
+def _optional_float(value: str | None, default: float | None = None) -> float | None:
+    if value is None or value.strip() == "":
+        return default
+    return float(value)
 
 
 def load_settings() -> Settings:
@@ -88,4 +95,5 @@ def load_settings() -> Settings:
         playground_host=os.getenv("PLAYGROUND_HOST", "0.0.0.0"),
         playground_port=int(os.getenv("PLAYGROUND_PORT", "7777")),
         agno_history_length=int(os.getenv("AGNO_HISTORY_LENGTH", "12")),
+        screening_new_rate=_optional_float(os.getenv("SCREENING_NEW_RATE"), 6.0),
     )

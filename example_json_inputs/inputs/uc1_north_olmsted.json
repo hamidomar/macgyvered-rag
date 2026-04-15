@@ -1,0 +1,145 @@
+{
+  "core": {
+    "balance": 290000.00,
+    "rate": 7.5,
+    "monthlyPayment": 2627.64,
+    "paymentBreakdown": {
+      "principal": null,
+      "interest": null,
+      "escrow": 600.00,
+      "pmi": null,
+      "other": null
+    },
+    "loanNumber": "NHL-2019-448291",
+    "propertyAddress": "1247 Maple Ridge Dr, North Olmsted, OH 44070",
+    "servicer": "National Home Lending",
+    "loanType": "conventional",
+    "rateType": "fixed",
+    "originationDate": "2019-11-01",
+    "maturityDate": "2049-12-01",
+    "loanTermYears": 30,
+    "originalLoanAmount": 289000,
+    "armResetDate": null,
+    "propertyValue": 375000,
+    "propertyData": {
+      "estimatedValue": 375000,
+      "purchasePrice": 340000,
+      "purchaseDate": "11/2019",
+      "propertyType": "single family home",
+      "county": "Cuyahoga County"
+    }
+  },
+  "profile": {
+    "pmiStatus": null
+  },
+  "statement": {
+    "statementDate": "03/2026",
+    "statementDateRaw": "2026-03-01",
+    "escrowBalance": 1200.00,
+    "pastDue": 0,
+    "feesAndCharges": 0,
+    "ytdPrincipal": null,
+    "ytdInterest": null,
+    "ytdEscrow": null,
+    "unappliedBalance": 0,
+    "borrowerName": "See mortgage statement",
+    "borrowerAddress": "1247 Maple Ridge Dr, North Olmsted, OH 44070",
+    "paymentDueDate": "2026-04-01"
+  },
+  "raw": {
+    "core": {
+      "balance": 290000.00,
+      "rate": 7.5,
+      "monthly_payment": 2627.64,
+      "principal": null,
+      "interest": null,
+      "escrow": 600.00,
+      "pmi": null,
+      "other_charges": null,
+      "loan_number": "NHL-2019-448291",
+      "property_address": "1247 Maple Ridge Dr, North Olmsted, OH 44070"
+    },
+    "profile": {
+      "servicer": "National Home Lending",
+      "loan_type": "conventional",
+      "rate_type": "fixed",
+      "origination_date": "2019-11-01",
+      "maturity_date": "2049-12-01",
+      "loan_term_years": 30,
+      "original_loan_amount": 289000
+    },
+    "statement": {
+      "statement_date": "2026-03-01",
+      "payment_due_date": "2026-04-01",
+      "escrow_balance": 1200.00,
+      "past_due": 0,
+      "fees_and_charges": 0,
+      "ytd_principal": null,
+      "ytd_interest": null,
+      "ytd_escrow": null,
+      "unapplied_balance": 0,
+      "borrower_name": "See mortgage statement",
+      "borrower_address": "1247 Maple Ridge Dr, North Olmsted, OH 44070"
+    },
+    "extra": {
+      "customer_service_phone": null,
+      "arm_reset_date": null,
+      "arm_index_margin": null,
+      "statement_note": "SIMULATED DOCUMENT — TurboRefi Test Suite"
+    }
+  },
+  "formDecisions": {
+    "loanType": "conventional",
+    "rateType": "fixed",
+    "loanMonth": "11",
+    "loanYear": "2019",
+    "yearsRemaining": "23",
+    "interestRate": "7.5",
+    "remainingBalance": "290000",
+    "monthlyPayment": "2627",
+    "paymentIncludesEscrow": "yes",
+    "escrowAmount": "600",
+    "paymentIncludesPmi": "no",
+    "pmiStatus": "no",
+    "pmiAmount": "",
+    "armResetMonth": null,
+    "armResetYear": null,
+    "reasoning": {
+      "loanType": "Statement explicitly states CONVENTIONAL.",
+      "rateType": "No ARM language present on statement; rate stated as a fixed 7.500%.",
+      "loanMonth": "Origination date fabricated as 2019-11-01 consistent with loan number year; month is 11.",
+      "loanYear": "Loan number prefix NHL-2019 implies 2019 origination.",
+      "yearsRemaining": "Maturity 2049-12, statement date 2026-03-01, approximately 23 years 9 months remaining; integer estimate is 23.",
+      "interestRate": "Statement explicitly states 7.500%.",
+      "remainingBalance": "Unpaid Principal Balance stated as $290,000.00.",
+      "monthlyPayment": "Total Monthly Payment stated as $2,627.64; formatted as 2627.",
+      "paymentIncludesEscrow": "Escrow (Tax + Insurance) line item present at $600.00. Tax bill monthly equivalent is $450.00; delta of $150.00 attributed to hazard insurance not itemised on statement.",
+      "escrowAmount": "Escrow line item is $600.00; digits only as 600.",
+      "paymentIncludesPmi": "No PMI line item present in payment breakdown. Original LTV was approximately 85% (289K/340K); PMI likely cancelled after balance paid below 80% of original value, consistent with a 2019 origination reviewed in 2026.",
+      "pmiStatus": "No mortgage insurance shown anywhere in the payment breakdown.",
+      "pmiAmount": "No PMI amount is present.",
+      "armResetMonth": "No ARM; field is null.",
+      "armResetYear": "No ARM; field is null."
+    }
+  },
+  "propertyLookup": {
+    "found": true,
+    "estimatedValue": 375000,
+    "purchasePrice": 340000,
+    "purchaseDate": "11/2019",
+    "propertyType": "single family home",
+    "bedrooms": 4,
+    "bathrooms": 2,
+    "squareFeet": 1780,
+    "yearBuilt": 1971,
+    "lotSize": "7,200 square feet",
+    "propertyTaxAnnual": 5400,
+    "streetAddress": "1247 Maple Ridge Dr",
+    "city": "North Olmsted",
+    "state": "OH",
+    "zipCode": "44070",
+    "county": "Cuyahoga County",
+    "source": "gemini-search",
+    "lookupTimeMs": 5010
+  }
+}

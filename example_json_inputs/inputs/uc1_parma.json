@@ -1,0 +1,145 @@
+{
+  "core": {
+    "balance": 185000.00,
+    "rate": 7.25,
+    "monthlyPayment": 1682.08,
+    "paymentBreakdown": {
+      "principal": null,
+      "interest": null,
+      "escrow": 420.00,
+      "pmi": null,
+      "other": null
+    },
+    "loanNumber": "PM-2020-771834",
+    "propertyAddress": "892 Brookpark Rd, Apt 4B, Parma, OH 44134",
+    "servicer": "PennyMac Financial",
+    "loanType": "conventional",
+    "rateType": "fixed",
+    "originationDate": "2020-08-01",
+    "maturityDate": "2050-09-01",
+    "loanTermYears": 30,
+    "originalLoanAmount": 210000,
+    "armResetDate": null,
+    "propertyValue": 25000,
+    "propertyData": {
+      "estimatedValue": 225000,
+      "purchasePrice": 205000,
+      "purchaseDate": "08/2020",
+      "propertyType": "condominium",
+      "county": "Cuyahoga County"
+    }
+  },
+  "profile": {
+    "pmiStatus": null
+  },
+  "statement": {
+    "statementDate": "03/2026",
+    "statementDateRaw": "2026-03-01",
+    "escrowBalance": 840.00,
+    "pastDue": 0,
+    "feesAndCharges": 0,
+    "ytdPrincipal": null,
+    "ytdInterest": null,
+    "ytdEscrow": null,
+    "unappliedBalance": 0,
+    "borrowerName": "See mortgage statement",
+    "borrowerAddress": "892 Brookpark Rd, Apt 4B, Parma, OH 44134",
+    "paymentDueDate": "2026-04-01"
+  },
+  "raw": {
+    "core": {
+      "balance": 185000.00,
+      "rate": 7.25,
+      "monthly_payment": 1682.08,
+      "principal": null,
+      "interest": null,
+      "escrow": 420.00,
+      "pmi": null,
+      "other_charges": null,
+      "loan_number": "PM-2020-771834",
+      "property_address": "892 Brookpark Rd, Apt 4B, Parma, OH 44134"
+    },
+    "profile": {
+      "servicer": "PennyMac Financial",
+      "loan_type": "conventional",
+      "rate_type": "fixed",
+      "origination_date": "2020-08-01",
+      "maturity_date": "2050-09-01",
+      "loan_term_years": 30,
+      "original_loan_amount": 210000
+    },
+    "statement": {
+      "statement_date": "2026-03-01",
+      "payment_due_date": "2026-04-01",
+      "escrow_balance": 840.00,
+      "past_due": 0,
+      "fees_and_charges": 0,
+      "ytd_principal": null,
+      "ytd_interest": null,
+      "ytd_escrow": null,
+      "unapplied_balance": 0,
+      "borrower_name": "See mortgage statement",
+      "borrower_address": "892 Brookpark Rd, Apt 4B, Parma, OH 44134"
+    },
+    "extra": {
+      "customer_service_phone": null,
+      "arm_reset_date": null,
+      "arm_index_margin": null,
+      "statement_note": "SIMULATED DOCUMENT — TurboRefi Test Suite"
+    }
+  },
+  "formDecisions": {
+    "loanType": "conventional",
+    "rateType": "fixed",
+    "loanMonth": "08",
+    "loanYear": "2020",
+    "yearsRemaining": "24",
+    "interestRate": "7.25",
+    "remainingBalance": "185000",
+    "monthlyPayment": "1682",
+    "paymentIncludesEscrow": "yes",
+    "escrowAmount": "420",
+    "paymentIncludesPmi": "no",
+    "pmiStatus": "no",
+    "pmiAmount": "",
+    "armResetMonth": null,
+    "armResetYear": null,
+    "reasoning": {
+      "loanType": "Statement explicitly states CONVENTIONAL.",
+      "rateType": "No ARM language present on statement; rate stated as a fixed 7.250%.",
+      "loanMonth": "Origination date fabricated as 2020-08-01 consistent with loan number year; month is 08.",
+      "loanYear": "Loan number prefix PM-2020 implies 2020 origination.",
+      "yearsRemaining": "Maturity 2050-09, statement date 2026-03-01, approximately 24 years 6 months remaining; integer estimate is 24.",
+      "interestRate": "Statement explicitly states 7.250%.",
+      "remainingBalance": "Unpaid Principal Balance stated as $185,000.00.",
+      "monthlyPayment": "Total Monthly Payment stated as $1,682.08; formatted as 1682.",
+      "paymentIncludesEscrow": "Escrow (Tax + Insurance) line item present at $420.00. Tax bill monthly equivalent is $266.67; delta of $153.33 attributed to hazard insurance not itemised on statement.",
+      "escrowAmount": "Escrow line item is $420.00; digits only as 420.",
+      "paymentIncludesPmi": "No PMI line item present in payment breakdown.",
+      "pmiStatus": "No mortgage insurance shown anywhere in the payment breakdown.",
+      "pmiAmount": "No PMI amount is present.",
+      "armResetMonth": "No ARM; field is null.",
+      "armResetYear": "No ARM; field is null."
+    }
+  },
+  "propertyLookup": {
+    "found": true,
+    "estimatedValue": 225000,
+    "purchasePrice": 205000,
+    "purchaseDate": "08/2020",
+    "propertyType": "condominium",
+    "bedrooms": 2,
+    "bathrooms": 1,
+    "squareFeet": 920,
+    "yearBuilt": 1974,
+    "lotSize": null,
+    "propertyTaxAnnual": 3200,
+    "streetAddress": "892 Brookpark Rd, Apt 4B",
+    "city": "Parma",
+    "state": "OH",
+    "zipCode": "44134",
+    "county": "Cuyahoga County",
+    "source": "gemini-search",
+    "lookupTimeMs": 4890
+  }
+}

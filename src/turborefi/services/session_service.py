@@ -2,27 +2,52 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from inspect import signature
 from pathlib import Path
 from typing import Any
 
+from turborefi.agents.json_first_conversation import build_json_first_conversation_agent
 from turborefi.agents.loan_officer import build_loan_officer_agent
 from turborefi.agents.verifier import build_verifier_agent
 from turborefi.config import Settings, load_settings
 from turborefi.extraction.service import DocumentExtractionService
 from turborefi.schemas import (
+    ClosingDisclosureData,
     ConversationMessage,
+    DocumentSet,
+    IdentityDocumentData,
+    InsuranceDeclarationData,
     LoanRecommendationPacket,
     MortgageStatementData,
     ScheduleCData,
     SessionState,
+    TaxBillData,
     ToolCallRecord,
     VerificationReport,
     W2Data,
     PaystubData,
+    PmiStatementData,
 )
-from turborefi.services.packet_builder import build_deterministic_loan_packet
+from turborefi.services.conversation_flows import (
+    automated_ready_message,
+    document_upload_follow_up,
+    next_question,
+    opening_message,
+)
+from turborefi.services.full_application_resolver import (
+    AgenticFullApplicationResolver,
+    FullApplicationResolver,
+    is_full_application_decision_pending,
+)
+from turborefi.services.minimal_assessment import refresh_minimal_uc1_uc2_assessment
+from turborefi.services.packet_builder import (
+    build_deterministic_loan_packet,
+    build_json_first_recommendation_packet,
+)
+from turborefi.services.received_input import parse_received_json
 from turborefi.services.guideline_research import DeterministicGuidelineResearcher, GuidelineResearcher
+from turborefi.services.gse_analysis import AgenticGSEAnalyzer, GSEAnalyzer
 from turborefi.services.intake_service import (
     IntakeUpdate,
     build_guided_follow_up,
@@ -38,6 +63,7 @@ from turborefi.services.session_state import (
     refresh_session_state,
     session_to_agent_state,
 )
+from turborefi.services.uc1_uc2_intake_resolver import AgenticUC1UC2IntakeResolver, UC1UC2IntakeResolver
 from turborefi.services.verification_service import VerificationService
 
 
@@ -85,8 +111,12 @@ class TurboRefiSessionService:
         extraction_service: DocumentExtractionService | None = None,
         loa_agent=None,
         verifier_agent=None,
+        json_first_conversation_agent=None,
         intake_resolver: IntakeResolver | None = None,
+        uc1_uc2_intake_resolver: UC1UC2IntakeResolver | None = None,
+        full_application_resolver: FullApplicationResolver | None = None,
         guideline_researcher: GuidelineResearcher | None = None,
+        gse_analyzer: GSEAnalyzer | None = None,
     ) -> None:
         self.settings = settings or load_settings()
         self.retrieval_service = retrieval_service or RetrievalService(
@@ -107,8 +137,159 @@ class TurboRefiSessionService:
             retrieval_service=self.retrieval_service,
             session_state=initial_state,
         )
+        if json_first_conversation_agent is not None:
+            self.json_first_conversation_agent = json_first_conversation_agent
+        elif os.getenv("OPENAI_API_KEY"):
+            try:
+                self.json_first_conversation_agent = build_json_first_conversation_agent(self.settings)
+            except ModuleNotFoundError:
+                self.json_first_conversation_agent = None
+            except Exception:
+                logger.exception("Failed to initialize JSON-first conversation agent; falling back to deterministic copy.")
+                self.json_first_conversation_agent = None
+        else:
+            self.json_first_conversation_agent = None
         self.verification_service = VerificationService(self.retrieval_service)
         self.intake_resolver = intake_resolver or AgentIntakeResolver(self.settings)
+        self.uc1_uc2_intake_resolver = uc1_uc2_intake_resolver or AgenticUC1UC2IntakeResolver(self.settings)
+        self.full_application_resolver = full_application_resolver or AgenticFullApplicationResolver(self.settings)
+        self.gse_analyzer = gse_analyzer or AgenticGSEAnalyzer(self.settings, self.retrieval_service)
+
+    @staticmethod
+    def _full_application_packet_summary(state: SessionState) -> str:
+        packet = state.loa_output
+        if packet is None:
+            return "The recommendation packet is ready for review."
+
+        recommended_gse = packet.recommended_gse.upper()
+        savings = packet.monthly_savings_estimate
+        ltv_percent = packet.ltv_percent
+        income = packet.qualifying_monthly_income
+        grouped_citations: dict[str, dict[str, list[str]]] = {}
+        for citation in packet.guideline_citations:
+            if citation.gse is None:
+                continue
+            gse = citation.gse.upper()
+            focus_label = citation.focus_label or "guideline support"
+            grouped_citations.setdefault(gse, {})
+            grouped_citations[gse].setdefault(focus_label, [])
+            if citation.section not in grouped_citations[gse][focus_label]:
+                grouped_citations[gse][focus_label].append(citation.section)
+        status_text = (
+            "Both FNMA and FHLMC appear supportable on the preliminary screen. "
+            if packet.fnma_eligible and packet.fhlmc_eligible
+            else "FNMA appears supportable on the preliminary screen. "
+            if packet.fnma_eligible
+            else "FHLMC appears supportable on the preliminary screen. "
+            if packet.fhlmc_eligible
+            else "Neither GSE is fully supportable on the preliminary screen yet. "
+        )
+        citation_parts: list[str] = []
+        for gse in ("FNMA", "FHLMC"):
+            focus_map = grouped_citations.get(gse, {})
+            if not focus_map:
+                continue
+            focus_parts = [
+                f"{focus.lower()} ({', '.join(sections[:2])})"
+                for focus, sections in list(focus_map.items())[:3]
+                if sections
+            ]
+            if focus_parts:
+                citation_parts.append(f"{gse} support covers " + "; ".join(focus_parts))
+        citation_text = f"{' '.join(citation_parts)}." if citation_parts else ""
+        doc_text = ""
+        if not packet.documentation_status.pending:
+            received_count = len(packet.documentation_status.received)
+            doc_text = f" The packet is document-complete with {received_count} received item(s)."
+        return (
+            f"Recommendation summary: {status_text}{recommended_gse} is the current best fit. "
+            f"Qualifying monthly income is ${income:,.0f}, packet LTV is {ltv_percent:.1f}%, "
+            f"and estimated monthly savings are ${savings:,.0f}.{doc_text} {citation_text}".strip()
+        )
+
+    @staticmethod
+    def _packet_markdown_table(headers: list[str], rows: list[list[str]]) -> str:
+        if not rows:
+            return ""
+        header_row = "| " + " | ".join(headers) + " |"
+        separator_row = "| " + " | ".join("---" for _ in headers) + " |"
+        body_rows = ["| " + " | ".join(row) + " |" for row in rows]
+        return "\n".join([header_row, separator_row, *body_rows])
+
+    def _full_application_packet_details(self, state: SessionState) -> str:
+        packet = state.loa_output
+        if packet is None:
+            return "The recommendation packet is being prepared."
+
+        overview_rows = [
+            ["Recommended path", packet.recommended_gse.upper()],
+            ["FNMA support", "Supported" if packet.fnma_eligible else "Not supported"],
+            ["FHLMC support", "Supported" if packet.fhlmc_eligible else "Not supported"],
+            ["Qualifying monthly income", f"${packet.qualifying_monthly_income:,.0f}"],
+            ["Packet LTV", f"{packet.ltv_percent:.1f}%"],
+            ["Estimated monthly savings", f"${packet.monthly_savings_estimate:,.0f}"],
+            ["Received documents", ", ".join(packet.documentation_status.received) or "none"],
+            ["Pending items", ", ".join(packet.documentation_status.pending) or "none"],
+        ]
+
+        analysis_rows_by_gse: dict[str, list[list[str]]] = {"FNMA": [], "FHLMC": []}
+        for gse, analysis in packet.gse_analysis.items():
+            analysis_rows_by_gse.setdefault(gse.upper(), [])
+            for finding in analysis.focus_results:
+                analysis_rows_by_gse[gse.upper()].append(
+                    [
+                        finding.focus_label,
+                        ", ".join(finding.section_ids) or "--",
+                        finding.decision_description,
+                    ]
+                )
+
+        sections: list[str] = [
+            "### Packet Overview",
+            self._packet_markdown_table(["Field", "Value"], overview_rows),
+        ]
+
+        for gse in ("FNMA", "FHLMC"):
+            rows = analysis_rows_by_gse.get(gse, [])
+            if not rows:
+                continue
+            sections.extend(
+                [
+                    f"### {gse} Guideline Basis",
+                    self._packet_markdown_table(["Purpose", "Section", "Decision basis"], rows),
+                ]
+            )
+
+        if packet.reasoning_chain:
+            sections.append("### Packet Notes")
+            sections.extend(f"- {step}" for step in packet.reasoning_chain)
+
+        return "\n\n".join(section for section in sections if section)
+
+    def _full_application_response(self, state: SessionState, intent: str) -> str:
+        if intent == "proceed":
+            state.full_application_intent = "proceed"
+            state.current_phase = "complete"
+            state.state_machine_state = "S7_DECISION"
+            if state.loa_output is None:
+                state.loa_output = self.get_result(state.session_id)
+            return (
+                "Understood. I marked this case as ready to proceed to the full application. "
+                "The preliminary screen is complete, the document packet is assembled, and the recommendation details are below.\n\n"
+                f"{self._full_application_packet_summary(state)}\n\n"
+                f"{self._full_application_packet_details(state)}"
+            )
+        if intent == "decline":
+            state.full_application_intent = "decline"
+            state.current_phase = "complete"
+            state.state_machine_state = "S7_DECISION"
+            return (
+                "Understood. I will leave the case at the completed preliminary-screen stage. "
+                "You can return later if you want to proceed to the full application."
+            )
+        return (
+            "I have the preliminary screen complete. Would you like to proceed to the full application?"
+        )
 
     def _session_path(self, session_id: str) -> Path:
         return self.settings.sessions_dir / f"{session_id}.json"
@@ -183,6 +364,11 @@ class TurboRefiSessionService:
             "paystub": "paystub",
             "w2": "W-2",
             "schedule_c": "Schedule C",
+            "identity": "government ID",
+            "tax_bill": "property tax bill",
+            "insurance": "insurance declaration",
+            "pmi_statement": "PMI statement",
+            "closing_disclosure": "closing disclosure",
         }.get(doc_type, doc_type.replace("_", " "))
         if filename:
             return f"Uploaded {label}: {filename}"
@@ -244,6 +430,22 @@ class TurboRefiSessionService:
             entries.append(self._verifier_trace_entry(report))
         return entries
 
+    def _json_first_screening_trace(self, state: SessionState) -> list[dict[str, Any]]:
+        screening_calls = [
+            ToolCallRecord(
+                tool="calculate_uc1_uc2_outputs",
+                inputs={},
+                result=state.calculated_outputs or {},
+            ),
+            ToolCallRecord(
+                tool="evaluate_lars",
+                inputs={},
+                result=state.lars_result.model_dump(mode="json") if state.lars_result else {},
+            ),
+        ]
+        state.tool_calls = screening_calls
+        return [self._tool_call_entry(record) for record in screening_calls]
+
     def _sync_agent_session_state(self, agent, state: SessionState) -> None:
         update_fn = getattr(agent, "update_session_state", None)
         if not callable(update_fn):
@@ -268,16 +470,206 @@ class TurboRefiSessionService:
             raise
 
     def _sync_all_agent_state(self, state: SessionState) -> None:
+        if state.source_mode == "received_json_uc1_uc2":
+            return
         self._sync_agent_session_state(self.loa_agent, state)
         self._sync_agent_session_state(self.verifier_agent, state)
 
-    def _run_agent(self, agent, state: SessionState, message: str) -> str:
+    def _run_agent(self, agent, state: SessionState, message: str, *, agent_session_id: str | None = None) -> str:
         response = agent.run(
             message,
-            session_id=state.session_id,
+            session_id=agent_session_id or state.session_id,
             session_state=session_to_agent_state(state),
         )
         return _response_text(response)
+
+    def _json_first_fact_highlights(self, state: SessionState, changed_fields: list[str] | None) -> list[str]:
+        if not changed_fields:
+            return []
+        facts = state.borrower_facts
+        priority = {
+            "fico_range": 0,
+            "fico_uncertain": 1,
+            "tenure_months": 2,
+            "property_type": 3,
+            "single_income_source": 4,
+            "pmi_type": 5,
+            "purchase_price": 6,
+            "down_payment_amount": 7,
+            "has_second_lien": 8,
+            "factual_uncertainty": 9,
+        }
+        highlights: list[str] = []
+        for field in sorted(changed_fields, key=lambda name: priority.get(name, 99)):
+            if field == "fico_range" and facts.fico_range:
+                label = facts.fico_range.replace("_", " to ").replace("760_plus", "760 and above")
+                highlights.append(f"I have your credit estimate in the {label} range.")
+            elif field == "fico_uncertain" and facts.fico_uncertain:
+                highlights.append("I noted that the credit score estimate is approximate.")
+            elif field == "tenure_months" and facts.tenure_months:
+                years = facts.tenure_months / 12
+                highlights.append(f"I also have about {years:.0f} years with your current employer.")
+            elif field == "single_income_source" and facts.single_income_source is True:
+                highlights.append("I have this as your regular job being your only income source.")
+            elif field == "single_income_source" and facts.single_income_source is False:
+                highlights.append("I noted that there is additional income beyond the primary job.")
+            elif field == "property_type" and facts.property_type:
+                property_labels = {
+                    "sfr": "single-family home",
+                    "townhome": "townhome",
+                    "condo": "condo",
+                }
+                highlights.append(f"I have the property as a {property_labels.get(facts.property_type, facts.property_type)}.")
+            elif field == "pmi_type" and facts.pmi_type:
+                if facts.pmi_type == "borrower_paid":
+                    highlights.append("I noted that the PMI is borrower-paid monthly.")
+                elif facts.pmi_type == "lender_paid":
+                    highlights.append("I noted that the PMI appears to be lender-paid and built into the rate.")
+            elif field == "purchase_price" and facts.purchase_price:
+                highlights.append(f"I have the purchase price at ${facts.purchase_price:,.0f}.")
+            elif field == "down_payment_amount" and facts.down_payment_amount:
+                highlights.append(f"I have the down payment at about ${facts.down_payment_amount:,.0f}.")
+            elif field == "has_second_lien" and facts.has_second_lien is False:
+                highlights.append("I have this as a first mortgage only, with no second lien or HELOC.")
+            elif field == "has_second_lien" and facts.has_second_lien is True:
+                highlights.append("I noted that there is a second lien or HELOC on the property.")
+            elif field == "factual_uncertainty" and facts.factual_uncertainties:
+                last_uncertain = facts.factual_uncertainties[-1].replace("_", " ")
+                highlights.append(f"I noted that the {last_uncertain} answer is uncertain.")
+        return _unique_preserving_order(highlights)
+
+    def _json_first_default_response(
+        self,
+        state: SessionState,
+        *,
+        event: str,
+        changed_fields: list[str] | None = None,
+        doc_type: str | None = None,
+        decision_intent: str | None = None,
+    ) -> str:
+        if event == "opening":
+            return opening_message(state)
+        if event == "document_upload":
+            if doc_type is None:
+                return next_question(state)
+            base = document_upload_follow_up(state, doc_type)
+            if state.missing_documents:
+                return base
+            if is_full_application_decision_pending(state):
+                return f"Thanks, I’ve added your {doc_type.replace('_', ' ')}. {automated_ready_message(state)}"
+            return f"Thanks, I’ve added your {doc_type.replace('_', ' ')}. {next_question(state)}"
+        if event == "full_application_decision":
+            return self._full_application_response(state, decision_intent or "unclear")
+        if event == "completed_follow_up":
+            if state.full_application_intent == "proceed":
+                return (
+                    "We are already in the full-application-ready state for this file. "
+                    "Here is the current recommendation packet and guide support.\n\n"
+                    f"{self._full_application_packet_summary(state)}\n\n"
+                    f"{self._full_application_packet_details(state)}"
+                )
+            return next_question(state)
+
+        base = next_question(state)
+        highlights = self._json_first_fact_highlights(state, changed_fields)
+        if not highlights:
+            return base
+        opener = "Thanks, that helps. "
+        return f"{opener}{' '.join(highlights[:4])} {base}".strip()
+
+    def _json_first_prompt(
+        self,
+        state: SessionState,
+        *,
+        event: str,
+        default_response: str,
+        user_message: str | None = None,
+        changed_fields: list[str] | None = None,
+        doc_type: str | None = None,
+        decision_intent: str | None = None,
+    ) -> str:
+        received_docs = ", ".join(state.received_documents) or "none"
+        missing_docs = ", ".join(state.missing_documents) or "none"
+        facts = self._json_first_fact_highlights(state, changed_fields)
+        outputs = state.calculated_outputs or {}
+        lars = state.lars_result
+        packet = state.loa_output
+        citation_lines: list[str] = []
+        if packet is not None:
+            for citation in packet.guideline_citations:
+                gse = citation.gse.upper() if citation.gse else "GUIDE"
+                citation_lines.append(f"- {gse} {citation.section}: {citation.finding}")
+        packet_summary = self._full_application_packet_summary(state) if packet is not None else "not available"
+        output_summary_parts = [
+            f"LTV {outputs.get('ltv_percent'):.1f}%." if isinstance(outputs.get("ltv_percent"), (int, float)) else "",
+            f"Gross monthly income ${outputs.get('gmi'):,.0f}." if isinstance(outputs.get("gmi"), (int, float)) else "",
+            f"Monthly savings ${outputs.get('total_monthly_savings'):,.0f}."
+            if isinstance(outputs.get("total_monthly_savings"), (int, float))
+            else "",
+        ]
+        output_summary = " ".join(part for part in output_summary_parts if part) or "none"
+        return (
+            "Draft the next borrower-facing assistant message for TurboRefi's JSON-first UC1/UC2 screening flow.\n"
+            f"Conversation event: {event}\n"
+            f"Latest borrower message: {user_message or 'n/a'}\n"
+            f"Uploaded document: {doc_type or 'none'}\n"
+            f"Decision intent: {decision_intent or 'n/a'}\n"
+            f"Use case: {state.use_case}\n"
+            f"Current phase: {state.current_phase}\n"
+            f"Received documents: {received_docs}\n"
+            f"Missing documents: {missing_docs}\n"
+            f"Important facts to acknowledge if helpful: {' '.join(facts) or 'none'}\n"
+            f"LARS status: {lars.decision if lars else 'not evaluated'}"
+            f"{f' at score {lars.final_score}' if lars else ''}\n"
+            f"Calculated output highlights: {output_summary}\n"
+            f"Recommendation packet summary: {packet_summary}\n"
+            f"Guide citations:\n{chr(10).join(citation_lines) if citation_lines else '- none'}\n\n"
+            "Workflow requirement: keep the factual meaning aligned with this required response shape, but rewrite it more naturally.\n"
+            f"Required response shape: {default_response}\n\n"
+            "If the required response shape contains markdown tables, preserve those tables exactly. "
+            "Write one short paragraph in plain English before the tables when appropriate. "
+            "Make it feel like a human loan officer. Do not mention tools, internal workflow, or factor codes. "
+            "Do not ask more than one new question."
+        )
+
+    def _json_first_response(
+        self,
+        state: SessionState,
+        *,
+        event: str,
+        user_message: str | None = None,
+        changed_fields: list[str] | None = None,
+        doc_type: str | None = None,
+        decision_intent: str | None = None,
+    ) -> str:
+        default_response = self._json_first_default_response(
+            state,
+            event=event,
+            changed_fields=changed_fields,
+            doc_type=doc_type,
+            decision_intent=decision_intent,
+        )
+        if self.json_first_conversation_agent is None:
+            return default_response
+        prompt = self._json_first_prompt(
+            state,
+            event=event,
+            default_response=default_response,
+            user_message=user_message,
+            changed_fields=changed_fields,
+            doc_type=doc_type,
+            decision_intent=decision_intent,
+        )
+        try:
+            return self._run_agent(
+                self.json_first_conversation_agent,
+                state,
+                prompt,
+                agent_session_id=f"{state.session_id}:json-first-conversation",
+            )
+        except Exception:
+            logger.exception("JSON-first conversational response generation failed for session_id=%s", state.session_id)
+            return default_response
 
     def _missing_docs_message(self, state: SessionState) -> str:
         if not state.missing_documents:
@@ -386,6 +778,36 @@ class TurboRefiSessionService:
             return self._packet_summary_message(state)
 
     def _apply_packet_if_ready(self, state: SessionState) -> list[dict[str, Any]]:
+        if state.source_mode == "received_json_uc1_uc2":
+            refresh_minimal_uc1_uc2_assessment(state)
+            screening_trace = self._json_first_screening_trace(state)
+            if state.handoff_package is None and state.missing_documents:
+                state.loa_output = None
+                state.retrieval_events = []
+                return screening_trace
+            if state.handoff_package is not None:
+                state.loa_output = None
+                state.retrieval_events = []
+                return screening_trace
+            if state.lars_result is None or state.lars_result.decision != "AUTOMATED":
+                state.loa_output = None
+                state.retrieval_events = []
+                return screening_trace
+            if state.full_application_intent != "proceed":
+                state.loa_output = None
+                state.retrieval_events = []
+                return screening_trace
+            build_result = build_json_first_recommendation_packet(
+                state,
+                self.retrieval_service,
+                guideline_researcher=self.guideline_researcher,
+                gse_analyzer=self.gse_analyzer,
+            )
+            state.loa_output = build_result.packet
+            state.retrieval_events = build_result.retrieval_events
+            state.tool_calls = build_result.tool_calls
+            return self._visible_tool_trace(build_result.tool_calls, state, None)
+
         if state.intake_pending or state.missing_documents:
             state.loa_output = None
             state.verifier_output = None
@@ -395,6 +817,7 @@ class TurboRefiSessionService:
             state,
             self.retrieval_service,
             guideline_researcher=self.guideline_researcher,
+            gse_analyzer=self.gse_analyzer,
         )
         state.loa_output = build_result.packet
         state.retrieval_events = build_result.retrieval_events
@@ -406,6 +829,103 @@ class TurboRefiSessionService:
             state,
             state.verifier_output,
         )
+
+    def create_session_from_received_json(
+        self,
+        payload: dict[str, Any],
+        *,
+        new_rate: float | None = None,
+        session_name: str | None = None,
+        session_id: str | None = None,
+    ) -> tuple[str, str, SessionState, list[dict[str, Any]]]:
+        effective_new_rate = new_rate if new_rate is not None else self.settings.screening_new_rate
+        parsed = parse_received_json(payload, new_rate=effective_new_rate)
+        state = SessionState(
+            session_id=session_id or SessionState().session_id,
+            session_name=session_name or "Received JSON",
+            borrower_name="Borrower",
+            borrower_id_token=parsed.borrower_id_token,
+            source_mode="received_json_uc1_uc2",
+            income_type="w2",
+            documents=DocumentSet(mortgage_statement=parsed.mortgage_statement),
+            received_mortgage=parsed.received_mortgage,
+            screening_assumptions=parsed.screening_assumptions,
+            source_data_warnings=parsed.warnings,
+            unsupported_reason=parsed.unsupported_reason,
+        )
+        if parsed.received_mortgage.property_type:
+            state.borrower_facts.property_type = parsed.received_mortgage.property_type
+        if parsed.received_mortgage.purchase_price:
+            state.borrower_facts.purchase_price = parsed.received_mortgage.purchase_price
+        if parsed.received_mortgage.pmi_monthly and parsed.received_mortgage.pmi_monthly > 0:
+            state.borrower_facts.pmi_type = "borrower_paid"
+
+        from turborefi.services.use_case_router import route_uc1_uc2
+
+        routing = route_uc1_uc2(parsed.received_mortgage, state.borrower_facts)
+        state.use_case = routing.use_case
+        if routing.deferred_reason:
+            state.unsupported_reason = routing.deferred_reason
+
+        state = refresh_session_state(state)
+        tool_trace = self._apply_packet_if_ready(state)
+        response_text = self._json_first_response(state, event="opening")
+        self._append_exchange(
+            state,
+            user_content="Received JSON input",
+            agent_content=response_text,
+            tool_trace=tool_trace,
+        )
+        self._save_state(state)
+        self._sync_all_agent_state(state)
+        return state.session_id, response_text, state, tool_trace
+
+    def upload_document_json(
+        self,
+        session_id: str,
+        doc_type: str,
+        payload: dict[str, Any],
+    ) -> tuple[str, SessionState, list[dict[str, Any]]]:
+        state = self.get_state(session_id)
+        if doc_type == "paystub":
+            document = PaystubData.model_validate(payload)
+        elif doc_type == "w2":
+            document = W2Data.model_validate(payload)
+        elif doc_type == "schedule_c":
+            document = ScheduleCData.model_validate(payload)
+        elif doc_type == "identity":
+            document = IdentityDocumentData.model_validate(payload).model_dump(mode="json")
+        elif doc_type == "tax_bill":
+            document = TaxBillData.model_validate(payload).model_dump(mode="json")
+        elif doc_type == "insurance":
+            document = InsuranceDeclarationData.model_validate(payload).model_dump(mode="json")
+        elif doc_type == "pmi_statement":
+            document = PmiStatementData.model_validate(payload).model_dump(mode="json")
+        elif doc_type == "closing_disclosure":
+            document = ClosingDisclosureData.model_validate(payload).model_dump(mode="json")
+        else:
+            document = payload
+        state = add_document_to_session(state, doc_type=doc_type, document=document)
+        tool_trace = self._apply_packet_if_ready(state)
+        response_text = next_question(state) if state.source_mode != "received_json_uc1_uc2" else self._json_first_response(
+            state,
+            event="document_upload",
+            doc_type=doc_type,
+        )
+        if state.source_mode != "received_json_uc1_uc2":
+            response_text = self._workflow_response(
+                state,
+                event="assessment_ready" if state.loa_output is not None else "supporting_document_missing",
+            )
+        self._append_exchange(
+            state,
+            user_content=self._upload_message(doc_type),
+            agent_content=response_text,
+            tool_trace=tool_trace,
+        )
+        self._save_state(state)
+        self._sync_all_agent_state(state)
+        return response_text, state, tool_trace
 
     def create_session_from_mortgage_data(
         self,
@@ -437,15 +957,22 @@ class TurboRefiSessionService:
         self,
         session_id: str,
         doc_type: str,
-        document: PaystubData | W2Data | ScheduleCData,
+        document: PaystubData | W2Data | ScheduleCData | dict[str, Any],
         *,
         filename: str | None = None,
     ) -> tuple[str, SessionState, list[dict[str, Any]]]:
         state = self.get_state(session_id)
         state = add_document_to_session(state, doc_type=doc_type, document=document)
         tool_trace = self._apply_packet_if_ready(state)
-        event = "assessment_ready" if state.loa_output is not None else "supporting_document_missing"
-        response_text = self._workflow_response(state, event=event)
+        if state.source_mode == "received_json_uc1_uc2":
+            response_text = self._json_first_response(
+                state,
+                event="document_upload",
+                doc_type=doc_type,
+            )
+        else:
+            event = "assessment_ready" if state.loa_output is not None else "supporting_document_missing"
+            response_text = self._workflow_response(state, event=event)
         self._append_exchange(
             state,
             user_content=self._upload_message(doc_type, filename=filename),
@@ -458,6 +985,64 @@ class TurboRefiSessionService:
 
     def send_message(self, session_id: str, message: str) -> tuple[str, SessionState, list[dict[str, Any]]]:
         state = self.get_state(session_id)
+        if state.source_mode == "received_json_uc1_uc2":
+            if state.full_application_intent is not None and not state.missing_documents and state.handoff_package is None:
+                response_text = self._json_first_response(
+                    state,
+                    event="completed_follow_up",
+                    user_message=message,
+                )
+                self._append_exchange(
+                    state,
+                    user_content=message,
+                    agent_content=response_text,
+                    tool_trace=[],
+                )
+                self._save_state(state)
+                self._sync_all_agent_state(state)
+                return response_text, state, []
+
+            if is_full_application_decision_pending(state):
+                decision_resolution = self.full_application_resolver.resolve(state, message)
+                tool_trace = [*decision_resolution.tool_trace]
+                if decision_resolution.intent == "proceed":
+                    state.full_application_intent = "proceed"
+                    tool_trace.extend(self._apply_packet_if_ready(state))
+                response_text = self._json_first_response(
+                    state,
+                    event="full_application_decision",
+                    user_message=message,
+                    decision_intent=decision_resolution.intent,
+                )
+                self._append_exchange(
+                    state,
+                    user_content=message,
+                    agent_content=response_text,
+                    tool_trace=tool_trace,
+                )
+                self._save_state(state)
+                self._sync_all_agent_state(state)
+                return response_text, state, tool_trace
+
+            intake_resolution = self.uc1_uc2_intake_resolver.resolve(state, message)
+            state = refresh_session_state(intake_resolution.state)
+            tool_trace = [*intake_resolution.tool_trace, *self._apply_packet_if_ready(state)]
+            response_text = self._json_first_response(
+                state,
+                event="intake_follow_up",
+                user_message=message,
+                changed_fields=intake_resolution.changed_fields,
+            )
+            self._append_exchange(
+                state,
+                user_content=message,
+                agent_content=response_text,
+                tool_trace=tool_trace,
+            )
+            self._save_state(state)
+            self._sync_all_agent_state(state)
+            return response_text, state, tool_trace
+
         packet_was_ready = state.loa_output is not None
         if not packet_was_ready:
             intake_resolution = self.intake_resolver.resolve(state, message)
@@ -507,6 +1092,28 @@ class TurboRefiSessionService:
 
     def get_result(self, session_id: str) -> LoanRecommendationPacket:
         state = self.get_state(session_id)
+        if state.source_mode == "received_json_uc1_uc2":
+            refresh_minimal_uc1_uc2_assessment(state)
+            if state.handoff_package is not None:
+                raise ValueError("Recommendation packet is not created for referred cases.")
+            if state.full_application_intent != "proceed":
+                raise ValueError(
+                    "Recommendation packet is available after the borrower elects to proceed to the full application."
+                )
+            if state.loa_output is None:
+                build_result = build_json_first_recommendation_packet(
+                    state,
+                    self.retrieval_service,
+                    guideline_researcher=self.guideline_researcher,
+                    gse_analyzer=self.gse_analyzer,
+                )
+                state.loa_output = build_result.packet
+                state.retrieval_events = build_result.retrieval_events
+                state.tool_calls = build_result.tool_calls
+            self._save_state(state)
+            self._sync_all_agent_state(state)
+            return state.loa_output
+
         if state.loa_output is None:
             tool_trace = self._apply_packet_if_ready(state)
             if state.loa_output is None:

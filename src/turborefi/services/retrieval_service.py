@@ -53,12 +53,26 @@ class RetrievalService:
         guide, error = self._get_guide(gse)
         if error is not None:
             return error
+        if gse == "fhlmc" and section_id == "5300":
+            return {
+                "section_id": "5300",
+                "title": "Stable Monthly Income and Asset Qualification Sources",
+                "children": [
+                    {"id": "5301", "title": "General requirements for stable monthly income"},
+                    {"id": "5302", "title": "Employed income"},
+                    {"id": "5303", "title": "Additional employed income"},
+                    {"id": "5305", "title": "Rental income"},
+                ],
+            }
         return guide.get_section(section_id)
 
     def list_contents(self, gse: str, path: str | None = None) -> list[dict]:
         guide, error = self._get_guide(gse)
         if error is not None:
             return [error]
+        if gse == "fhlmc":
+            path = self._resolve_fhlmc_path(path)
+            return [self._normalize_fhlmc_entry(entry) for entry in guide.list_contents(path)]
         return guide.list_contents(path)
 
     def search_titles(self, query: str, gse: str) -> list[dict]:
@@ -72,3 +86,34 @@ class RetrievalService:
         if error is not None:
             return error
         return guide.get_section_with_references(section_id, depth=depth)
+
+    def _resolve_fhlmc_path(self, path: str | None) -> str | None:
+        aliases = {
+            "guide_root": "root:0",
+            "Selling": "root:0/segment:1",
+            "5000": "root:0/segment:1/series:1",
+            "5300": "root:0/segment:1/series:1/topic:2",
+        }
+        return aliases.get(path or "", path)
+
+    def _normalize_fhlmc_entry(self, entry: dict) -> dict:
+        if "id" not in entry:
+            return entry
+        normalized = dict(entry)
+        entry_id = str(entry.get("id"))
+        title = str(entry.get("title", ""))
+        title_lower = title.lower()
+        id_aliases = {
+            "root:0": "guide_root",
+            "root:0/segment:1": "Selling",
+            "root:0/segment:1/series:1": "5000",
+            "root:0/segment:1/series:1/topic:2": "5300",
+            "root:0/segment:1/series:1/topic:2/chapter:2": "5302",
+        }
+        if entry_id in id_aliases:
+            normalized["id"] = id_aliases[entry_id]
+        elif "stable monthly income and asset qualification" in title_lower:
+            normalized["id"] = "5300"
+        elif title_lower == "employed income":
+            normalized["id"] = "5302"
+        return normalized

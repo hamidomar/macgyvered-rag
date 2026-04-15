@@ -56,32 +56,56 @@ interface Store {
   setIsSessionsLoading: (isSessionsLoading: boolean) => void
   turboRefiSession: {
     currentPhase: string | null
+    useCase: string | null
+    stateMachineState: string | null
+    referralDecision: string | null
+    fullApplicationIntent: 'proceed' | 'decline' | null
     intakePending: string[]
     documentsReceived: string[]
     documentsPending: string[]
     borrowerFacts: Record<string, unknown> | null
     mortgageData: Record<string, unknown> | null
+    receivedMortgage: Record<string, unknown> | null
     incomeDocs: Record<string, unknown>[]
+    screeningAssumptions: Record<string, unknown> | null
+    calculatedOutputs: Record<string, unknown> | null
+    larsResult: Record<string, unknown> | null
+    handoffPackage: Record<string, unknown> | null
+    sourceDataWarnings: string[]
     recommendationPacket: Record<string, unknown> | null
   }
   setTurboRefiSession: (
     updates:
       | Partial<Store['turboRefiSession']>
-      | ((prev: Store['turboRefiSession']) => Partial<Store['turboRefiSession']>)
+      | ((
+          prev: Store['turboRefiSession']
+        ) => Partial<Store['turboRefiSession']>)
   ) => void
   resetTurboRefiSession: () => void
+  turboRefiScreeningRate: number | null
+  setTurboRefiScreeningRate: (turboRefiScreeningRate: number | null) => void
   isTurboRefiLoading: boolean
   setIsTurboRefiLoading: (isTurboRefiLoading: boolean) => void
 }
 
 const initialTurboRefiSession = {
   currentPhase: null,
+  useCase: null,
+  stateMachineState: null,
+  referralDecision: null,
+  fullApplicationIntent: null,
   intakePending: [],
   documentsReceived: [],
   documentsPending: [],
   borrowerFacts: null,
   mortgageData: null,
+  receivedMortgage: null,
   incomeDocs: [],
+  screeningAssumptions: null,
+  calculatedOutputs: null,
+  larsResult: null,
+  handoffPackage: null,
+  sourceDataWarnings: [],
   recommendationPacket: null
 }
 
@@ -146,6 +170,9 @@ export const useStore = create<Store>()(
         })),
       resetTurboRefiSession: () =>
         set(() => ({ turboRefiSession: initialTurboRefiSession })),
+      turboRefiScreeningRate: 6,
+      setTurboRefiScreeningRate: (turboRefiScreeningRate) =>
+        set(() => ({ turboRefiScreeningRate })),
       isTurboRefiLoading: false,
       setIsTurboRefiLoading: (isTurboRefiLoading) =>
         set(() => ({ isTurboRefiLoading }))
@@ -154,7 +181,8 @@ export const useStore = create<Store>()(
       name: 'endpoint-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        selectedEndpoint: state.selectedEndpoint
+        selectedEndpoint: state.selectedEndpoint,
+        turboRefiScreeningRate: state.turboRefiScreeningRate
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated?.()
