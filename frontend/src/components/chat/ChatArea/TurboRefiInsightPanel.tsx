@@ -12,6 +12,9 @@ const asRecord = (value: unknown): JsonRecord | null =>
     ? (value as JsonRecord)
     : null
 
+const isJsonRecord = (value: JsonRecord | null): value is JsonRecord =>
+  value !== null
+
 const asNumber = (value: unknown): number | null =>
   typeof value === 'number' && Number.isFinite(value) ? value : null
 
@@ -78,9 +81,7 @@ const importantToolNames = new Set([
   'evaluate_lars',
   'analyze_gse_eligibility',
   'review_guideline_support',
-  'build_json_first_recommendation_packet',
-  'build_deterministic_loan_packet',
-  'verify_recommendation_packet'
+  'build_json_first_recommendation_packet'
 ])
 
 const parseToolStatus = (toolCall: ToolCall) => {
@@ -115,10 +116,7 @@ const compactToolResult = (toolCall: ToolCall) => {
         : 'guides'
       return `Reviewed ${retrievedGses}`
     }
-    if (
-      toolCall.tool_name === 'build_json_first_recommendation_packet' ||
-      toolCall.tool_name === 'build_deterministic_loan_packet'
-    ) {
+    if (toolCall.tool_name === 'build_json_first_recommendation_packet') {
       const recommendedGse = asText(parsed.recommended_gse)?.toUpperCase()
       const ltv = asNumber(parsed.ltv_percent)
       return `${recommendedGse || 'Packet'} ready${ltv !== null ? ` - LTV ${ltv.toFixed(1)}%` : ''}`
@@ -185,7 +183,9 @@ const TurboRefiInsightPanel = () => {
   const packetCitations = Array.isArray(
     recommendationPacket?.guideline_citations
   )
-    ? recommendationPacket.guideline_citations.map(asRecord).filter(Boolean)
+    ? recommendationPacket.guideline_citations
+        .map(asRecord)
+        .filter(isJsonRecord)
     : []
   const groupedCitations = useMemo<CitationGroup[]>(() => {
     if (!packetCitations.length) return []
@@ -234,7 +234,7 @@ const TurboRefiInsightPanel = () => {
     return Object.entries(analysis).map(([gse, value]) => {
       const record = asRecord(value)
       const focusResults = Array.isArray(record?.focus_results)
-        ? record.focus_results.map(asRecord).filter(Boolean)
+        ? record.focus_results.map(asRecord).filter(isJsonRecord)
         : []
       return {
         gse: gse.toUpperCase(),

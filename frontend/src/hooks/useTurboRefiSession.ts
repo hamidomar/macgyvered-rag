@@ -26,11 +26,9 @@ import {
 import useAIResponseStream from './useAIResponseStream'
 
 const getDocumentLabel = (documentType: string) =>
-  documentType === 'mortgage_statement'
-    ? 'mortgage statement'
-    : documentType === 'schedule_c'
-      ? 'Schedule C'
-      : documentType === 'tax_bill'
+  documentType === 'schedule_c'
+    ? 'Schedule C'
+    : documentType === 'tax_bill'
         ? 'property tax bill'
         : documentType === 'insurance'
           ? 'homeowners insurance declaration'
@@ -171,7 +169,6 @@ export const useTurboRefiSession = () => {
           documentsReceived: status.documents_received,
           documentsPending: status.documents_pending,
           borrowerFacts: status.borrower_facts,
-          mortgageData: status.mortgage_data,
           receivedMortgage: status.received_mortgage ?? null,
           incomeDocs: status.income_docs,
           screeningAssumptions: status.screening_assumptions ?? null,
@@ -236,7 +233,6 @@ export const useTurboRefiSession = () => {
           documentsReceived: session.documents_received,
           documentsPending: session.documents_pending,
           borrowerFacts: session.borrower_facts,
-          mortgageData: session.mortgage_data,
           receivedMortgage: session.received_mortgage ?? null,
           incomeDocs: session.income_docs,
           screeningAssumptions: session.screening_assumptions ?? null,
@@ -310,16 +306,19 @@ export const useTurboRefiSession = () => {
       setIsTurboRefiLoading(true)
       try {
         const endpoint = getTurboRefiEndpoint()
-        let effectiveSessionId = sessionId
+        if (!sessionId) {
+          throw new Error(
+            'Create a session from received JSON before uploading supporting documents'
+          )
+        }
         let result
         try {
           result = await ingestTurboRefiDocumentAPI(endpoint, file, {
-            sessionId: effectiveSessionId,
+            sessionId,
             authToken
           })
         } catch (error) {
           const isStaleSession =
-            effectiveSessionId &&
             error instanceof Error &&
             error.message.toLowerCase().includes('session not found')
 
@@ -329,13 +328,12 @@ export const useTurboRefiSession = () => {
 
           setTurboRefiSessionId(null)
           resetTurboRefiSession()
-          effectiveSessionId = undefined
-          result = await ingestTurboRefiDocumentAPI(endpoint, file, {
-            authToken
-          })
+          throw new Error(
+            'The active session no longer exists. Load the received JSON again to continue.'
+          )
         }
 
-        appendIngestMessages(file, result, effectiveSessionId)
+        appendIngestMessages(file, result, sessionId)
 
         setTurboRefiSessionId(result.session_id)
 
@@ -357,11 +355,6 @@ export const useTurboRefiSession = () => {
       setTurboRefiSessionId,
       setTurboRefiSession
     ]
-  )
-
-  const createSessionFromMortgage = useCallback(
-    async (file: File) => ingestDocument(file),
-    [ingestDocument]
   )
 
   const createSessionFromReceivedJson = useCallback(
@@ -417,15 +410,6 @@ export const useTurboRefiSession = () => {
       setTurboRefiSessionId,
       turboRefiScreeningRate
     ]
-  )
-
-  const uploadSecondaryDocument = useCallback(
-    async (
-      sessionId: string,
-      _docType: 'paystub' | 'w2' | 'schedule_c',
-      file: File
-    ) => ingestDocument(file, sessionId),
-    [ingestDocument]
   )
 
   const uploadDocumentJson = useCallback(
@@ -637,9 +621,7 @@ export const useTurboRefiSession = () => {
 
   return {
     ingestDocument,
-    createSessionFromMortgage,
     createSessionFromReceivedJson,
-    uploadSecondaryDocument,
     uploadDocumentJson,
     listSessions,
     loadSession,

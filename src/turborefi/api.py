@@ -8,6 +8,7 @@ from typing import Any
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from turborefi.extraction.service import SECONDARY_DOCUMENT_TYPES, UnsupportedDocumentError
@@ -131,11 +132,6 @@ def _serialize_session_detail(state) -> dict:
             if state.handoff_package is not None
             else None
         ),
-        "mortgage_data": (
-            state.documents.mortgage_statement.model_dump(mode="json")
-            if state.documents.mortgage_statement
-            else None
-        ),
         "income_docs": _status_income_docs(state),
         "messages": [
             {
@@ -175,16 +171,107 @@ def _serialize_session_detail(state) -> dict:
             if state.loa_output is not None
             else None
         ),
-        "verification_report": (
-            state.verifier_output.model_dump(mode="json")
-            if state.verifier_output is not None
-            else None
-        ),
     }
 
 
 def build_api(service: TurboRefiSessionService) -> FastAPI:
     api = FastAPI(title="TurboRefi API")
+    api.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    @api.get("/health")
+    async def health() -> dict[str, str]:
+        return {"status": "ok"}
+
+    @api.get("/teams")
+    async def teams() -> list[dict[str, str]]:
+        return []
+
+    @api.get("/agents")
+    async def agents() -> list[dict[str, Any]]:
+        return [
+            {
+                "id": "turborefi-loa",
+                "name": "TurboRefi LOA",
+                "db_id": "turborefi",
+                "model": {
+                    "name": service.settings.openai_model_loa,
+                    "model": service.settings.openai_model_loa,
+                    "provider": "openai",
+                },
+            }
+        ]
+
+    @api.get("/sessions")
+    async def list_sessions(
+        type: str | None = None,
+        component_id: str | None = None,
+        db_id: str | None = None,
+    ):
+        del type, component_id, db_id
+        data = [_serialize_session_summary(state) for state in service.list_states()]
+        return {"data": data}
+
+    @api.get("/sessions/{session_id}/runs")
+    async def get_session_runs(
+        session_id: str,
+        type: str | None = None,
+        db_id: str | None = None,
+    ):
+        del type, db_id
+        if not service.session_exists(session_id):
+            raise HTTPException(status_code=404, detail="Session not found")
+        state = service.get_state(session_id)
+        entries: list[dict[str, Any]] = []
+        conversation = list(state.conversation)
+        for index in range(0, len(conversation), 2):
+            user_message = conversation[index] if index < len(conversation) else None
+            agent_message = conversation[index + 1] if index + 1 < len(conversation) else None
+            if user_message is None and agent_message is None:
+                continue
+            entries.append(
+                {
+                    "message": {
+                        "role": user_message.role if user_message is not None else "user",
+                        "content": user_message.content if user_message is not None else "",
+                        "created_at": int(
+                            (user_message.created_at if user_message is not None else state.created_at).timestamp()
+                        ),
+                    },
+                    "response": {
+                        "content": agent_message.content if agent_message is not None else "",
+                        "tools": [
+                            _trace_to_tool_payload(
+                                trace,
+                                trace_index,
+                                created_at=int(
+                                    (agent_message.created_at if agent_message is not None else state.updated_at).timestamp()
+                                ),
+                            )
+                            for trace_index, trace in enumerate(
+                                agent_message.tool_trace if agent_message is not None else []
+                            )
+                        ],
+                        "created_at": int(
+                            (agent_message.created_at if agent_message is not None else state.updated_at).timestamp()
+                        ),
+                    },
+                }
+            )
+        return entries
+
+    @api.delete("/sessions/{session_id}")
+    async def delete_session_compat(session_id: str, db_id: str | None = None):
+        del db_id
+        if not service.session_exists(session_id):
+            raise HTTPException(status_code=404, detail="Session not found")
+        service.delete_session(session_id)
+        return {"ok": True}
 
     def ingest_document_bytes(
         file_bytes: bytes,
@@ -202,42 +289,17 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
             doc_type,
             len(file_bytes),
         )
-        if session_id and not service.session_exists(session_id):
-            # Stale frontend state should not block the first mortgage upload.
-            if doc_type in (None, "mortgage_statement"):
-                logger.warning(
-                    "TurboRefi ingest clearing stale session_id=%r for initial mortgage upload",
-                    session_id,
-                )
-                session_id = None
-            else:
-                logger.exception(
-                    "TurboRefi ingest rejected unknown session_id=%r for supporting upload",
-                    session_id,
-                )
-                raise HTTPException(status_code=404, detail="Session not found")
-
         if not session_id:
-            if doc_type and doc_type != "mortgage_statement":
-                raise HTTPException(status_code=400, detail="The first upload must be a mortgage statement")
-            effective_doc_type, document = service.extraction_service.extract_upload(
-                file_bytes=file_bytes,
-                filename=filename,
-                mime_type=mime_type,
-                doc_type="mortgage_statement",
-                is_new_session=True,
+            raise HTTPException(
+                status_code=400,
+                detail="Create a session from received JSON before uploading supporting documents.",
             )
-            next_session_id, response_text, state, tool_trace = service.create_session_from_mortgage_data(
-                document,
-                session_name=filename,
+        if not service.session_exists(session_id):
+            logger.exception(
+                "TurboRefi ingest rejected unknown session_id=%r for supporting upload",
+                session_id,
             )
-            return {
-                "session_id": next_session_id,
-                "response": response_text,
-                "current_phase": state.current_phase,
-                "document_type": effective_doc_type,
-                "tool_trace": tool_trace,
-            }
+            raise HTTPException(status_code=404, detail="Session not found")
 
         if doc_type and doc_type not in SECONDARY_DOCUMENT_TYPES:
             supported = ", ".join(SECONDARY_DOCUMENT_TYPES)
@@ -253,7 +315,7 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
             )
         except UnsupportedDocumentError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
-        response_text, state, tool_trace = service.upload_secondary_document(
+        response_text, state, tool_trace = service.upload_document(
             session_id,
             effective_doc_type,
             document,
@@ -266,25 +328,6 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
             "document_type": effective_doc_type,
             "tool_trace": tool_trace,
         }
-
-    @api.post("/session")
-    async def create_session(file: UploadFile = File(...)):
-        try:
-            file_bytes = await file.read()
-            result = ingest_document_bytes(
-                file_bytes,
-                mime_type=file.content_type or "application/pdf",
-                filename=file.filename,
-            )
-            return {
-                "session_id": result["session_id"],
-                "response": result["response"],
-                "current_phase": result["current_phase"],
-            }
-        except HTTPException:
-            raise
-        except Exception as exc:
-            raise HTTPException(status_code=500, detail=str(exc))
 
     @api.post("/session/from-json")
     async def create_session_from_json(request: dict[str, Any]):
@@ -315,26 +358,6 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
                 "lars_result": state.lars_result.model_dump(mode="json") if state.lars_result else None,
                 "handoff_package": state.handoff_package.model_dump(mode="json") if state.handoff_package else None,
                 "tool_trace": tool_trace,
-            }
-        except HTTPException:
-            raise
-        except Exception as exc:
-            raise HTTPException(status_code=500, detail=str(exc))
-
-    @api.post("/session/{session_id}/upload")
-    async def upload_document(session_id: str, doc_type: str = Form(...), file: UploadFile = File(...)):
-        try:
-            file_bytes = await file.read()
-            result = ingest_document_bytes(
-                file_bytes,
-                mime_type=file.content_type or "application/pdf",
-                filename=file.filename,
-                session_id=session_id,
-                doc_type=doc_type,
-            )
-            return {
-                "response": result["response"],
-                "current_phase": result["current_phase"],
             }
         except HTTPException:
             raise
@@ -591,18 +614,9 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
                 else None
             ),
             "source_data_warnings": state.source_data_warnings,
-            "verification_status": (
-                state.verifier_output.verification_status
-                if state.verifier_output is not None
-                else None
-            ),
             "borrower_facts": state.borrower_facts.model_dump(mode="json"),
-            "mortgage_data": (
-                state.documents.mortgage_statement.model_dump(mode="json")
-                if state.documents.mortgage_statement
-                else None
-            ),
             "income_docs": _status_income_docs(state),
+            "full_application_intent": state.full_application_intent,
         }
 
     @api.get("/refi/sessions")
@@ -633,26 +647,5 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
         return packet.model_dump(mode="json")
-
-    @api.post("/session/{session_id}/verify")
-    async def verify_session(session_id: str):
-        if not service.session_exists(session_id):
-            raise HTTPException(status_code=404, detail="Session not found")
-        if service.get_state(session_id).source_mode == "received_json_uc1_uc2":
-            raise HTTPException(status_code=400, detail="Verifier is not part of the UC1/UC2 target flow")
-        try:
-            report, _state = service.verify_session(session_id)
-        except ValueError as exc:
-            raise HTTPException(status_code=400, detail=str(exc)) from exc
-        return report.model_dump(mode="json")
-
-    @api.get("/session/{session_id}/verification")
-    async def get_verification(session_id: str):
-        if not service.session_exists(session_id):
-            raise HTTPException(status_code=404, detail="Session not found")
-        state = service.get_state(session_id)
-        if state.verifier_output is None:
-            raise HTTPException(status_code=400, detail="Verification report not generated yet")
-        return state.verifier_output.model_dump(mode="json")
 
     return api

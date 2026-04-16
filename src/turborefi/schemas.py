@@ -233,17 +233,6 @@ class DocumentSet(BaseModel):
                 categories.append(key)
         return categories
 
-
-class BorrowerCase(BaseModel):
-    case_id: str
-    borrower_name: str
-    use_case: UseCaseType
-    income_type: IncomeType
-    borrower_facts: BorrowerFacts = Field(default_factory=BorrowerFacts)
-    documents: DocumentSet
-    notes: list[str] = Field(default_factory=list)
-
-
 class GuidelineCitation(BaseModel):
     section: str
     finding: str
@@ -308,35 +297,6 @@ class LoanRecommendationPacket(BaseModel):
     source_data_warnings: list[str] = Field(default_factory=list)
     gse_analysis: dict[str, GSEAnalysisSummary] = Field(default_factory=dict)
 
-
-class ComplianceComponent(BaseModel):
-    component: str
-    weight: float
-    score: float
-    status: Literal["PASS", "FLAG", "FAIL"]
-
-
-class ComplianceScore(BaseModel):
-    total: float
-    components: list[ComplianceComponent] = Field(default_factory=list)
-
-
-class FieldComparison(BaseModel):
-    field: str
-    loa_value: Any
-    verifier_value: Any
-    match: bool
-    guideline_section: str | None = None
-    notes: str = ""
-
-
-class VerificationReport(BaseModel):
-    verification_status: Literal["PASS", "FLAG", "FAIL"]
-    field_comparisons: list[FieldComparison] = Field(default_factory=list)
-    compliance_score: ComplianceScore | None = None
-    audit_notes: list[str] = Field(default_factory=list)
-
-
 class RetrievalEvent(BaseModel):
     gse: Literal["fnma", "fhlmc"]
     tool: str
@@ -359,7 +319,6 @@ class ConversationMessage(BaseModel):
 
 class SessionState(BaseModel):
     session_id: str = Field(default_factory=lambda: str(uuid4()))
-    borrower_case_id: str | None = None
     session_name: str | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
@@ -389,4 +348,3 @@ class SessionState(BaseModel):
     tool_calls: list[ToolCallRecord] = Field(default_factory=list)
     conversation: list[ConversationMessage] = Field(default_factory=list)
     loa_output: LoanRecommendationPacket | None = None
-    verifier_output: VerificationReport | None = None

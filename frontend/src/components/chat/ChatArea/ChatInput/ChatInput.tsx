@@ -12,16 +12,24 @@ import { isTurboRefiLoanOfficer } from '@/lib/turborefi'
 import { useStore } from '@/store'
 
 const documentLabel = (value: string) =>
-  value === 'mortgage_statement'
-    ? 'Mortgage Statement'
-    : value === 'schedule_c'
-      ? 'Schedule C'
-      : value === 'paystub'
-        ? 'Paystub'
-        : 'W-2'
+  value === 'schedule_c'
+    ? 'Schedule C'
+    : value === 'tax_bill'
+      ? 'Tax Bill'
+      : value === 'insurance'
+        ? 'Insurance'
+        : value === 'identity'
+          ? 'Identity'
+          : value === 'pmi_statement'
+            ? 'PMI Statement'
+            : value === 'closing_disclosure'
+              ? 'Closing Disclosure'
+    : value === 'paystub'
+      ? 'Paystub'
+      : 'W-2'
 
 const phaseLabel = (value: string | null) =>
-  value ? value.replace(/_/g, ' ') : 'awaiting mortgage statement'
+  value ? value.replace(/_/g, ' ') : 'awaiting received json'
 
 const summarizeDocumentCounts = (documentTypes: string[]) => {
   const counts = new Map<string, number>()
@@ -33,8 +41,13 @@ const summarizeDocumentCounts = (documentTypes: string[]) => {
 
 const ChatInput = () => {
   const { chatInputRef } = useStore()
-  const { ingestDocument, loadSession, sendMessage, isTurboRefiLoading } =
-    useTurboRefiSession()
+  const {
+    createSessionFromReceivedJson,
+    ingestDocument,
+    loadSession,
+    sendMessage,
+    isTurboRefiLoading
+  } = useTurboRefiSession()
   const [selectedAgent] = useQueryState('agent')
   const [turboRefiSessionId, setTurboRefiSessionId] =
     useQueryState('refi_session')
@@ -86,15 +99,17 @@ const ChatInput = () => {
     turboRefiSessionId
   ])
 
-  const canUpload = mode === 'agent' && !isTurboRefiLoading && !isStreaming
-  const canChat = Boolean(
-    mode === 'agent' && hasActiveTurboRefiSession && isLoanOfficerSelected
-  )
+  const canUpload =
+    mode === 'agent' &&
+    hasActiveTurboRefiSession &&
+    !isTurboRefiLoading &&
+    !isStreaming
+  const canType = Boolean(mode === 'agent' && isLoanOfficerSelected)
   const placeholder =
     mode !== 'agent'
       ? 'Switch to agent mode to use TurboRefi'
       : !hasActiveTurboRefiSession
-        ? 'Attach a mortgage statement to begin'
+        ? 'Paste received mortgage JSON and send to begin'
         : !selectedAgent || !isLoanOfficerSelected
           ? 'Select the TurboRefi LOA agent to continue'
           : turboRefiSession.intakePending.length > 0
@@ -109,7 +124,19 @@ const ChatInput = () => {
 
     try {
       if (!hasActiveTurboRefiSession || !turboRefiSessionId) {
-        throw new Error('Upload a mortgage statement before sending a message')
+        let payload: Record<string, unknown>
+        try {
+          payload = JSON.parse(currentMessage)
+        } catch {
+          throw new Error(
+            'Paste a valid received mortgage JSON payload to start the session'
+          )
+        }
+        await createSessionFromReceivedJson(payload, {
+          newRate: turboRefiScreeningRate ?? undefined,
+          sessionName: 'Received JSON'
+        })
+        return
       }
       await sendMessage(turboRefiSessionId, currentMessage)
     } catch (error) {
@@ -131,9 +158,7 @@ const ChatInput = () => {
 
     if (files.length === 0) return
 
-    let nextSessionId = hasActiveTurboRefiSession
-      ? (turboRefiSessionId ?? undefined)
-      : undefined
+    let nextSessionId = turboRefiSessionId ?? undefined
     let successCount = 0
 
     for (const file of files) {
@@ -222,8 +247,8 @@ const ChatInput = () => {
           </>
         ) : (
           <span className="text-muted-foreground">
-            Upload the mortgage statement first. After that, attach paystubs,
-            W-2s, or Schedule C files in the same chat.
+            Paste the received mortgage JSON in the message box to start. After
+            that, attach the requested supporting documents here.
           </span>
         )}
       </div>
@@ -252,7 +277,7 @@ const ChatInput = () => {
               ? 'Uploading'
               : hasActiveTurboRefiSession
                 ? 'Attach'
-                : 'Upload'}
+                : 'Attach'}
           </span>
         </Button>
         <TextArea
@@ -271,12 +296,12 @@ const ChatInput = () => {
             }
           }}
           className="text-foreground min-h-[40px] border-0 bg-transparent px-2 text-sm shadow-none focus-visible:border-transparent focus-visible:ring-0"
-          disabled={!canChat}
+          disabled={!canType}
           ref={chatInputRef}
         />
         <Button
           onClick={handleSubmit}
-          disabled={!canChat || !inputMessage.trim() || isStreaming}
+          disabled={!canType || !inputMessage.trim() || isStreaming}
           size="icon"
           className="text-primary-foreground rounded-xl bg-primary"
         >

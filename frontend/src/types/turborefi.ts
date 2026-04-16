@@ -1,7 +1,6 @@
 import type { ToolCall } from '@/types/os'
 
 export type TurboRefiDocumentType =
-  | 'mortgage_statement'
   | 'paystub'
   | 'w2'
   | 'schedule_c'
@@ -67,9 +66,7 @@ export interface TurboRefiSessionStatus {
   intake_pending: string[]
   documents_received: string[]
   documents_pending: string[]
-  verification_status: string | null
   borrower_facts: Record<string, unknown>
-  mortgage_data: Record<string, unknown> | null
   received_mortgage?: Record<string, unknown> | null
   income_docs: Record<string, unknown>[]
   screening_assumptions?: Record<string, unknown>
@@ -95,7 +92,6 @@ export interface TurboRefiSessionDetail extends TurboRefiSessionStatus {
   borrower_id_token?: string | null
   messages: TurboRefiConversationMessage[]
   recommendation_packet: Record<string, unknown> | null
-  verification_report: Record<string, unknown> | null
 }
 
 export type TurboRefiRecommendationPacket = Record<string, unknown>

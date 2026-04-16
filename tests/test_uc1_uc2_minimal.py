@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -14,6 +13,7 @@ from turborefi.services.full_application_resolver import (
     DeterministicFullApplicationResolver,
     is_full_application_decision_pending,
 )
+from turborefi.services.gse_analysis import DeterministicGSEAnalyzer
 from turborefi.services.information_firewall import build_loa_visible_session
 from turborefi.services.lars_engine import evaluate_lars
 from turborefi.services.received_input import parse_received_json
@@ -25,17 +25,9 @@ from turborefi.services.uc1_uc2_intake_resolver import (
 from turborefi.testing.fake_retrieval import FakeHierarchyRetrievalService
 
 
-class FakeAgent:
-    def __init__(self, prefix: str):
-        self.prefix = prefix
-        self.session_states = {}
-
-    def update_session_state(self, session_id=None, session_state_updates=None):
-        self.session_states[session_id] = session_state_updates or {}
-
-    def run(self, message, session_id=None, session_state=None):
-        self.session_states[session_id] = session_state or {}
-        return SimpleNamespace(content=f"{self.prefix}:{message}")
+class FallbackConversationAgent:
+    def run(self, *_args, **_kwargs):
+        raise RuntimeError("force deterministic fallback")
 
 
 def build_settings(tmp_path: Path) -> Settings:
@@ -305,8 +297,8 @@ def test_json_first_uc1_clean_service_flow(tmp_path):
     service = TurboRefiSessionService(
         settings=build_settings(tmp_path),
         retrieval_service=FakeHierarchyRetrievalService(),
-        loa_agent=FakeAgent("loa"),
-        verifier_agent=FakeAgent("verifier"),
+        json_first_conversation_agent=FallbackConversationAgent(),
+        gse_analyzer=DeterministicGSEAnalyzer(FakeHierarchyRetrievalService()),
         uc1_uc2_intake_resolver=DeterministicUC1UC2IntakeResolver(),
     )
 
@@ -411,8 +403,8 @@ def test_automated_ready_yes_response_does_not_repeat_same_question(tmp_path):
     service = TurboRefiSessionService(
         settings=build_settings(tmp_path),
         retrieval_service=FakeHierarchyRetrievalService(),
-        loa_agent=FakeAgent("loa"),
-        verifier_agent=FakeAgent("verifier"),
+        json_first_conversation_agent=FallbackConversationAgent(),
+        gse_analyzer=DeterministicGSEAnalyzer(FakeHierarchyRetrievalService()),
         uc1_uc2_intake_resolver=DeterministicUC1UC2IntakeResolver(),
     )
 
@@ -562,8 +554,8 @@ def test_json_first_message_stream_emits_tool_and_content_events(tmp_path):
     service = TurboRefiSessionService(
         settings=build_settings(tmp_path),
         retrieval_service=FakeHierarchyRetrievalService(),
-        loa_agent=FakeAgent("loa"),
-        verifier_agent=FakeAgent("verifier"),
+        json_first_conversation_agent=FallbackConversationAgent(),
+        gse_analyzer=DeterministicGSEAnalyzer(FakeHierarchyRetrievalService()),
         uc1_uc2_intake_resolver=DeterministicUC1UC2IntakeResolver(),
     )
     client = TestClient(build_api(service))
@@ -598,8 +590,8 @@ def test_json_first_proceed_stream_emits_stage_messages(tmp_path):
     service = TurboRefiSessionService(
         settings=build_settings(tmp_path),
         retrieval_service=FakeHierarchyRetrievalService(),
-        loa_agent=FakeAgent("loa"),
-        verifier_agent=FakeAgent("verifier"),
+        json_first_conversation_agent=FallbackConversationAgent(),
+        gse_analyzer=DeterministicGSEAnalyzer(FakeHierarchyRetrievalService()),
         uc1_uc2_intake_resolver=DeterministicUC1UC2IntakeResolver(),
         full_application_resolver=DeterministicFullApplicationResolver(),
     )
@@ -634,8 +626,8 @@ def test_json_first_uses_configured_screening_rate_when_request_omits_rate(tmp_p
     service = TurboRefiSessionService(
         settings=settings,
         retrieval_service=FakeHierarchyRetrievalService(),
-        loa_agent=FakeAgent("loa"),
-        verifier_agent=FakeAgent("verifier"),
+        json_first_conversation_agent=FallbackConversationAgent(),
+        gse_analyzer=DeterministicGSEAnalyzer(FakeHierarchyRetrievalService()),
         uc1_uc2_intake_resolver=DeterministicUC1UC2IntakeResolver(),
     )
 
@@ -651,8 +643,8 @@ def test_referred_lars_does_not_stop_conversation_before_intake_complete(tmp_pat
     service = TurboRefiSessionService(
         settings=build_settings(tmp_path),
         retrieval_service=FakeHierarchyRetrievalService(),
-        loa_agent=FakeAgent("loa"),
-        verifier_agent=FakeAgent("verifier"),
+        json_first_conversation_agent=FallbackConversationAgent(),
+        gse_analyzer=DeterministicGSEAnalyzer(FakeHierarchyRetrievalService()),
         uc1_uc2_intake_resolver=DeterministicUC1UC2IntakeResolver(),
     )
 
@@ -679,8 +671,8 @@ def test_referred_case_handoffs_only_after_docs_complete(tmp_path):
     service = TurboRefiSessionService(
         settings=build_settings(tmp_path),
         retrieval_service=FakeHierarchyRetrievalService(),
-        loa_agent=FakeAgent("loa"),
-        verifier_agent=FakeAgent("verifier"),
+        json_first_conversation_agent=FallbackConversationAgent(),
+        gse_analyzer=DeterministicGSEAnalyzer(FakeHierarchyRetrievalService()),
         uc1_uc2_intake_resolver=DeterministicUC1UC2IntakeResolver(),
     )
 

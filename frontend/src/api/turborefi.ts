@@ -32,27 +32,6 @@ const readErrorMessage = async (response: Response) => {
   }
 }
 
-export const createTurboRefiSessionAPI = async (
-  endpoint: string,
-  file: File,
-  authToken?: string
-): Promise<TurboRefiSessionCreateResponse> => {
-  const formData = new FormData()
-  formData.append('file', file)
-
-  const response = await fetch(`${endpoint}/session`, {
-    method: 'POST',
-    headers: createHeaders(authToken),
-    body: formData
-  })
-
-  if (!response.ok) {
-    throw new Error(await readErrorMessage(response))
-  }
-
-  return response.json()
-}
-
 export const createTurboRefiSessionFromJsonAPI = async (
   endpoint: string,
   payload: Record<string, unknown>,
@@ -73,30 +52,6 @@ export const createTurboRefiSessionFromJsonAPI = async (
       new_rate: options?.newRate,
       session_name: options?.sessionName
     })
-  })
-
-  if (!response.ok) {
-    throw new Error(await readErrorMessage(response))
-  }
-
-  return response.json()
-}
-
-export const uploadTurboRefiDocumentAPI = async (
-  endpoint: string,
-  sessionId: string,
-  docType: 'paystub' | 'w2' | 'schedule_c',
-  file: File,
-  authToken?: string
-): Promise<TurboRefiSessionUploadResponse> => {
-  const formData = new FormData()
-  formData.append('doc_type', docType)
-  formData.append('file', file)
-
-  const response = await fetch(`${endpoint}/session/${sessionId}/upload`, {
-    method: 'POST',
-    headers: createHeaders(authToken),
-    body: formData
   })
 
   if (!response.ok) {

@@ -172,7 +172,7 @@ const ChatBlankState = () => {
               </div>
             </span>
           </div>
-          <p>Attach a mortgage statement from the chat footer to start the TurboRefi flow</p>
+          <p>Paste the received mortgage JSON in chat to start the TurboRefi flow</p>
         </motion.h1>
         <motion.div
           initial={{ opacity: 0, y: 10 }}

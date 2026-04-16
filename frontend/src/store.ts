@@ -64,7 +64,6 @@ interface Store {
     documentsReceived: string[]
     documentsPending: string[]
     borrowerFacts: Record<string, unknown> | null
-    mortgageData: Record<string, unknown> | null
     receivedMortgage: Record<string, unknown> | null
     incomeDocs: Record<string, unknown>[]
     screeningAssumptions: Record<string, unknown> | null
@@ -98,7 +97,6 @@ const initialTurboRefiSession = {
   documentsReceived: [],
   documentsPending: [],
   borrowerFacts: null,
-  mortgageData: null,
   receivedMortgage: null,
   incomeDocs: [],
   screeningAssumptions: null,
