@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Iterable, Protocol
+from typing import Callable, Iterable, Protocol
 
 from turborefi.schemas import GuidelineCitation, RetrievalEvent, SessionState
 from turborefi.services.guide_traversal import EvidenceValidator, TraversalEngine
@@ -33,7 +33,11 @@ class GuidelineResearchResult:
 
 
 class GuidelineResearcher(Protocol):
-    def research(self, session_state: SessionState) -> GuidelineResearchResult: ...
+    def research(
+        self,
+        session_state: SessionState,
+        progress_callback: Callable[[str], None] | None = None,
+    ) -> GuidelineResearchResult: ...
 
 
 class DeterministicGuidelineResearcher:
@@ -47,11 +51,17 @@ class DeterministicGuidelineResearcher:
         self.traversal_engine = traversal_engine or TraversalEngine(retrieval_service)
         self.evidence_validator = evidence_validator or EvidenceValidator()
 
-    def research(self, session_state: SessionState) -> GuidelineResearchResult:
+    def research(
+        self,
+        session_state: SessionState,
+        progress_callback: Callable[[str], None] | None = None,
+    ) -> GuidelineResearchResult:
         result = GuidelineResearchResult()
         focuses = focus_definitions_for_state(session_state)
 
         for gse in self.retrieval_service.available_guides():
+            if callable(progress_callback):
+                progress_callback(f"Reviewing {gse.upper()} guidance...")
             for focus in focuses:
                 traversal = self.traversal_engine.collect_candidates(gse=gse, focus=focus)
                 result.retrieval_events.extend(traversal.retrieval_events)

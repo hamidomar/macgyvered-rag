@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import logging
 import os
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import UTC, datetime
+from pathlib import Path
+from time import perf_counter
 from typing import Protocol
 
 from turborefi.agents.common import build_base_agent_kwargs
@@ -11,6 +16,14 @@ from turborefi.schemas import GSEAnalysisSummary, GSEFocusFinding, GuidelineCita
 from turborefi.services.information_firewall import build_loa_visible_session
 from turborefi.services.retrieval_policy import focus_definitions_for_state
 from turborefi.services.retrieval_service import RetrievalService
+
+
+logger = logging.getLogger(__name__)
+
+MAX_PRIMARY_TEXT_CHARS = 1200
+MAX_REFERENCE_TEXT_CHARS = 350
+MAX_REFERENCE_SECTIONS = 2
+MAX_LINK_IDS = 6
 
 
 class GSEAnalyzer(Protocol):
@@ -251,79 +264,233 @@ class AgenticGSEAnalyzer:
         payload = self.retrieval_service.get_section_with_references(section_id=section_id, gse=gse, depth=1)
         return payload if isinstance(payload, dict) else {"primary": section_id, "sections": []}
 
+    def _truncate_text(self, value: object, limit: int) -> str:
+        if not isinstance(value, str):
+            return ""
+        normalized = " ".join(value.split())
+        if len(normalized) <= limit:
+            return normalized
+        return normalized[: limit - 3].rstrip() + "..."
+
+    def _compact_section(self, section: dict[str, object], *, text_limit: int) -> dict[str, object]:
+        return {
+            "section_id": section.get("section_id"),
+            "title": section.get("title"),
+            "text_excerpt": self._truncate_text(section.get("text"), text_limit),
+            "text_length": section.get("text_length"),
+            "references": list(section.get("references") or [])[:MAX_LINK_IDS],
+            "cited_by": list(section.get("cited_by") or [])[:MAX_LINK_IDS],
+        }
+
+    def _compact_section_payload(self, gse: str, section_id: str) -> dict[str, object]:
+        payload = self._section_payload(gse, section_id)
+        sections = payload.get("sections")
+        if not isinstance(sections, list):
+            sections = []
+
+        primary_section = next(
+            (
+                section
+                for section in sections
+                if isinstance(section, dict) and section.get("section_id") == section_id
+            ),
+            sections[0] if sections and isinstance(sections[0], dict) else {},
+        )
+        related_sections = [
+            section
+            for section in sections
+            if isinstance(section, dict) and section.get("section_id") != section_id
+        ][:MAX_REFERENCE_SECTIONS]
+
+        return {
+            "primary": payload.get("primary"),
+            "total_text_length": payload.get("total_text_length"),
+            "primary_section": self._compact_section(primary_section, text_limit=MAX_PRIMARY_TEXT_CHARS)
+            if isinstance(primary_section, dict)
+            else {"section_id": section_id},
+            "related_sections": [
+                self._compact_section(section, text_limit=MAX_REFERENCE_TEXT_CHARS) for section in related_sections
+            ],
+        }
+
+    def _dump_prompt(self, *, session_id: str, gse: str, prompt: str) -> Path | None:
+        try:
+            prompt_dir = self.settings.traces_dir / "gse_analysis_prompts"
+            prompt_dir.mkdir(parents=True, exist_ok=True)
+            timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
+            path = prompt_dir / f"{session_id}_{gse}_{timestamp}.txt"
+            path.write_text(prompt, encoding="utf-8")
+            return path
+        except Exception:
+            logger.exception(
+                "[TEMP timing] Failed to dump GSE analysis prompt for session_id=%s gse=%s",
+                session_id,
+                gse,
+            )
+            return None
+
+    def _analyze_single_gse(
+        self,
+        *,
+        session_state: SessionState,
+        gse: str,
+        summary: GSEAnalysisSummary,
+        grouped: dict[tuple[str, str], list[GuidelineCitation]],
+        visible_state: dict[str, object],
+        focus_defs,
+    ) -> GSEAnalysisSummary:
+        gse_started = perf_counter()
+        section_expand_started = perf_counter()
+        sections_by_focus = {}
+        for finding in summary.focus_results:
+            focus_citations = grouped.get((gse, finding.focus_key), [])
+            sections_by_focus[finding.focus_key] = [
+                self._compact_section_payload(gse, citation.section) for citation in focus_citations
+            ]
+        section_expand_ms = (perf_counter() - section_expand_started) * 1000
+        prompt = (
+            "Assess one GSE path for a TurboRefi borrower.\n"
+            f"GSE: {gse}\n"
+            f"Borrower profile: {visible_state}\n"
+            f"Retrieved guideline sections by focus: {sections_by_focus}\n"
+            f"Deterministic baseline summary: {summary.model_dump(mode='json')}\n"
+            "Return a structured GSEAnalysisSummary. Preserve the same gse and focus_results ordering. "
+            "Only change the semantic interpretation if the provided guideline text supports that change."
+        )
+        prompt_path = self._dump_prompt(session_id=session_state.session_id, gse=gse, prompt=prompt)
+        agent = self._build_agent()
+        if agent is None:
+            logger.warning(
+                "[TEMP timing] AgenticGSEAnalyzer per-gse fallback session_id=%s gse=%s elapsed_ms=%.1f",
+                session_state.session_id,
+                gse,
+                (perf_counter() - gse_started) * 1000,
+            )
+            return summary
+        try:
+            agent_started = perf_counter()
+            response = agent.run(prompt)
+            agent_ms = (perf_counter() - agent_started) * 1000
+            content = getattr(response, "content", response)
+            upgraded_summary = (
+                content if isinstance(content, GSEAnalysisSummary) else GSEAnalysisSummary.model_validate(content)
+            )
+            upgraded_summary.gse = summary.gse
+            normalized_focus_results: list[GSEFocusFinding] = []
+            for focus in summary.focus_results:
+                candidate = next(
+                    (result for result in upgraded_summary.focus_results if result.focus_key == focus.focus_key),
+                    None,
+                )
+                if candidate is None:
+                    normalized_focus_results.append(focus)
+                    continue
+                candidate.gse = focus.gse
+                candidate.focus_key = focus.focus_key
+                candidate.focus_label = focus.focus_label
+                candidate.section_ids = focus.section_ids
+                candidate.source = "agentic"
+                normalized_focus_results.append(candidate)
+            required_results = [
+                finding
+                for finding in normalized_focus_results
+                if any(focus.key == finding.focus_key and focus.required for focus in focus_defs)
+            ]
+            supported = all(finding.assessment == "pass" for finding in required_results)
+            blockers = [
+                finding.focus_label
+                for finding in required_results
+                if finding.assessment in {"fail", "unclear"}
+            ]
+            result = GSEAnalysisSummary(
+                gse=summary.gse,
+                supported=supported,
+                overall_reason=(
+                    "All required focus areas are supported."
+                    if supported
+                    else "Support is limited by: " + ", ".join(blockers)
+                ),
+                focus_results=normalized_focus_results,
+            )
+            logger.warning(
+                "[TEMP timing] AgenticGSEAnalyzer gse=%s session_id=%s citations=%s section_expand_ms=%.1f agent_ms=%.1f total_ms=%.1f prompt_chars=%s prompt_dump=%s",
+                gse,
+                session_state.session_id,
+                sum(len(grouped.get((gse, finding.focus_key), [])) for finding in summary.focus_results),
+                section_expand_ms,
+                agent_ms,
+                (perf_counter() - gse_started) * 1000,
+                len(prompt),
+                str(prompt_path) if prompt_path else "n/a",
+            )
+            return result
+        except Exception:
+            logger.exception(
+                "[TEMP timing] AgenticGSEAnalyzer failed for gse=%s session_id=%s after_ms=%.1f",
+                gse,
+                session_state.session_id,
+                (perf_counter() - gse_started) * 1000,
+            )
+            return summary
+
     def analyze(
         self,
         session_state: SessionState,
         citations: list[GuidelineCitation],
     ) -> dict[str, GSEAnalysisSummary]:
+        analysis_started = perf_counter()
         baseline = self.fallback.analyze(session_state, citations)
         focus_defs = focus_definitions_for_state(session_state)
         agent = self._build_agent()
         if agent is None:
+            logger.warning(
+                "[TEMP timing] AgenticGSEAnalyzer fallback only: session_id=%s citations=%s elapsed_ms=%.1f",
+                session_state.session_id,
+                len(citations),
+                (perf_counter() - analysis_started) * 1000,
+            )
             return baseline
 
         visible_state = build_loa_visible_session(session_state)
         grouped = _group_citations(citations)
-        for gse, summary in baseline.items():
-            sections_by_focus = {}
-            for finding in summary.focus_results:
-                focus_citations = grouped.get((gse, finding.focus_key), [])
-                sections_by_focus[finding.focus_key] = [
-                    self._section_payload(gse, citation.section) for citation in focus_citations
-                ]
-            prompt = (
-                "Assess one GSE path for a TurboRefi borrower.\n"
-                f"GSE: {gse}\n"
-                f"Borrower profile: {visible_state}\n"
-                f"Retrieved guideline sections by focus: {sections_by_focus}\n"
-                f"Deterministic baseline summary: {summary.model_dump(mode='json')}\n"
-                "Return a structured GSEAnalysisSummary. Preserve the same gse and focus_results ordering. "
-                "Only change the semantic interpretation if the provided guideline text supports that change."
+        if len(baseline) == 1:
+            gse, summary = next(iter(baseline.items()))
+            baseline[gse] = self._analyze_single_gse(
+                session_state=session_state,
+                gse=gse,
+                summary=summary,
+                grouped=grouped,
+                visible_state=visible_state,
+                focus_defs=focus_defs,
             )
-            try:
-                response = agent.run(prompt)
-                content = getattr(response, "content", response)
-                upgraded_summary = (
-                    content if isinstance(content, GSEAnalysisSummary) else GSEAnalysisSummary.model_validate(content)
-                )
-                upgraded_summary.gse = summary.gse
-                baseline_focus_map = {finding.focus_key: finding for finding in summary.focus_results}
-                normalized_focus_results: list[GSEFocusFinding] = []
-                for focus in summary.focus_results:
-                    candidate = next(
-                        (result for result in upgraded_summary.focus_results if result.focus_key == focus.focus_key),
-                        None,
-                    )
-                    if candidate is None:
-                        normalized_focus_results.append(focus)
-                        continue
-                    candidate.gse = focus.gse
-                    candidate.focus_key = focus.focus_key
-                    candidate.focus_label = focus.focus_label
-                    candidate.section_ids = focus.section_ids
-                    candidate.source = "agentic"
-                    normalized_focus_results.append(candidate)
-                required_results = [
-                    finding
-                    for finding in normalized_focus_results
-                    if any(focus.key == finding.focus_key and focus.required for focus in focus_defs)
-                ]
-                supported = all(finding.assessment == "pass" for finding in required_results)
-                blockers = [
-                    finding.focus_label
-                    for finding in required_results
-                    if finding.assessment in {"fail", "unclear"}
-                ]
-                baseline[gse] = GSEAnalysisSummary(
-                    gse=summary.gse,
-                    supported=supported,
-                    overall_reason=(
-                        "All required focus areas are supported."
-                        if supported
-                        else "Support is limited by: " + ", ".join(blockers)
-                    ),
-                    focus_results=normalized_focus_results,
-                )
-            except Exception:
-                baseline[gse] = summary
+        else:
+            with ThreadPoolExecutor(max_workers=min(2, len(baseline))) as executor:
+                future_map = {
+                    executor.submit(
+                        self._analyze_single_gse,
+                        session_state=session_state,
+                        gse=gse,
+                        summary=summary,
+                        grouped=grouped,
+                        visible_state=visible_state,
+                        focus_defs=focus_defs,
+                    ): gse
+                    for gse, summary in baseline.items()
+                }
+                for future in as_completed(future_map):
+                    gse = future_map[future]
+                    try:
+                        baseline[gse] = future.result()
+                    except Exception:
+                        logger.exception(
+                            "[TEMP timing] AgenticGSEAnalyzer future failed for gse=%s session_id=%s",
+                            gse,
+                            session_state.session_id,
+                        )
+        logger.warning(
+            "[TEMP timing] AgenticGSEAnalyzer total session_id=%s citations=%s elapsed_ms=%.1f",
+            session_state.session_id,
+            len(citations),
+            (perf_counter() - analysis_started) * 1000,
+        )
         return baseline

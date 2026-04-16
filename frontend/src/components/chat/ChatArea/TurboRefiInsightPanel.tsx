@@ -179,6 +179,9 @@ const TurboRefiInsightPanel = () => {
     recommendationPacket?.monthly_savings_estimate
   )
   const packetLtv = formatPercent(recommendationPacket?.ltv_percent)
+  const packetRecommendedReason = asText(
+    recommendationPacket?.recommended_gse_reason
+  )
   const packetCitations = Array.isArray(
     recommendationPacket?.guideline_citations
   )
@@ -379,6 +382,14 @@ const TurboRefiInsightPanel = () => {
                   {recommendedGse ? recommendedGse.toUpperCase() : '--'}
                 </span>
               </div>
+              {packetRecommendedReason ? (
+                <div className="space-y-1">
+                  <span className="text-xs text-secondary">Why selected</span>
+                  <p className="text-sm text-primary">
+                    {packetRecommendedReason}
+                  </p>
+                </div>
+              ) : null}
               {packetIncome ? (
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-xs text-secondary">

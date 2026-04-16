@@ -292,6 +292,7 @@ class LoanRecommendationPacket(BaseModel):
     fnma_eligible: bool
     fhlmc_eligible: bool
     recommended_gse: Literal["fnma", "fhlmc"]
+    recommended_gse_reason: str = ""
     qualifying_monthly_income: float
     ltv_percent: float
     monthly_savings_estimate: float

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import dataclass
-from typing import Any
+from time import perf_counter
+from typing import Any, Callable
 
 from turborefi.rules.document_requirements import get_document_status
 from turborefi.rules.guideline_map import USE_CASE_MAX_LTV
@@ -22,6 +24,9 @@ from turborefi.services.guideline_research import (
 from turborefi.services.gse_analysis import DeterministicGSEAnalyzer, GSEAnalyzer
 from turborefi.services.retrieval_service import RetrievalService
 from turborefi.tools.calculators import calc_ltv, calc_pmi_savings, calc_se_income, calc_w2_income
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -108,6 +113,7 @@ def _packet_generation_tool_call(
         },
         {
             "recommended_gse": packet.recommended_gse,
+            "recommended_gse_reason": packet.recommended_gse_reason,
             "fnma_eligible": packet.fnma_eligible,
             "fhlmc_eligible": packet.fhlmc_eligible,
             "qualifying_monthly_income": packet.qualifying_monthly_income,
@@ -222,9 +228,10 @@ def _guideline_artifacts(
     session_state: SessionState,
     retrieval_service: RetrievalService,
     guideline_researcher: GuidelineResearcher | None = None,
+    progress_callback: Callable[[str], None] | None = None,
 ) -> tuple[list[GuidelineCitation], list[RetrievalEvent], set[str]]:
     researcher = guideline_researcher or DeterministicGuidelineResearcher(retrieval_service)
-    research_result = researcher.research(session_state)
+    research_result = researcher.research(session_state, progress_callback=progress_callback)
     supported_gses = research_result.supported_gses(required_focus_keys_for_state(session_state))
     citations = [citation for citation in research_result.citations if citation.gse in supported_gses]
     return citations, research_result.retrieval_events, supported_gses
@@ -270,6 +277,79 @@ def _recommended_gse(
     if fhlmc_eligible:
         return "fhlmc"
     return "fnma"
+
+
+def _assessment_priority(value: str) -> int:
+    return {
+        "pass": 3,
+        "not_applicable": 2,
+        "unclear": 1,
+        "fail": 0,
+    }.get(value, 0)
+
+
+def _confidence_priority(value: str) -> int:
+    return {
+        "high": 2,
+        "medium": 1,
+        "low": 0,
+    }.get(value, 0)
+
+
+def _analysis_score(summary) -> tuple[int, int, int, int]:
+    pass_score = sum(_assessment_priority(finding.assessment) for finding in summary.focus_results)
+    confidence_score = sum(_confidence_priority(finding.confidence) for finding in summary.focus_results)
+    fail_count = sum(1 for finding in summary.focus_results if finding.assessment == "fail")
+    unclear_count = sum(1 for finding in summary.focus_results if finding.assessment == "unclear")
+    return pass_score, confidence_score, -fail_count, -unclear_count
+
+
+def _citation_count(citations: list[GuidelineCitation], gse: str) -> int:
+    return sum(1 for citation in citations if citation.gse == gse)
+
+
+def _choose_recommended_gse_from_analysis(
+    session_state: SessionState,
+    *,
+    fnma_eligible: bool,
+    fhlmc_eligible: bool,
+    gse_analysis: dict[str, Any],
+    citations: list[GuidelineCitation],
+    default_if_tied: str = "fnma",
+) -> tuple[str, str]:
+    if fnma_eligible and not fhlmc_eligible:
+        return "fnma", "FNMA is selected because the current packet supports FNMA while FHLMC is not fully supported."
+    if fhlmc_eligible and not fnma_eligible:
+        return "fhlmc", "FHLMC is selected because the current packet supports FHLMC while FNMA is not fully supported."
+
+    statement_owner = (
+        session_state.documents.mortgage_statement.gse_owner if session_state.documents.mortgage_statement else "unknown"
+    )
+    if statement_owner == "fnma" and fnma_eligible:
+        return "fnma", "FNMA is selected because the current loan already appears Fannie Mae-backed and the FNMA path is supportable."
+    if statement_owner == "fhlmc" and fhlmc_eligible:
+        return "fhlmc", "FHLMC is selected because the current loan already appears Freddie Mac-backed and the FHLMC path is supportable."
+
+    fnma_summary = gse_analysis.get("fnma")
+    fhlmc_summary = gse_analysis.get("fhlmc")
+    if fnma_summary is not None and fhlmc_summary is not None:
+        fnma_score = _analysis_score(fnma_summary)
+        fhlmc_score = _analysis_score(fhlmc_summary)
+        if fnma_score > fhlmc_score:
+            return "fnma", "FNMA is selected because its GSE analysis shows the stronger overall focus-level support across the required guideline checks."
+        if fhlmc_score > fnma_score:
+            return "fhlmc", "FHLMC is selected because its GSE analysis shows the stronger overall focus-level support across the required guideline checks."
+
+    fnma_citations = _citation_count(citations, "fnma")
+    fhlmc_citations = _citation_count(citations, "fhlmc")
+    if fnma_citations > fhlmc_citations:
+        return "fnma", "FNMA is selected because it retained more accepted guideline support for this case."
+    if fhlmc_citations > fnma_citations:
+        return "fhlmc", "FHLMC is selected because it retained more accepted guideline support for this case."
+
+    if default_if_tied == "fhlmc":
+        return "fhlmc", "Both FNMA and FHLMC remain equally supportable after the comparative analysis, so FHLMC is retained as the deterministic tie-break."
+    return "fnma", "Both FNMA and FHLMC remain equally supportable after the comparative analysis, so FNMA is retained as the deterministic tie-break."
 
 
 def _reasoning_chain(
@@ -386,19 +466,40 @@ def build_json_first_recommendation_packet(
     retrieval_service: RetrievalService,
     guideline_researcher: GuidelineResearcher | None = None,
     gse_analyzer: GSEAnalyzer | None = None,
+    progress_callback: Callable[[str], None] | None = None,
 ) -> PacketBuildResult:
+    packet_started = perf_counter()
+    research_started = perf_counter()
     citations, retrieval_events, retrieved_gses = _guideline_artifacts(
         session_state,
         retrieval_service,
         guideline_researcher=guideline_researcher,
+        progress_callback=progress_callback,
     )
+    research_ms = (perf_counter() - research_started) * 1000
+    if callable(progress_callback):
+        progress_callback("Building recommendation packet...")
     tool_calls = _json_first_tool_calls(session_state)
     doc_status = _json_first_doc_status(session_state)
     analyzer = gse_analyzer or DeterministicGSEAnalyzer(retrieval_service)
+    analysis_started = perf_counter()
     gse_analysis_models = analyzer.analyze(session_state, citations)
+    analysis_ms = (perf_counter() - analysis_started) * 1000
     gse_analysis = {gse: summary.model_dump(mode="json") for gse, summary in gse_analysis_models.items()}
     fnma_eligible = bool(gse_analysis_models.get("fnma") and gse_analysis_models["fnma"].supported)
     fhlmc_eligible = bool(gse_analysis_models.get("fhlmc") and gse_analysis_models["fhlmc"].supported)
+    recommended_gse, recommended_gse_reason = _choose_recommended_gse_from_analysis(
+        session_state,
+        fnma_eligible=fnma_eligible,
+        fhlmc_eligible=fhlmc_eligible,
+        gse_analysis=gse_analysis_models,
+        citations=citations,
+        default_if_tied=_json_first_recommended_gse(
+            fnma_eligible=fnma_eligible,
+            fhlmc_eligible=fhlmc_eligible,
+            retrieved_gses=retrieved_gses,
+        ),
+    )
 
     packet = LoanRecommendationPacket(
         borrower_name="Borrower",
@@ -406,11 +507,8 @@ def build_json_first_recommendation_packet(
         use_case=session_state.use_case,
         fnma_eligible=fnma_eligible,
         fhlmc_eligible=fhlmc_eligible,
-        recommended_gse=_json_first_recommended_gse(
-            fnma_eligible=fnma_eligible,
-            fhlmc_eligible=fhlmc_eligible,
-            retrieved_gses=retrieved_gses,
-        ),
+        recommended_gse=recommended_gse,
+        recommended_gse_reason=recommended_gse_reason,
         qualifying_monthly_income=_json_first_monthly_income(session_state),
         ltv_percent=_json_first_ltv_percent(session_state),
         monthly_savings_estimate=_json_first_monthly_savings(session_state),
@@ -443,6 +541,15 @@ def build_json_first_recommendation_packet(
         retrieved_gses=retrieved_gses,
     )
     tool_calls.extend([guideline_review_call, gse_analysis_call, packet_generation_call])
+    logger.warning(
+        "[TEMP timing] build_json_first_recommendation_packet session_id=%s research_ms=%.1f gse_analysis_ms=%.1f citations=%s retrieval_events=%s total_ms=%.1f",
+        session_state.session_id,
+        research_ms,
+        analysis_ms,
+        len(citations),
+        len(retrieval_events),
+        (perf_counter() - packet_started) * 1000,
+    )
     return PacketBuildResult(
         packet=packet,
         retrieval_events=retrieval_events,
@@ -455,6 +562,7 @@ def build_deterministic_loan_packet(
     retrieval_service: RetrievalService,
     guideline_researcher: GuidelineResearcher | None = None,
     gse_analyzer: GSEAnalyzer | None = None,
+    progress_callback: Callable[[str], None] | None = None,
 ) -> PacketBuildResult:
     if session_state.documents.mortgage_statement is None:
         raise ValueError("Mortgage statement must be present before building a recommendation packet.")
@@ -484,12 +592,27 @@ def build_deterministic_loan_packet(
         session_state,
         retrieval_service,
         guideline_researcher=guideline_researcher,
+        progress_callback=progress_callback,
     )
+    if callable(progress_callback):
+        progress_callback("Building recommendation packet...")
     analyzer = gse_analyzer or DeterministicGSEAnalyzer(retrieval_service)
     gse_analysis_models = analyzer.analyze(session_state, citations)
     gse_analysis = {gse: summary.model_dump(mode="json") for gse, summary in gse_analysis_models.items()}
     fnma_eligible = bool(gse_analysis_models.get("fnma") and gse_analysis_models["fnma"].supported)
     fhlmc_eligible = bool(gse_analysis_models.get("fhlmc") and gse_analysis_models["fhlmc"].supported)
+    recommended_gse, recommended_gse_reason = _choose_recommended_gse_from_analysis(
+        session_state,
+        fnma_eligible=fnma_eligible,
+        fhlmc_eligible=fhlmc_eligible,
+        gse_analysis=gse_analysis_models,
+        citations=citations,
+        default_if_tied=_recommended_gse(
+            session_state,
+            fnma_eligible=fnma_eligible,
+            fhlmc_eligible=fhlmc_eligible,
+        ),
+    )
 
     calculations = {
         "income": income_call,
@@ -505,11 +628,8 @@ def build_deterministic_loan_packet(
         use_case=session_state.use_case,
         fnma_eligible=fnma_eligible,
         fhlmc_eligible=fhlmc_eligible,
-        recommended_gse=_recommended_gse(
-            session_state,
-            fnma_eligible=fnma_eligible,
-            fhlmc_eligible=fhlmc_eligible,
-        ),
+        recommended_gse=recommended_gse,
+        recommended_gse_reason=recommended_gse_reason,
         qualifying_monthly_income=float(qualifying_monthly_income),
         ltv_percent=float(ltv_call.result["ltv_percent"]),
         monthly_savings_estimate=_monthly_savings_estimate(session_state, session_state.use_case),

@@ -114,6 +114,87 @@ def referred_uc1_payload():
     }
 
 
+def complete_json_first_uc1_case(service: TurboRefiSessionService) -> str:
+    session_id, _response, _state, _trace = service.create_session_from_received_json(
+        uc1_clean_payload(),
+        new_rate=6.0,
+    )
+    service.send_message(
+        session_id,
+        "I am around 740, I have been with my employer for 7 years, it is my only income, single-family home.",
+    )
+    service.upload_document_json(
+        session_id,
+        "paystub",
+        {
+            "employer_name": "Acme Manufacturing",
+            "gross_this_period": 3846.15,
+            "pay_frequency": "biweekly",
+            "ytd_gross": 25000,
+            "pay_period_end_date": "2026-03-31",
+            "base_pay": 3846.15,
+        },
+    )
+    service.upload_document_json(
+        session_id,
+        "paystub",
+        {
+            "employer_name": "Acme Manufacturing",
+            "gross_this_period": 3846.15,
+            "pay_frequency": "biweekly",
+            "ytd_gross": 21153.85,
+            "pay_period_end_date": "2026-03-15",
+            "base_pay": 3846.15,
+        },
+    )
+    service.upload_document_json(
+        session_id,
+        "w2",
+        {
+            "tax_year": 2024,
+            "wages_box1": 98000,
+            "employer_name": "Acme Manufacturing",
+        },
+    )
+    service.upload_document_json(
+        session_id,
+        "w2",
+        {
+            "tax_year": 2023,
+            "wages_box1": 95000,
+            "employer_name": "Acme Manufacturing",
+        },
+    )
+    service.upload_document_json(
+        session_id,
+        "tax_bill",
+        {
+            "tax_bill_annual": 5400,
+            "tax_year": 2025,
+            "property_address": "1247 Maple Ridge Dr, North Olmsted OH",
+        },
+    )
+    service.upload_document_json(
+        session_id,
+        "insurance",
+        {
+            "insurance_annual": 1800,
+            "carrier_name": "Test Insurance",
+        },
+    )
+    service.upload_document_json(
+        session_id,
+        "identity",
+        {
+            "document_present": True,
+            "document_type": "drivers_license",
+            "issuing_state": "OH",
+            "id_last4": "1234",
+        },
+    )
+    return session_id
+
+
 def test_uc1_spec_clean_calculators():
     gmi = income.gross_monthly_income(3846.15, "biweekly")
     annualized = income.paystub_annualized(3846.15, "biweekly")
@@ -291,6 +372,8 @@ def test_json_first_uc1_clean_service_flow(tmp_path):
     assert state.lars_result.final_score == 100
     assert state.lars_result.decision == "AUTOMATED"
     assert packet.recommended_gse == "fnma"
+    assert packet.recommended_gse_reason
+    assert "supportable" in packet.recommended_gse_reason.lower() or "selected because" in packet.recommended_gse_reason.lower()
     assert len(packet.guideline_citations) >= 3
     assert any(citation.section == "B2-1.3-02" for citation in packet.guideline_citations)
     assert any(citation.section == "4301.4" for citation in packet.guideline_citations)
@@ -509,6 +592,35 @@ def test_json_first_message_stream_emits_tool_and_content_events(tmp_path):
         event.get("tool", {}).get("tool_name") == "resolve_uc1_uc2_intake"
         for event in events
     )
+
+
+def test_json_first_proceed_stream_emits_stage_messages(tmp_path):
+    service = TurboRefiSessionService(
+        settings=build_settings(tmp_path),
+        retrieval_service=FakeHierarchyRetrievalService(),
+        loa_agent=FakeAgent("loa"),
+        verifier_agent=FakeAgent("verifier"),
+        uc1_uc2_intake_resolver=DeterministicUC1UC2IntakeResolver(),
+        full_application_resolver=DeterministicFullApplicationResolver(),
+    )
+    session_id = complete_json_first_uc1_case(service)
+    client = TestClient(build_api(service))
+
+    with client.stream(
+        "POST",
+        f"/session/{session_id}/message/stream",
+        json={"message": "Yes lets proceed."},
+    ) as response:
+        body = "".join(response.iter_text())
+
+    events = [json.loads(line) for line in body.splitlines() if line.strip()]
+    run_content = [event["content"] for event in events if event["event"] == "RunContent"]
+
+    assert response.status_code == 200
+    assert any("Reviewing FNMA guidance..." in content for content in run_content)
+    assert any("Reviewing FHLMC guidance..." in content for content in run_content)
+    assert any("Building recommendation packet..." in content for content in run_content)
+    assert events[-1]["event"] == "RunCompleted"
 
 
 def test_json_first_uses_configured_screening_rate_when_request_omits_rate(tmp_path):

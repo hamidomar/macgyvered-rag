@@ -5,7 +5,8 @@ import logging
 import os
 from inspect import signature
 from pathlib import Path
-from typing import Any
+from time import perf_counter
+from typing import Any, Callable
 
 from turborefi.agents.json_first_conversation import build_json_first_conversation_agent
 from turborefi.agents.loan_officer import build_loan_officer_agent
@@ -92,6 +93,15 @@ def _guide_limitations(state: SessionState) -> list[str]:
             message = f"{event.gse.upper()} guide support is unavailable because no compatible index is configured."
             limitations.append(message)
     return _unique_preserving_order(limitations)
+
+
+def _looks_like_recommendation_why_question(message: str | None) -> bool:
+    if not message:
+        return False
+    lowered = message.lower()
+    if "why" not in lowered:
+        return False
+    return any(token in lowered for token in ("fnma", "fhlmc", "selected", "chosen", "recommend", "path"))
 
 
 def _response_text(run_response: Any) -> str:
@@ -204,8 +214,35 @@ class TurboRefiSessionService:
         return (
             f"Recommendation summary: {status_text}{recommended_gse} is the current best fit. "
             f"Qualifying monthly income is ${income:,.0f}, packet LTV is {ltv_percent:.1f}%, "
-            f"and estimated monthly savings are ${savings:,.0f}.{doc_text} {citation_text}".strip()
+            f"and estimated monthly savings are ${savings:,.0f}. {TurboRefiSessionService._recommended_gse_reason(state)}"
+            f"{doc_text} {citation_text}".strip()
         )
+
+    @staticmethod
+    def _recommended_gse_reason(state: SessionState) -> str:
+        packet = state.loa_output
+        if packet is None:
+            return "A recommendation rationale is not available until the packet is built."
+        if packet.recommended_gse_reason:
+            return packet.recommended_gse_reason
+        if state.handoff_package is not None:
+            return "This file is referred for manual review, so no automated GSE recommendation is selected."
+        if packet.fnma_eligible and not packet.fhlmc_eligible:
+            return "FNMA is selected because the current packet supports FNMA while FHLMC is not fully supported."
+        if packet.fhlmc_eligible and not packet.fnma_eligible:
+            return "FHLMC is selected because the current packet supports FHLMC while FNMA is not fully supported."
+        statement_owner = (
+            state.documents.mortgage_statement.gse_owner if state.documents.mortgage_statement is not None else "unknown"
+        )
+        if statement_owner == "fnma" and packet.fnma_eligible:
+            return "FNMA is selected because the current loan already appears Fannie Mae-backed and the FNMA path is supportable."
+        if statement_owner == "fhlmc" and packet.fhlmc_eligible:
+            return "FHLMC is selected because the current loan already appears Freddie Mac-backed and the FHLMC path is supportable."
+        if packet.fnma_eligible and packet.fhlmc_eligible and packet.recommended_gse == "fnma":
+            return "Both FNMA and FHLMC are supportable on this screen, and FNMA is the current tie-break default in the automated packet builder."
+        if packet.fnma_eligible and packet.fhlmc_eligible and packet.recommended_gse == "fhlmc":
+            return "Both FNMA and FHLMC are supportable on this screen, and FHLMC is the current selected path."
+        return f"{packet.recommended_gse.upper()} is the only currently selected path from the packet builder."
 
     @staticmethod
     def _packet_markdown_table(headers: list[str], rows: list[list[str]]) -> str:
@@ -223,6 +260,7 @@ class TurboRefiSessionService:
 
         overview_rows = [
             ["Recommended path", packet.recommended_gse.upper()],
+            ["Selection rationale", self._recommended_gse_reason(state)],
             ["FNMA support", "Supported" if packet.fnma_eligible else "Not supported"],
             ["FHLMC support", "Supported" if packet.fhlmc_eligible else "Not supported"],
             ["Qualifying monthly income", f"${packet.qualifying_monthly_income:,.0f}"],
@@ -543,6 +581,7 @@ class TurboRefiSessionService:
         state: SessionState,
         *,
         event: str,
+        user_message: str | None = None,
         changed_fields: list[str] | None = None,
         doc_type: str | None = None,
         decision_intent: str | None = None,
@@ -562,6 +601,11 @@ class TurboRefiSessionService:
             return self._full_application_response(state, decision_intent or "unclear")
         if event == "completed_follow_up":
             if state.full_application_intent == "proceed":
+                if _looks_like_recommendation_why_question(user_message):
+                    return (
+                        f"{self._recommended_gse_reason(state)}\n\n"
+                        f"{self._full_application_packet_details(state)}"
+                    )
                 return (
                     "We are already in the full-application-ready state for this file. "
                     "Here is the current recommendation packet and guide support.\n\n"
@@ -642,14 +686,22 @@ class TurboRefiSessionService:
         doc_type: str | None = None,
         decision_intent: str | None = None,
     ) -> str:
+        started = perf_counter()
         default_response = self._json_first_default_response(
             state,
             event=event,
+            user_message=user_message,
             changed_fields=changed_fields,
             doc_type=doc_type,
             decision_intent=decision_intent,
         )
         if self.json_first_conversation_agent is None:
+            logger.warning(
+                "[TEMP timing] json_first_response fallback session_id=%s event=%s elapsed_ms=%.1f",
+                state.session_id,
+                event,
+                (perf_counter() - started) * 1000,
+            )
             return default_response
         prompt = self._json_first_prompt(
             state,
@@ -661,14 +713,28 @@ class TurboRefiSessionService:
             decision_intent=decision_intent,
         )
         try:
-            return self._run_agent(
+            response = self._run_agent(
                 self.json_first_conversation_agent,
                 state,
                 prompt,
                 agent_session_id=f"{state.session_id}:json-first-conversation",
             )
+            logger.warning(
+                "[TEMP timing] json_first_response agentic session_id=%s event=%s prompt_chars=%s elapsed_ms=%.1f",
+                state.session_id,
+                event,
+                len(prompt),
+                (perf_counter() - started) * 1000,
+            )
+            return response
         except Exception:
             logger.exception("JSON-first conversational response generation failed for session_id=%s", state.session_id)
+            logger.warning(
+                "[TEMP timing] json_first_response agentic_failed session_id=%s event=%s elapsed_ms=%.1f",
+                state.session_id,
+                event,
+                (perf_counter() - started) * 1000,
+            )
             return default_response
 
     def _missing_docs_message(self, state: SessionState) -> str:
@@ -777,7 +843,13 @@ class TurboRefiSessionService:
         except Exception:
             return self._packet_summary_message(state)
 
-    def _apply_packet_if_ready(self, state: SessionState) -> list[dict[str, Any]]:
+    def _apply_packet_if_ready(
+        self,
+        state: SessionState,
+        *,
+        progress_callback: Callable[[str], None] | None = None,
+    ) -> list[dict[str, Any]]:
+        started = perf_counter()
         if state.source_mode == "received_json_uc1_uc2":
             refresh_minimal_uc1_uc2_assessment(state)
             screening_trace = self._json_first_screening_trace(state)
@@ -802,10 +874,17 @@ class TurboRefiSessionService:
                 self.retrieval_service,
                 guideline_researcher=self.guideline_researcher,
                 gse_analyzer=self.gse_analyzer,
+                progress_callback=progress_callback,
             )
             state.loa_output = build_result.packet
             state.retrieval_events = build_result.retrieval_events
             state.tool_calls = build_result.tool_calls
+            logger.warning(
+                "[TEMP timing] apply_packet_if_ready json_first session_id=%s intent=%s total_ms=%.1f",
+                state.session_id,
+                state.full_application_intent,
+                (perf_counter() - started) * 1000,
+            )
             return self._visible_tool_trace(build_result.tool_calls, state, None)
 
         if state.intake_pending or state.missing_documents:
@@ -818,6 +897,7 @@ class TurboRefiSessionService:
             self.retrieval_service,
             guideline_researcher=self.guideline_researcher,
             gse_analyzer=self.gse_analyzer,
+            progress_callback=progress_callback,
         )
         state.loa_output = build_result.packet
         state.retrieval_events = build_result.retrieval_events
@@ -983,8 +1063,23 @@ class TurboRefiSessionService:
         self._sync_all_agent_state(state)
         return response_text, state, tool_trace
 
-    def send_message(self, session_id: str, message: str) -> tuple[str, SessionState, list[dict[str, Any]]]:
+    def send_message(
+        self,
+        session_id: str,
+        message: str,
+        progress_callback: Callable[[str], None] | None = None,
+    ) -> tuple[str, SessionState, list[dict[str, Any]]]:
+        started = perf_counter()
         state = self.get_state(session_id)
+        logger.warning(
+            "TurboRefi send_message session_id=%s source_mode=%s phase=%s full_application_intent=%s missing_documents=%s message=%r",
+            session_id,
+            state.source_mode,
+            state.current_phase,
+            state.full_application_intent,
+            list(state.missing_documents),
+            message,
+        )
         if state.source_mode == "received_json_uc1_uc2":
             if state.full_application_intent is not None and not state.missing_documents and state.handoff_package is None:
                 response_text = self._json_first_response(
@@ -1003,16 +1098,37 @@ class TurboRefiSessionService:
                 return response_text, state, []
 
             if is_full_application_decision_pending(state):
+                logger.warning(
+                    "TurboRefi full application decision pending session_id=%s message=%r",
+                    state.session_id,
+                    message,
+                )
+                decision_started = perf_counter()
                 decision_resolution = self.full_application_resolver.resolve(state, message)
+                decision_ms = (perf_counter() - decision_started) * 1000
                 tool_trace = [*decision_resolution.tool_trace]
+                packet_ms = 0.0
                 if decision_resolution.intent == "proceed":
+                    packet_started = perf_counter()
                     state.full_application_intent = "proceed"
-                    tool_trace.extend(self._apply_packet_if_ready(state))
+                    tool_trace.extend(self._apply_packet_if_ready(state, progress_callback=progress_callback))
+                    packet_ms = (perf_counter() - packet_started) * 1000
+                response_started = perf_counter()
                 response_text = self._json_first_response(
                     state,
                     event="full_application_decision",
                     user_message=message,
                     decision_intent=decision_resolution.intent,
+                )
+                response_ms = (perf_counter() - response_started) * 1000
+                logger.warning(
+                    "[TEMP timing] send_message full_application_decision session_id=%s intent=%s decision_ms=%.1f packet_ms=%.1f response_ms=%.1f total_ms=%.1f",
+                    state.session_id,
+                    decision_resolution.intent,
+                    decision_ms,
+                    packet_ms,
+                    response_ms,
+                    (perf_counter() - started) * 1000,
                 )
                 self._append_exchange(
                     state,
@@ -1026,7 +1142,10 @@ class TurboRefiSessionService:
 
             intake_resolution = self.uc1_uc2_intake_resolver.resolve(state, message)
             state = refresh_session_state(intake_resolution.state)
-            tool_trace = [*intake_resolution.tool_trace, *self._apply_packet_if_ready(state)]
+            tool_trace = [
+                *intake_resolution.tool_trace,
+                *self._apply_packet_if_ready(state, progress_callback=progress_callback),
+            ]
             response_text = self._json_first_response(
                 state,
                 event="intake_follow_up",
@@ -1047,7 +1166,10 @@ class TurboRefiSessionService:
         if not packet_was_ready:
             intake_resolution = self.intake_resolver.resolve(state, message)
             state = refresh_session_state(intake_resolution.state)
-            tool_trace = [*intake_resolution.tool_trace, *self._apply_packet_if_ready(state)]
+            tool_trace = [
+                *intake_resolution.tool_trace,
+                *self._apply_packet_if_ready(state, progress_callback=progress_callback),
+            ]
 
             if state.loa_output is not None:
                 response_text = self._workflow_response(state, event="assessment_ready")

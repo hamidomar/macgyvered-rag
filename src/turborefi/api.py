@@ -395,6 +395,11 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
         if not service.session_exists(session_id):
             raise HTTPException(status_code=404, detail="Session not found")
         try:
+            logger.warning(
+                "TurboRefi message endpoint received session_id=%s message=%r",
+                session_id,
+                request.message,
+            )
             response_text, _state, tool_trace = service.send_message(session_id, request.message)
             return {"response": response_text, "tool_trace": tool_trace}
         except Exception as exc:
@@ -404,6 +409,11 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
     async def send_message_stream(session_id: str, request: MessageRequest):
         if not service.session_exists(session_id):
             raise HTTPException(status_code=404, detail="Session not found")
+        logger.warning(
+            "TurboRefi message stream received session_id=%s message=%r",
+            session_id,
+            request.message,
+        )
 
         async def event_stream():
             created_at = int(datetime.now(UTC).timestamp())
@@ -418,11 +428,61 @@ def build_api(service: TurboRefiSessionService) -> FastAPI:
             )
 
             try:
-                response_text, state, tool_trace = await asyncio.to_thread(
-                    service.send_message,
-                    session_id,
-                    request.message,
+                loop = asyncio.get_running_loop()
+                progress_queue: asyncio.Queue[str] = asyncio.Queue()
+                streamed_stages: list[str] = []
+
+                def progress_callback(message: str) -> None:
+                    loop.call_soon_threadsafe(progress_queue.put_nowait, message)
+
+                send_task = asyncio.create_task(
+                    asyncio.to_thread(
+                        service.send_message,
+                        session_id,
+                        request.message,
+                        progress_callback=progress_callback,
+                    )
                 )
+
+                while not send_task.done():
+                    try:
+                        stage_message = await asyncio.wait_for(progress_queue.get(), timeout=0.1)
+                    except asyncio.TimeoutError:
+                        continue
+                    if stage_message in streamed_stages:
+                        continue
+                    streamed_stages.append(stage_message)
+                    yield _stream_json_event(
+                        {
+                            "event": "RunContent",
+                            "content": "\n".join(streamed_stages),
+                            "content_type": "str",
+                            "session_id": session_id,
+                            "created_at": int(datetime.now(UTC).timestamp()),
+                        }
+                    )
+                    await asyncio.sleep(0)
+
+                while True:
+                    try:
+                        stage_message = progress_queue.get_nowait()
+                    except asyncio.QueueEmpty:
+                        break
+                    if stage_message in streamed_stages:
+                        continue
+                    streamed_stages.append(stage_message)
+                    yield _stream_json_event(
+                        {
+                            "event": "RunContent",
+                            "content": "\n".join(streamed_stages),
+                            "content_type": "str",
+                            "session_id": session_id,
+                            "created_at": int(datetime.now(UTC).timestamp()),
+                        }
+                    )
+                    await asyncio.sleep(0)
+
+                response_text, state, tool_trace = await send_task
                 tool_payloads = [
                     _trace_to_tool_payload(trace, index, created_at=created_at + 1)
                     for index, trace in enumerate(tool_trace)
