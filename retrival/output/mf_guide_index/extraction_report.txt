@@ -1,0 +1,125 @@
+======================================================================
+FREDDIE MAC MULTIFAMILY GUIDE PRE-PROCESSING REPORT
+======================================================================
+
+Total bookmarks in outline:       3064
+  Groups:          12
+  Chapters:        76
+  Sections:        1282
+  Sub-sections:    1655
+  Sub-sub-sections:39
+  Other:           0
+
+Leaf bookmarks (text extracted):  2603
+Leaf sections in output:          2603
+Cross-referenced sections:        839
+
+WARNING: 4 sections have empty text:
+  - b: Other Guide provisions
+  - (no id): b.
+  - (no id): 60.14
+  - (no id): 60.15
+
+NOTE: 190 sections have very short text (<50 chars):
+  - a: 22 chars — Reserved
+  - b: 22 chars — Reserved
+  - i: 22 chars — Reserved
+  - j: 22 chars — Reserved
+  - (no id): 27 chars — 6SBL.12 Reserved
+  - 8.2.c: 22 chars — Reserved
+  - 8.21.h: 22 chars — Reserved
+  - c: 22 chars — Reserved
+  - e: 22 chars — Reserved
+  - f: 22 chars — Reserved
+  - (no id): 26 chars — 8SBL.9     Reserved
+  - d: 22 chars — Reserved
+  - a: 22 chars — Reserved
+  - (no id): 27 chars — 8SBL.16    Reserved
+  - b: 22 chars — Reserved
+  ... and 175 more
+
+Text length statistics (chars):
+  Min:    11
+  Max:    102851
+  Mean:   1082
+  Median: 605
+  Total:  2,812,190
+
+Sections per chapter (75 chapters):
+  Ch         : 404 sections
+  Ch       01: 30 sections
+  Ch       02: 77 sections
+  Ch       03: 43 sections
+  Ch       04: 41 sections
+  Ch       05: 51 sections
+  Ch       06: 28 sections
+  Ch    06SBL: 30 sections
+  Ch       07: 18 sections
+  Ch       08: 79 sections
+  Ch    08SBL: 47 sections
+  Ch       09: 30 sections
+  Ch    09SBL: 20 sections
+  Ch       10: 23 sections
+  Ch       11: 34 sections
+  Ch 12-16SBL: 1 sections
+  Ch       17: 33 sections
+  Ch      17A: 29 sections
+  Ch       18: 1 sections
+  Ch    18SBL: 31 sections
+  Ch       19: 37 sections
+  Ch      19A: 39 sections
+  Ch       20: 36 sections
+  Ch       21: 49 sections
+  Ch       22: 40 sections
+  Ch       23: 14 sections
+  Ch       24: 7 sections
+  Ch       25: 49 sections
+  Ch      25A: 26 sections
+  Ch       26: 1 sections
+  Ch       27: 83 sections
+  Ch       28: 87 sections
+  Ch      28A: 56 sections
+  Ch       29: 28 sections
+  Ch    29SBL: 1 sections
+  Ch       30: 19 sections
+  Ch       31: 59 sections
+  Ch       32: 34 sections
+  Ch       33: 16 sections
+  Ch       34: 9 sections
+  Ch       35: 1 sections
+  Ch       36: 32 sections
+  Ch       37: 1 sections
+  Ch       38: 5 sections
+  Ch       39: 40 sections
+  Ch       40: 48 sections
+  Ch       41: 34 sections
+  Ch    41SBL: 37 sections
+  Ch       42: 34 sections
+  Ch       43: 129 sections
+  Ch       44: 15 sections
+  Ch       45: 7 sections
+  Ch       46: 1 sections
+  Ch    46SBL: 22 sections
+  Ch       47: 13 sections
+  Ch       48: 5 sections
+  Ch       49: 1 sections
+  Ch       50: 32 sections
+  Ch       51: 10 sections
+  Ch       52: 22 sections
+  Ch       53: 36 sections
+  Ch       54: 33 sections
+  Ch       55: 8 sections
+  Ch    55SBL: 6 sections
+  Ch    56-59: 1 sections
+  Ch       60: 56 sections
+  Ch       61: 70 sections
+  Ch       62: 28 sections
+  Ch    62SBL: 37 sections
+  Ch       63: 17 sections
+  Ch       64: 19 sections
+  Ch    64SBL: 19 sections
+  Ch       65: 13 sections
+  Ch       66: 30 sections
+  Ch    67-69: 1 sections
+
+======================================================================

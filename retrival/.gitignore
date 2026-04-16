@@ -26,7 +26,6 @@ wheels/
 *.egg
 
 # Data & Generated Content
-output/
 data/pdfs/*.pdf
 
 # IDEs

@@ -95,7 +95,7 @@ def _text_stream_chunks(text: str, *, chunk_size: int = 28) -> list[str]:
 def _serialize_session_summary(state) -> dict:
     return {
         "session_id": state.session_id,
-        "session_name": state.borrower_name or state.session_name or "Borrower",
+        "session_name": state.session_name or state.borrower_name or "Borrower",
         "created_at": int(state.created_at.timestamp()),
         "updated_at": int(state.updated_at.timestamp()),
         "current_phase": state.current_phase,

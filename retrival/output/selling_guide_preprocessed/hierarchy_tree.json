@@ -1,0 +1,4252 @@
+[
+  {
+    "id": "",
+    "title": "Fannie Mae Single Family Selling Guide",
+    "node_type": "other",
+    "page_index": 0
+  },
+  {
+    "id": "",
+    "title": "Table of Contents",
+    "node_type": "other",
+    "page_index": 2
+  },
+  {
+    "id": "",
+    "title": "Preface",
+    "node_type": "other",
+    "page_index": 12
+  },
+  {
+    "id": "A",
+    "title": "A, Doing Business with Fannie Mae",
+    "node_type": "part",
+    "page_index": 17,
+    "children": [
+      {
+        "id": "A1",
+        "title": "A1, Approval Qualification",
+        "node_type": "subpart",
+        "page_index": 18,
+        "children": [
+          {
+            "id": "A1-1",
+            "title": "A1-1, Application and Approval of Seller/Servicer",
+            "node_type": "chapter",
+            "page_index": 18,
+            "children": [
+              {
+                "id": "A1-1-01",
+                "title": "Application and Approval of Seller/Servicer",
+                "node_type": "topic",
+                "section_id": "A1-1-01",
+                "date": "09/04/2018",
+                "page_index": 18
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "A2",
+        "title": "A2, Lender Contract",
+        "node_type": "subpart",
+        "page_index": 18,
+        "children": [
+          {
+            "id": "A2-1",
+            "title": "A2-1, Contractual Obligations for Sellers/Servicers",
+            "node_type": "chapter",
+            "page_index": 19,
+            "children": [
+              {
+                "id": "A2-1-01",
+                "title": "Contractual Obligations for Sellers/Servicers",
+                "node_type": "topic",
+                "section_id": "A2-1-01",
+                "date": "06/04/2025",
+                "page_index": 19
+              },
+              {
+                "id": "A2-1-02",
+                "title": "Nature of Mortgage Transaction",
+                "node_type": "topic",
+                "section_id": "A2-1-02",
+                "date": "02/27/2018",
+                "page_index": 23
+              },
+              {
+                "id": "A2-1-03",
+                "title": "Indemnification for Losses",
+                "node_type": "topic",
+                "section_id": "A2-1-03",
+                "date": "10/06/2021",
+                "page_index": 24
+              }
+            ]
+          },
+          {
+            "id": "A2-2",
+            "title": "A2-2, Contractual Representations and Warranties",
+            "node_type": "chapter",
+            "page_index": 29,
+            "children": [
+              {
+                "id": "A2-2-01",
+                "title": "Representations and Warranties Overview",
+                "node_type": "topic",
+                "section_id": "A2-2-01",
+                "date": "02/05/2020",
+                "page_index": 30
+              },
+              {
+                "id": "A2-2-02",
+                "title": "Delivery Information and Delivery-Option Specific Representations and Warranties",
+                "node_type": "topic",
+                "section_id": "A2-2-02",
+                "date": "08/30/2016",
+                "page_index": 32
+              },
+              {
+                "id": "A2-2-03",
+                "title": "Document Warranties",
+                "node_type": "topic",
+                "section_id": "A2-2-03",
+                "date": "10/06/2021",
+                "page_index": 33
+              },
+              {
+                "id": "A2-2-04",
+                "title": "Limited Waiver and Enforcement Relief of Representations and Warranties",
+                "node_type": "topic",
+                "section_id": "A2-2-04",
+                "date": "11/05/2025",
+                "page_index": 36
+              },
+              {
+                "id": "A2-2-05",
+                "title": "Invalidation of Limited Waiver of Representations and Warranties",
+                "node_type": "topic",
+                "section_id": "A2-2-05",
+                "date": "01/27/2015",
+                "page_index": 42
+              },
+              {
+                "id": "A2-2-06",
+                "title": "Representations and Warranties on Property Value",
+                "node_type": "topic",
+                "section_id": "A2-2-06",
+                "date": "09/03/2025",
+                "page_index": 43
+              },
+              {
+                "id": "A2-2-07",
+                "title": "Life-of-Loan Representations and Warranties",
+                "node_type": "topic",
+                "section_id": "A2-2-07",
+                "date": "08/02/2023",
+                "page_index": 46
+              }
+            ]
+          },
+          {
+            "id": "A2-3",
+            "title": "A2-3, Lender Breach of Contract",
+            "node_type": "chapter",
+            "page_index": 54,
+            "children": [
+              {
+                "id": "A2-3.1",
+                "title": "A2-3.1, Lender Breach of Contract",
+                "node_type": "section",
+                "page_index": 54,
+                "children": [
+                  {
+                    "id": "A2-3.1-01",
+                    "title": "Lender Breach of Contract",
+                    "node_type": "topic",
+                    "section_id": "A2-3.1-01",
+                    "date": "08/05/2020",
+                    "page_index": 54
+                  },
+                  {
+                    "id": "A2-3.1-02",
+                    "title": "Sanctions, Suspensions, and Terminations",
+                    "node_type": "topic",
+                    "section_id": "A2-3.1-02",
+                    "date": "02/23/2016",
+                    "page_index": 56
+                  }
+                ]
+              },
+              {
+                "id": "A2-3.2",
+                "title": "A2-3.2, Loan Repurchases and Make Whole Payments Requested by Fannie Mae",
+                "node_type": "section",
+                "page_index": 58,
+                "children": [
+                  {
+                    "id": "A2-3.2-01",
+                    "title": "Loan Repurchases and Make Whole Payments Requested by Fannie Mae",
+                    "node_type": "topic",
+                    "section_id": "A2-3.2-01",
+                    "date": "08/29/2017",
+                    "page_index": 58
+                  },
+                  {
+                    "id": "A2-3.2-02",
+                    "title": "Enforcement Relief for Breaches of Certain Representations and Warranties Related to Underwriting and Eligibility",
+                    "node_type": "topic",
+                    "section_id": "A2-3.2-02",
+                    "date": "08/06/2025",
+                    "page_index": 63
+                  },
+                  {
+                    "id": "A2-3.2-03",
+                    "title": "Remedies Framework",
+                    "node_type": "topic",
+                    "section_id": "A2-3.2-03",
+                    "date": "08/30/2016",
+                    "page_index": 68
+                  }
+                ]
+              },
+              {
+                "id": "A2-3.3",
+                "title": "A2-3.3, Compensatory Fees",
+                "node_type": "section",
+                "page_index": 74,
+                "children": [
+                  {
+                    "id": "A2-3.3-01",
+                    "title": "Compensatory Fees",
+                    "node_type": "topic",
+                    "section_id": "A2-3.3-01",
+                    "date": "07/30/2013",
+                    "page_index": 74
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "A2-4",
+            "title": "A2-4, Loan Files and Records",
+            "node_type": "chapter",
+            "page_index": 76,
+            "children": [
+              {
+                "id": "A2-4.1",
+                "title": "A2-4.1, Establishment, Ownership, and Retention of Loan Files and Records",
+                "node_type": "section",
+                "page_index": 76,
+                "children": [
+                  {
+                    "id": "A2-4.1-01",
+                    "title": "Establishing Loan Files",
+                    "node_type": "topic",
+                    "section_id": "A2-4.1-01",
+                    "date": "09/04/2024",
+                    "page_index": 76
+                  },
+                  {
+                    "id": "A2-4.1-02",
+                    "title": "Ownership and Retention of Loan Files and Records",
+                    "node_type": "topic",
+                    "section_id": "A2-4.1-02",
+                    "date": "12/19/2017",
+                    "page_index": 81
+                  },
+                  {
+                    "id": "A2-4.1-03",
+                    "title": "Electronic Records, Signatures, and Transactions",
+                    "node_type": "topic",
+                    "section_id": "A2-4.1-03",
+                    "date": "07/02/2025",
+                    "page_index": 87
+                  },
+                  {
+                    "id": "A2-4.1-04",
+                    "title": "Notarization Standards",
+                    "node_type": "topic",
+                    "section_id": "A2-4.1-04",
+                    "date": "06/02/2021",
+                    "page_index": 97
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "A2-5",
+            "title": "A2-5, Fannie Mae Trade Name and Trademarks",
+            "node_type": "chapter",
+            "page_index": 100,
+            "children": [
+              {
+                "id": "A2-5-01",
+                "title": "Fannie Mae Trade Name and Trademarks",
+                "node_type": "topic",
+                "section_id": "A2-5-01",
+                "date": "08/29/2017",
+                "page_index": 100
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "A3",
+        "title": "A3, Getting Started With Fannie Mae",
+        "node_type": "subpart",
+        "page_index": 103,
+        "children": [
+          {
+            "id": "A3-1",
+            "title": "A3-1, Fannie Mae’s Technology Products",
+            "node_type": "chapter",
+            "page_index": 104,
+            "children": [
+              {
+                "id": "A3-1-01",
+                "title": "Fannie Mae’s Technology Products",
+                "node_type": "topic",
+                "section_id": "A3-1-01",
+                "date": "10/06/2021",
+                "page_index": 104
+              }
+            ]
+          },
+          {
+            "id": "A3-2",
+            "title": "A3-2, Compliance With Requirements and Laws",
+            "node_type": "chapter",
+            "page_index": 105,
+            "children": [
+              {
+                "id": "A3-2-01",
+                "title": "Compliance With Laws",
+                "node_type": "topic",
+                "section_id": "A3-2-01",
+                "date": "12/10/2025",
+                "page_index": 105
+              },
+              {
+                "id": "A3-2-02",
+                "title": "Responsible Lending Practices",
+                "node_type": "topic",
+                "section_id": "A3-2-02",
+                "date": "09/01/2021",
+                "page_index": 117
+              }
+            ]
+          },
+          {
+            "id": "A3-3",
+            "title": "A3-3, Third-Party Lending Functions and Servicing Arrangements",
+            "node_type": "chapter",
+            "page_index": 120,
+            "children": [
+              {
+                "id": "A3-3-01",
+                "title": "Outsourcing of Mortgage Processing and Third-Party Originations",
+                "node_type": "topic",
+                "section_id": "A3-3-01",
+                "date": "02/07/2024",
+                "page_index": 121
+              },
+              {
+                "id": "A3-3-02",
+                "title": "Concurrent Servicing Transfers",
+                "node_type": "topic",
+                "section_id": "A3-3-02",
+                "date": "05/01/2024",
+                "page_index": 123
+              },
+              {
+                "id": "A3-3-03",
+                "title": "Other Servicing Arrangements",
+                "node_type": "topic",
+                "section_id": "A3-3-03",
+                "date": "12/15/2015",
+                "page_index": 129
+              },
+              {
+                "id": "A3-3-04",
+                "title": "Document Custodians",
+                "node_type": "topic",
+                "section_id": "A3-3-04",
+                "date": "05/04/2022",
+                "page_index": 131
+              },
+              {
+                "id": "A3-3-05",
+                "title": "Custody of Mortgage Documents",
+                "node_type": "topic",
+                "section_id": "A3-3-05",
+                "date": "05/04/2022",
+                "page_index": 133
+              }
+            ]
+          },
+          {
+            "id": "A3-4",
+            "title": "A3-4, Lending Practices",
+            "node_type": "chapter",
+            "page_index": 135,
+            "children": [
+              {
+                "id": "A3-4-01",
+                "title": "Confidentiality of Information",
+                "node_type": "topic",
+                "section_id": "A3-4-01",
+                "date": "02/05/2025",
+                "page_index": 135
+              },
+              {
+                "id": "A3-4-02",
+                "title": "Data Quality and Integrity",
+                "node_type": "topic",
+                "section_id": "A3-4-02",
+                "date": "08/07/2018",
+                "page_index": 139
+              },
+              {
+                "id": "A3-4-03",
+                "title": "Preventing, Detecting, and Reporting Mortgage Fraud",
+                "node_type": "topic",
+                "section_id": "A3-4-03",
+                "date": "12/10/2025",
+                "page_index": 139
+              }
+            ]
+          },
+          {
+            "id": "A3-5",
+            "title": "A3-5, Fidelity Bond and Errors and Omissions Coverage",
+            "node_type": "chapter",
+            "page_index": 143,
+            "children": [
+              {
+                "id": "A3-5-01",
+                "title": "Fidelity Bond and Errors and Omissions Coverage Provisions",
+                "node_type": "topic",
+                "section_id": "A3-5-01",
+                "date": "07/25/2017",
+                "page_index": 143
+              },
+              {
+                "id": "A3-5-02",
+                "title": "Fidelity Bond Policy Requirements",
+                "node_type": "topic",
+                "section_id": "A3-5-02",
+                "date": "07/25/2017",
+                "page_index": 144
+              },
+              {
+                "id": "A3-5-03",
+                "title": "Errors and Omissions Policy Requirements",
+                "node_type": "topic",
+                "section_id": "A3-5-03",
+                "date": "07/25/2017",
+                "page_index": 146
+              },
+              {
+                "id": "A3-5-04",
+                "title": "Reporting Fidelity Bond and Errors and Omissions Events",
+                "node_type": "topic",
+                "section_id": "A3-5-04",
+                "date": "12/04/2019",
+                "page_index": 148
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "A4",
+        "title": "A4, Maintaining Seller/Servicer Eligibility",
+        "node_type": "subpart",
+        "page_index": 148,
+        "children": [
+          {
+            "id": "A4-1",
+            "title": "A4-1, Maintaining Seller/Servicer Eligibility: Overview",
+            "node_type": "chapter",
+            "page_index": 149,
+            "children": [
+              {
+                "id": "A4-1-01",
+                "title": "Maintaining Seller/Servicer Eligibility",
+                "node_type": "topic",
+                "section_id": "A4-1-01",
+                "date": "02/05/2025",
+                "page_index": 149
+              },
+              {
+                "id": "A4-1-02",
+                "title": "Submission of Financial Statements and Reports",
+                "node_type": "topic",
+                "section_id": "A4-1-02",
+                "date": "05/01/2024",
+                "page_index": 156
+              },
+              {
+                "id": "A4-1-03",
+                "title": "Report of Changes in the Seller/Servicer’s Organization",
+                "node_type": "topic",
+                "section_id": "A4-1-03",
+                "date": "05/01/2024",
+                "page_index": 160
+              },
+              {
+                "id": "A4-1-04",
+                "title": "Submission of Irrevocable Limited Powers of Attorney",
+                "node_type": "topic",
+                "section_id": "A4-1-04",
+                "date": "05/04/2022",
+                "page_index": 162
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "B",
+    "title": "B, Origination Through Closing",
+    "node_type": "part",
+    "page_index": 164,
+    "children": [
+      {
+        "id": "B1",
+        "title": "B1, Loan Application Package",
+        "node_type": "subpart",
+        "page_index": 165,
+        "children": [
+          {
+            "id": "B1-1",
+            "title": "B1-1, Application Package Documentation",
+            "node_type": "chapter",
+            "page_index": 165,
+            "children": [
+              {
+                "id": "B1-1-01",
+                "title": "Contents of the Application Package",
+                "node_type": "topic",
+                "section_id": "B1-1-01",
+                "date": "05/01/2024",
+                "page_index": 165
+              },
+              {
+                "id": "B1-1-02",
+                "title": "Blanket Authorization Form",
+                "node_type": "topic",
+                "section_id": "B1-1-02",
+                "date": "04/01/2009",
+                "page_index": 167
+              },
+              {
+                "id": "B1-1-03",
+                "title": "Allowable Age of Credit Documents and Federal Income Tax Returns",
+                "node_type": "topic",
+                "section_id": "B1-1-03",
+                "date": "04/02/2025",
+                "page_index": 168
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "B2",
+        "title": "B2, Eligibility",
+        "node_type": "subpart",
+        "page_index": 173,
+        "children": [
+          {
+            "id": "B2-1",
+            "title": "B2-1, Mortgage Eligibility",
+            "node_type": "chapter",
+            "page_index": 173,
+            "children": [
+              {
+                "id": "B2-1.1",
+                "title": "B2-1.1, Occupancy Types",
+                "node_type": "section",
+                "page_index": 173,
+                "children": [
+                  {
+                    "id": "B2-1.1-01",
+                    "title": "Occupancy Types",
+                    "node_type": "topic",
+                    "section_id": "B2-1.1-01",
+                    "date": "10/05/2022",
+                    "page_index": 173
+                  }
+                ]
+              },
+              {
+                "id": "B2-1.2",
+                "title": "B2-1.2, LTV, CLTV, HCLTV, and Subordinate Financing",
+                "node_type": "section",
+                "page_index": 176,
+                "children": [
+                  {
+                    "id": "B2-1.2-01",
+                    "title": "Loan-to-Value (LTV) Ratios",
+                    "node_type": "topic",
+                    "section_id": "B2-1.2-01",
+                    "date": "06/01/2022",
+                    "page_index": 177
+                  },
+                  {
+                    "id": "B2-1.2-02",
+                    "title": "Combined Loan-to-Value (CLTV) Ratios",
+                    "node_type": "topic",
+                    "section_id": "B2-1.2-02",
+                    "date": "12/04/2018",
+                    "page_index": 179
+                  },
+                  {
+                    "id": "B2-1.2-03",
+                    "title": "Home Equity Combined Loan-to-Value (HCLTV) Ratios",
+                    "node_type": "topic",
+                    "section_id": "B2-1.2-03",
+                    "date": "02/23/2016",
+                    "page_index": 180
+                  },
+                  {
+                    "id": "B2-1.2-04",
+                    "title": "Subordinate Financing",
+                    "node_type": "topic",
+                    "section_id": "B2-1.2-04",
+                    "date": "08/06/2025",
+                    "page_index": 181
+                  }
+                ]
+              },
+              {
+                "id": "B2-1.3",
+                "title": "B2-1.3, Loan Purpose",
+                "node_type": "section",
+                "page_index": 186,
+                "children": [
+                  {
+                    "id": "B2-1.3-01",
+                    "title": "Purchase Transactions",
+                    "node_type": "topic",
+                    "section_id": "B2-1.3-01",
+                    "date": "11/05/2025",
+                    "page_index": 186
+                  },
+                  {
+                    "id": "B2-1.3-02",
+                    "title": "Limited Cash-Out Refinance Transactions",
+                    "node_type": "topic",
+                    "section_id": "B2-1.3-02",
+                    "date": "10/08/2025",
+                    "page_index": 189
+                  },
+                  {
+                    "id": "B2-1.3-03",
+                    "title": "Cash-Out Refinance Transactions",
+                    "node_type": "topic",
+                    "section_id": "B2-1.3-03",
+                    "date": "12/10/2025",
+                    "page_index": 195
+                  },
+                  {
+                    "id": "B2-1.3-04",
+                    "title": "Prohibited Refinancing Practices",
+                    "node_type": "topic",
+                    "section_id": "B2-1.3-04",
+                    "date": "08/04/2021",
+                    "page_index": 200
+                  },
+                  {
+                    "id": "B2-1.3-05",
+                    "title": "Payoff of Installment Land Contract Requirements",
+                    "node_type": "topic",
+                    "section_id": "B2-1.3-05",
+                    "date": "12/11/2024",
+                    "page_index": 203
+                  }
+                ]
+              },
+              {
+                "id": "B2-1.4",
+                "title": "B2-1.4, Loan Amortization Types",
+                "node_type": "section",
+                "page_index": 204,
+                "children": [
+                  {
+                    "id": "B2-1.4-01",
+                    "title": "Fixed-Rate Loans",
+                    "node_type": "topic",
+                    "section_id": "B2-1.4-01",
+                    "date": "12/14/2022",
+                    "page_index": 204
+                  },
+                  {
+                    "id": "B2-1.4-02",
+                    "title": "Adjustable-Rate Mortgages (ARMs)",
+                    "node_type": "topic",
+                    "section_id": "B2-1.4-02",
+                    "date": "12/10/2025",
+                    "page_index": 205
+                  },
+                  {
+                    "id": "B2-1.4-03",
+                    "title": "Convertible ARMs",
+                    "node_type": "topic",
+                    "section_id": "B2-1.4-03",
+                    "date": "02/23/2016",
+                    "page_index": 213
+                  },
+                  {
+                    "id": "B2-1.4-04",
+                    "title": "Temporary Interest Rate Buydowns",
+                    "node_type": "topic",
+                    "section_id": "B2-1.4-04",
+                    "date": "08/07/2024",
+                    "page_index": 217
+                  }
+                ]
+              },
+              {
+                "id": "B2-1.5",
+                "title": "B2-1.5, Other Loan Attributes and Related Policies",
+                "node_type": "section",
+                "page_index": 221,
+                "children": [
+                  {
+                    "id": "B2-1.5-01",
+                    "title": "Loan Limits",
+                    "node_type": "topic",
+                    "section_id": "B2-1.5-01",
+                    "date": "02/02/2022",
+                    "page_index": 222
+                  },
+                  {
+                    "id": "B2-1.5-02",
+                    "title": "Loan Eligibility",
+                    "node_type": "topic",
+                    "section_id": "B2-1.5-02",
+                    "date": "06/05/2024",
+                    "page_index": 223
+                  },
+                  {
+                    "id": "B2-1.5-03",
+                    "title": "Legal Requirements",
+                    "node_type": "topic",
+                    "section_id": "B2-1.5-03",
+                    "date": "06/03/2020",
+                    "page_index": 234
+                  },
+                  {
+                    "id": "B2-1.5-04",
+                    "title": "Escrow Accounts",
+                    "node_type": "topic",
+                    "section_id": "B2-1.5-04",
+                    "date": "04/01/2020",
+                    "page_index": 236
+                  },
+                  {
+                    "id": "B2-1.5-05",
+                    "title": "Principal Curtailments",
+                    "node_type": "topic",
+                    "section_id": "B2-1.5-05",
+                    "date": "11/06/2024",
+                    "page_index": 237
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "B2-2",
+            "title": "B2-2, Borrower Eligibility",
+            "node_type": "chapter",
+            "page_index": 239,
+            "children": [
+              {
+                "id": "B2-2-01",
+                "title": "General Borrower Eligibility Requirements",
+                "node_type": "topic",
+                "section_id": "B2-2-01",
+                "date": "09/03/2025",
+                "page_index": 239
+              },
+              {
+                "id": "B2-2-02",
+                "title": "Non–U.S. Citizen Borrower Eligibility Requirements",
+                "node_type": "topic",
+                "section_id": "B2-2-02",
+                "date": "07/28/2015",
+                "page_index": 241
+              },
+              {
+                "id": "B2-2-03",
+                "title": "Multiple Financed Properties for the Same Borrower",
+                "node_type": "topic",
+                "section_id": "B2-2-03",
+                "date": "11/05/2025",
+                "page_index": 242
+              },
+              {
+                "id": "B2-2-04",
+                "title": "Guarantors, Co-Signers, or Non-Occupant Borrowers on the Subject Transaction",
+                "node_type": "topic",
+                "section_id": "B2-2-04",
+                "date": "09/02/2020",
+                "page_index": 245
+              },
+              {
+                "id": "B2-2-05",
+                "title": "Inter Vivos Revocable Trusts",
+                "node_type": "topic",
+                "section_id": "B2-2-05",
+                "date": "10/31/2017",
+                "page_index": 248
+              },
+              {
+                "id": "B2-2-06",
+                "title": "Homeownership Education and Housing Counseling",
+                "node_type": "topic",
+                "section_id": "B2-2-06",
+                "date": "11/05/2025",
+                "page_index": 251
+              },
+              {
+                "id": "B2-2-07",
+                "title": "First-Generation Homebuyer Loans",
+                "node_type": "topic",
+                "section_id": "B2-2-07",
+                "date": "05/01/2024",
+                "page_index": 254
+              }
+            ]
+          },
+          {
+            "id": "B2-3",
+            "title": "B2-3, Property Eligibility",
+            "node_type": "chapter",
+            "page_index": 255,
+            "children": [
+              {
+                "id": "B2-3-01",
+                "title": "General Property Eligibility",
+                "node_type": "topic",
+                "section_id": "B2-3-01",
+                "date": "09/03/2025",
+                "page_index": 256
+              },
+              {
+                "id": "B2-3-02",
+                "title": "Special Property Eligibility and Underwriting Considerations: Factory-Built Housing",
+                "node_type": "topic",
+                "section_id": "B2-3-02",
+                "date": "02/04/2026",
+                "page_index": 259
+              },
+              {
+                "id": "B2-3-03",
+                "title": "Special Property Eligibility and Underwriting Considerations: Leasehold Estates",
+                "node_type": "topic",
+                "section_id": "B2-3-03",
+                "date": "06/04/2025",
+                "page_index": 266
+              },
+              {
+                "id": "B2-3-04",
+                "title": "Special Property Eligibility Considerations",
+                "node_type": "topic",
+                "section_id": "B2-3-04",
+                "date": "10/08/2025",
+                "page_index": 272
+              },
+              {
+                "id": "B2-3-05",
+                "title": "Properties Affected by a Disaster",
+                "node_type": "topic",
+                "section_id": "B2-3-05",
+                "date": "09/03/2025",
+                "page_index": 280
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "B3",
+        "title": "B3, Underwriting Borrowers",
+        "node_type": "subpart",
+        "page_index": 282,
+        "children": [
+          {
+            "id": "B3-1",
+            "title": "B3-1, Manual Underwriting",
+            "node_type": "chapter",
+            "page_index": 283,
+            "children": [
+              {
+                "id": "B3-1-01",
+                "title": "Comprehensive Risk Assessment",
+                "node_type": "topic",
+                "section_id": "B3-1-01",
+                "date": "11/05/2025",
+                "page_index": 283
+              }
+            ]
+          },
+          {
+            "id": "B3-2",
+            "title": "B3-2, Desktop Underwriter (DU)",
+            "node_type": "chapter",
+            "page_index": 284,
+            "children": [
+              {
+                "id": "B3-2-01",
+                "title": "General Information on DU",
+                "node_type": "topic",
+                "section_id": "B3-2-01",
+                "date": "07/02/2025",
+                "page_index": 285
+              },
+              {
+                "id": "B3-2-02",
+                "title": "DU Validation Service",
+                "node_type": "topic",
+                "section_id": "B3-2-02",
+                "date": "02/05/2025",
+                "page_index": 288
+              },
+              {
+                "id": "B3-2-03",
+                "title": "Risk Factors Evaluated by DU",
+                "node_type": "topic",
+                "section_id": "B3-2-03",
+                "date": "02/05/2025",
+                "page_index": 297
+              },
+              {
+                "id": "B3-2-04",
+                "title": "DU Documentation Requirements",
+                "node_type": "topic",
+                "section_id": "B3-2-04",
+                "date": "03/31/2015",
+                "page_index": 303
+              },
+              {
+                "id": "B3-2-05",
+                "title": "Approve/Eligible Recommendations",
+                "node_type": "topic",
+                "section_id": "B3-2-05",
+                "date": "01/27/2015",
+                "page_index": 304
+              },
+              {
+                "id": "B3-2-06",
+                "title": "Approve/Ineligible Recommendations",
+                "node_type": "topic",
+                "section_id": "B3-2-06",
+                "date": "02/01/2023",
+                "page_index": 305
+              },
+              {
+                "id": "B3-2-07",
+                "title": "Refer with Caution Recommendations",
+                "node_type": "topic",
+                "section_id": "B3-2-07",
+                "date": "02/01/2023",
+                "page_index": 307
+              },
+              {
+                "id": "B3-2-08",
+                "title": "Out of Scope Recommendations",
+                "node_type": "topic",
+                "section_id": "B3-2-08",
+                "date": "04/01/2009",
+                "page_index": 309
+              },
+              {
+                "id": "B3-2-09",
+                "title": "Erroneous Credit Report Data",
+                "node_type": "topic",
+                "section_id": "B3-2-09",
+                "date": "01/27/2015",
+                "page_index": 309
+              },
+              {
+                "id": "B3-2-10",
+                "title": "Accuracy of DU Data, DU Tolerances, and Errors in the Credit Report",
+                "node_type": "topic",
+                "section_id": "B3-2-10",
+                "date": "12/04/2019",
+                "page_index": 311
+              },
+              {
+                "id": "B3-2-11",
+                "title": "DU Underwriting Findings Report",
+                "node_type": "topic",
+                "section_id": "B3-2-11",
+                "date": "09/07/2022",
+                "page_index": 314
+              }
+            ]
+          },
+          {
+            "id": "B3-3",
+            "title": "B3-3, Income Assessment",
+            "node_type": "chapter",
+            "page_index": 315,
+            "children": [
+              {
+                "id": "B3-3.1",
+                "title": "B3-3.1, Employment and Other Sources of Income",
+                "node_type": "section",
+                "page_index": 316,
+                "children": [
+                  {
+                    "id": "B3-3.1-01",
+                    "title": "General Income Information",
+                    "node_type": "topic",
+                    "section_id": "B3-3.1-01",
+                    "date": "05/01/2024",
+                    "page_index": 316
+                  },
+                  {
+                    "id": "B3-3.1-02",
+                    "title": "Standards for Employment Documentation",
+                    "node_type": "topic",
+                    "section_id": "B3-3.1-02",
+                    "date": "03/06/2024",
+                    "page_index": 322
+                  },
+                  {
+                    "id": "B3-3.1-03",
+                    "title": "Base Pay (Salary or Hourly), Bonus, and Overtime Income",
+                    "node_type": "topic",
+                    "section_id": "B3-3.1-03",
+                    "date": "11/03/2021",
+                    "page_index": 325
+                  },
+                  {
+                    "id": "B3-3.1-04",
+                    "title": "Commission Income",
+                    "node_type": "topic",
+                    "section_id": "B3-3.1-04",
+                    "date": "12/04/2018",
+                    "page_index": 328
+                  },
+                  {
+                    "id": "B3-3.1-05",
+                    "title": "Secondary Employment Income (Second Job and Multiple Jobs) and Seasonal Income",
+                    "node_type": "topic",
+                    "section_id": "B3-3.1-05",
+                    "date": "12/15/2021",
+                    "page_index": 329
+                  },
+                  {
+                    "id": "B3-3.1-06",
+                    "title": "Requirements and Uses of IRS IVES Request for Transcript of Tax Return Form 4506-C",
+                    "node_type": "topic",
+                    "section_id": "B3-3.1-06",
+                    "date": "12/16/2020",
+                    "page_index": 331
+                  },
+                  {
+                    "id": "B3-3.1-07",
+                    "title": "Verbal Verification of Employment",
+                    "node_type": "topic",
+                    "section_id": "B3-3.1-07",
+                    "date": "03/06/2024",
+                    "page_index": 333
+                  },
+                  {
+                    "id": "B3-3.1-08",
+                    "title": "Rental Income",
+                    "node_type": "topic",
+                    "section_id": "B3-3.1-08",
+                    "date": "10/08/2025",
+                    "page_index": 335
+                  },
+                  {
+                    "id": "B3-3.1-09",
+                    "title": "Other Sources of Income",
+                    "node_type": "topic",
+                    "section_id": "B3-3.1-09",
+                    "date": "10/08/2025",
+                    "page_index": 346
+                  },
+                  {
+                    "id": "B3-3.1-10",
+                    "title": "Income Calculator",
+                    "node_type": "topic",
+                    "section_id": "B3-3.1-10",
+                    "date": "04/02/2025",
+                    "page_index": 371
+                  }
+                ]
+              },
+              {
+                "id": "B3-3.2",
+                "title": "B3-3.2, Self-Employment Income",
+                "node_type": "section",
+                "page_index": 372,
+                "children": [
+                  {
+                    "id": "B3-3.2-01",
+                    "title": "Underwriting Factors and Documentation for a Self-Employed Borrower",
+                    "node_type": "topic",
+                    "section_id": "B3-3.2-01",
+                    "date": "12/13/2023",
+                    "page_index": 372
+                  },
+                  {
+                    "id": "B3-3.2-02",
+                    "title": "Business Structures",
+                    "node_type": "topic",
+                    "section_id": "B3-3.2-02",
+                    "date": "12/16/2014",
+                    "page_index": 377
+                  },
+                  {
+                    "id": "B3-3.2-03",
+                    "title": "IRS Forms Quick Reference",
+                    "node_type": "topic",
+                    "section_id": "B3-3.2-03",
+                    "date": "12/16/2020",
+                    "page_index": 381
+                  }
+                ]
+              },
+              {
+                "id": "B3-3.3",
+                "title": "B3-3.3, Self-Employment Documentation Requirements for an Individual",
+                "node_type": "section",
+                "page_index": 383,
+                "children": [
+                  {
+                    "id": "B3-3.3-01",
+                    "title": "General Information on Analyzing Individual Tax Returns",
+                    "node_type": "topic",
+                    "section_id": "B3-3.3-01",
+                    "date": "06/05/2019",
+                    "page_index": 383
+                  },
+                  {
+                    "id": "B3-3.3-02",
+                    "title": "Income Reported on IRS Form 1040",
+                    "node_type": "topic",
+                    "section_id": "B3-3.3-02",
+                    "date": "05/15/2012",
+                    "page_index": 384
+                  },
+                  {
+                    "id": "B3-3.3-03",
+                    "title": "Income or Loss Reported on IRS Form 1040, Schedule C",
+                    "node_type": "topic",
+                    "section_id": "B3-3.3-03",
+                    "date": "04/01/2009",
+                    "page_index": 386
+                  },
+                  {
+                    "id": "B3-3.3-04",
+                    "title": "Income or Loss Reported on IRS Form 1040, Schedule D",
+                    "node_type": "topic",
+                    "section_id": "B3-3.3-04",
+                    "date": "11/13/2012",
+                    "page_index": 387
+                  },
+                  {
+                    "id": "B3-3.3-05",
+                    "title": "Income or Loss Reported on IRS Form 1040, Schedule E",
+                    "node_type": "topic",
+                    "section_id": "B3-3.3-05",
+                    "date": "09/30/2014",
+                    "page_index": 388
+                  },
+                  {
+                    "id": "B3-3.3-06",
+                    "title": "Income or Loss Reported on IRS Form 1040, Schedule F",
+                    "node_type": "topic",
+                    "section_id": "B3-3.3-06",
+                    "date": "04/01/2009",
+                    "page_index": 390
+                  },
+                  {
+                    "id": "B3-3.3-07",
+                    "title": "Income or Loss Reported on IRS Form 1065 or IRS Form 1120S, Schedule K-1",
+                    "node_type": "topic",
+                    "section_id": "B3-3.3-07",
+                    "date": "05/07/2025",
+                    "page_index": 390
+                  }
+                ]
+              },
+              {
+                "id": "B3-3.4",
+                "title": "B3-3.4, Self-Employment Documentation Requirements for a Business",
+                "node_type": "section",
+                "page_index": 392,
+                "children": [
+                  {
+                    "id": "B3-3.4-01",
+                    "title": "Analyzing Partnership Returns for a Partnership or LLC",
+                    "node_type": "topic",
+                    "section_id": "B3-3.4-01",
+                    "date": "02/07/2024",
+                    "page_index": 392
+                  },
+                  {
+                    "id": "B3-3.4-02",
+                    "title": "Analyzing Returns for an S Corporation",
+                    "node_type": "topic",
+                    "section_id": "B3-3.4-02",
+                    "date": "02/07/2024",
+                    "page_index": 394
+                  },
+                  {
+                    "id": "B3-3.4-03",
+                    "title": "Analyzing Returns for a Corporation",
+                    "node_type": "topic",
+                    "section_id": "B3-3.4-03",
+                    "date": "06/05/2019",
+                    "page_index": 397
+                  },
+                  {
+                    "id": "B3-3.4-04",
+                    "title": "Analyzing Profit and Loss Statements",
+                    "node_type": "topic",
+                    "section_id": "B3-3.4-04",
+                    "date": "04/01/2009",
+                    "page_index": 398
+                  }
+                ]
+              },
+              {
+                "id": "B3-3.5",
+                "title": "B3-3.5, DU Requirements for Income Assessment",
+                "node_type": "section",
+                "page_index": 399,
+                "children": [
+                  {
+                    "id": "B3-3.5-01",
+                    "title": "Income and Employment Documentation for DU",
+                    "node_type": "topic",
+                    "section_id": "B3-3.5-01",
+                    "date": "10/04/2023",
+                    "page_index": 399
+                  },
+                  {
+                    "id": "B3-3.5-02",
+                    "title": "Income from Rental Property in DU",
+                    "node_type": "topic",
+                    "section_id": "B3-3.5-02",
+                    "date": "06/01/2022",
+                    "page_index": 403
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "B3-4",
+            "title": "B3-4, Asset Assessment",
+            "node_type": "chapter",
+            "page_index": 406,
+            "children": [
+              {
+                "id": "B3-4.1",
+                "title": "B3-4.1, General Asset Requirements",
+                "node_type": "section",
+                "page_index": 406,
+                "children": [
+                  {
+                    "id": "B3-4.1-01",
+                    "title": "Minimum Reserve Requirements",
+                    "node_type": "topic",
+                    "section_id": "B3-4.1-01",
+                    "date": "08/07/2024",
+                    "page_index": 406
+                  },
+                  {
+                    "id": "B3-4.1-02",
+                    "title": "Interested Party Contributions (IPCs)",
+                    "node_type": "topic",
+                    "section_id": "B3-4.1-02",
+                    "date": "05/07/2025",
+                    "page_index": 412
+                  },
+                  {
+                    "id": "B3-4.1-03",
+                    "title": "Lender Incentives",
+                    "node_type": "topic",
+                    "section_id": "B3-4.1-03",
+                    "date": "07/02/2025",
+                    "page_index": 416
+                  },
+                  {
+                    "id": "B3-4.1-04",
+                    "title": "Virtual Currency",
+                    "node_type": "topic",
+                    "section_id": "B3-4.1-04",
+                    "date": "05/04/2022",
+                    "page_index": 417
+                  }
+                ]
+              },
+              {
+                "id": "B3-4.2",
+                "title": "B3-4.2, Verification of Depository Assets",
+                "node_type": "section",
+                "page_index": 418,
+                "children": [
+                  {
+                    "id": "B3-4.2-01",
+                    "title": "Verification of Deposits and Assets",
+                    "node_type": "topic",
+                    "section_id": "B3-4.2-01",
+                    "date": "05/04/2022",
+                    "page_index": 418
+                  },
+                  {
+                    "id": "B3-4.2-02",
+                    "title": "Depository Accounts",
+                    "node_type": "topic",
+                    "section_id": "B3-4.2-02",
+                    "date": "12/14/2022",
+                    "page_index": 421
+                  },
+                  {
+                    "id": "B3-4.2-03",
+                    "title": "Individual Development Accounts",
+                    "node_type": "topic",
+                    "section_id": "B3-4.2-03",
+                    "date": "02/06/2019",
+                    "page_index": 424
+                  },
+                  {
+                    "id": "B3-4.2-04",
+                    "title": "Pooled Savings (Community Savings Funds)",
+                    "node_type": "topic",
+                    "section_id": "B3-4.2-04",
+                    "date": "04/01/2009",
+                    "page_index": 427
+                  },
+                  {
+                    "id": "B3-4.2-05",
+                    "title": "Foreign Assets",
+                    "node_type": "topic",
+                    "section_id": "B3-4.2-05",
+                    "date": "05/04/2022",
+                    "page_index": 427
+                  }
+                ]
+              },
+              {
+                "id": "B3-4.3",
+                "title": "B3-4.3, Verification of Non-Depository Assets",
+                "node_type": "section",
+                "page_index": 428,
+                "children": [
+                  {
+                    "id": "B3-4.3-01",
+                    "title": "Stocks, Stock Options, Bonds, and Mutual Funds",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-01",
+                    "date": "06/30/2015",
+                    "page_index": 428
+                  },
+                  {
+                    "id": "B3-4.3-02",
+                    "title": "Trust Accounts",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-02",
+                    "date": "04/01/2009",
+                    "page_index": 429
+                  },
+                  {
+                    "id": "B3-4.3-03",
+                    "title": "Retirement Accounts",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-03",
+                    "date": "06/30/2015",
+                    "page_index": 430
+                  },
+                  {
+                    "id": "B3-4.3-04",
+                    "title": "Personal Gifts",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-04",
+                    "date": "02/04/2026",
+                    "page_index": 431
+                  },
+                  {
+                    "id": "B3-4.3-05",
+                    "title": "Gifts of Equity",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-05",
+                    "date": "10/07/2020",
+                    "page_index": 434
+                  },
+                  {
+                    "id": "B3-4.3-06",
+                    "title": "Grants and Lender Contributions",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-06",
+                    "date": "05/07/2025",
+                    "page_index": 435
+                  },
+                  {
+                    "id": "B3-4.3-07",
+                    "title": "Disaster Relief Grants or Loans",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-07",
+                    "date": "04/01/2009",
+                    "page_index": 438
+                  },
+                  {
+                    "id": "B3-4.3-08",
+                    "title": "Employer Assistance",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-08",
+                    "date": "09/29/2015",
+                    "page_index": 439
+                  },
+                  {
+                    "id": "B3-4.3-09",
+                    "title": "Earnest Money Deposit",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-09",
+                    "date": "05/04/2022",
+                    "page_index": 441
+                  },
+                  {
+                    "id": "B3-4.3-10",
+                    "title": "Anticipated Sales Proceeds",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-10",
+                    "date": "02/23/2016",
+                    "page_index": 442
+                  },
+                  {
+                    "id": "B3-4.3-11",
+                    "title": "Trade Equity",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-11",
+                    "date": "12/16/2020",
+                    "page_index": 443
+                  },
+                  {
+                    "id": "B3-4.3-12",
+                    "title": "Rent-Related Credits",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-12",
+                    "date": "08/07/2024",
+                    "page_index": 445
+                  },
+                  {
+                    "id": "B3-4.3-13",
+                    "title": "Sweat Equity",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-13",
+                    "date": "04/15/2014",
+                    "page_index": 446
+                  },
+                  {
+                    "id": "B3-4.3-14",
+                    "title": "Bridge/Swing Loans",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-14",
+                    "date": "04/01/2009",
+                    "page_index": 447
+                  },
+                  {
+                    "id": "B3-4.3-15",
+                    "title": "Borrowed Funds Secured by an Asset",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-15",
+                    "date": "10/30/2009",
+                    "page_index": 447
+                  },
+                  {
+                    "id": "B3-4.3-16",
+                    "title": "Credit Card Financing and Reward Points",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-16",
+                    "date": "08/04/2021",
+                    "page_index": 448
+                  },
+                  {
+                    "id": "B3-4.3-17",
+                    "title": "Personal Unsecured Loans",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-17",
+                    "date": "09/20/2010",
+                    "page_index": 450
+                  },
+                  {
+                    "id": "B3-4.3-18",
+                    "title": "Sale of Personal Assets",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-18",
+                    "date": "12/16/2020",
+                    "page_index": 450
+                  },
+                  {
+                    "id": "B3-4.3-19",
+                    "title": "Cash Value of Life Insurance",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-19",
+                    "date": "05/27/2014",
+                    "page_index": 451
+                  },
+                  {
+                    "id": "B3-4.3-20",
+                    "title": "Anticipated Savings and Cash-on-Hand",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-20",
+                    "date": "04/01/2009",
+                    "page_index": 452
+                  },
+                  {
+                    "id": "B3-4.3-21",
+                    "title": "Borrower's Earned Real Estate Commission",
+                    "node_type": "topic",
+                    "section_id": "B3-4.3-21",
+                    "date": "04/05/2023",
+                    "page_index": 453
+                  }
+                ]
+              },
+              {
+                "id": "B3-4.4",
+                "title": "B3-4.4, DU Requirements for Asset Assessment",
+                "node_type": "section",
+                "page_index": 454,
+                "children": [
+                  {
+                    "id": "B3-4.4-01",
+                    "title": "DU Asset Verification",
+                    "node_type": "topic",
+                    "section_id": "B3-4.4-01",
+                    "date": "12/16/2020",
+                    "page_index": 454
+                  },
+                  {
+                    "id": "B3-4.4-02",
+                    "title": "Requirements for Certain Assets in DU",
+                    "node_type": "topic",
+                    "section_id": "B3-4.4-02",
+                    "date": "06/01/2022",
+                    "page_index": 456
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "B3-5",
+            "title": "B3-5, Credit Assessment",
+            "node_type": "chapter",
+            "page_index": 459,
+            "children": [
+              {
+                "id": "B3-5.1",
+                "title": "B3-5.1, Credit Scores",
+                "node_type": "section",
+                "page_index": 459,
+                "children": [
+                  {
+                    "id": "B3-5.1-01",
+                    "title": "General Requirements for Credit Scores",
+                    "node_type": "topic",
+                    "section_id": "B3-5.1-01",
+                    "date": "11/05/2025",
+                    "page_index": 459
+                  },
+                  {
+                    "id": "B3-5.1-02",
+                    "title": "Determining the Credit Score for a Mortgage Loan",
+                    "node_type": "topic",
+                    "section_id": "B3-5.1-02",
+                    "date": "11/05/2025",
+                    "page_index": 463
+                  }
+                ]
+              },
+              {
+                "id": "B3-5.2",
+                "title": "B3-5.2, Credit Reports",
+                "node_type": "section",
+                "page_index": 465,
+                "children": [
+                  {
+                    "id": "B3-5.2-01",
+                    "title": "Requirements for Credit Reports",
+                    "node_type": "topic",
+                    "section_id": "B3-5.2-01",
+                    "date": "11/05/2025",
+                    "page_index": 465
+                  },
+                  {
+                    "id": "B3-5.2-02",
+                    "title": "Types of Credit Reports",
+                    "node_type": "topic",
+                    "section_id": "B3-5.2-02",
+                    "date": "11/05/2025",
+                    "page_index": 469
+                  },
+                  {
+                    "id": "B3-5.2-03",
+                    "title": "Accuracy of Credit Information in a Credit Report",
+                    "node_type": "topic",
+                    "section_id": "B3-5.2-03",
+                    "date": "07/25/2017",
+                    "page_index": 471
+                  }
+                ]
+              },
+              {
+                "id": "B3-5.3",
+                "title": "B3-5.3, Traditional Credit History",
+                "node_type": "section",
+                "page_index": 472,
+                "children": [
+                  {
+                    "id": "B3-5.3-01",
+                    "title": "Number and Age of Accounts",
+                    "node_type": "topic",
+                    "section_id": "B3-5.3-01",
+                    "date": "04/01/2009",
+                    "page_index": 472
+                  },
+                  {
+                    "id": "B3-5.3-02",
+                    "title": "Payment History",
+                    "node_type": "topic",
+                    "section_id": "B3-5.3-02",
+                    "date": "04/01/2009",
+                    "page_index": 473
+                  },
+                  {
+                    "id": "B3-5.3-03",
+                    "title": "Previous Mortgage Payment History",
+                    "node_type": "topic",
+                    "section_id": "B3-5.3-03",
+                    "date": "07/25/2017",
+                    "page_index": 473
+                  },
+                  {
+                    "id": "B3-5.3-04",
+                    "title": "Inquiries: Recent Attempts to Obtain New Credit",
+                    "node_type": "topic",
+                    "section_id": "B3-5.3-04",
+                    "date": "04/01/2009",
+                    "page_index": 475
+                  },
+                  {
+                    "id": "B3-5.3-05",
+                    "title": "Credit Utilization",
+                    "node_type": "topic",
+                    "section_id": "B3-5.3-05",
+                    "date": "05/31/2016",
+                    "page_index": 476
+                  },
+                  {
+                    "id": "B3-5.3-06",
+                    "title": "Authorized Users of Credit",
+                    "node_type": "topic",
+                    "section_id": "B3-5.3-06",
+                    "date": "10/30/2009",
+                    "page_index": 476
+                  },
+                  {
+                    "id": "B3-5.3-07",
+                    "title": "Significant Derogatory Credit Events — Waiting Periods and Re-establishing Credit",
+                    "node_type": "topic",
+                    "section_id": "B3-5.3-07",
+                    "date": "08/07/2019",
+                    "page_index": 477
+                  },
+                  {
+                    "id": "B3-5.3-08",
+                    "title": "Extenuating Circumstances for Derogatory Credit",
+                    "node_type": "topic",
+                    "section_id": "B3-5.3-08",
+                    "date": "12/16/2014",
+                    "page_index": 483
+                  },
+                  {
+                    "id": "B3-5.3-09",
+                    "title": "DU Credit Report Analysis",
+                    "node_type": "topic",
+                    "section_id": "B3-5.3-09",
+                    "date": "02/05/2025",
+                    "page_index": 484
+                  }
+                ]
+              },
+              {
+                "id": "B3-5.4",
+                "title": "B3-5.4, Nontraditional Credit History",
+                "node_type": "section",
+                "page_index": 493,
+                "children": [
+                  {
+                    "id": "B3-5.4-01",
+                    "title": "Eligibility Requirements for Loans with Nontraditional Credit",
+                    "node_type": "topic",
+                    "section_id": "B3-5.4-01",
+                    "date": "11/05/2025",
+                    "page_index": 493
+                  },
+                  {
+                    "id": "B3-5.4-02",
+                    "title": "Number and Types of Nontraditional Credit References",
+                    "node_type": "topic",
+                    "section_id": "B3-5.4-02",
+                    "date": "02/04/2026",
+                    "page_index": 495
+                  },
+                  {
+                    "id": "B3-5.4-03",
+                    "title": "Documentation and Assessment of a Nontraditional Credit History",
+                    "node_type": "topic",
+                    "section_id": "B3-5.4-03",
+                    "date": "02/07/2024",
+                    "page_index": 498
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "B3-6",
+            "title": "B3-6, Liability Assessment",
+            "node_type": "chapter",
+            "page_index": 501,
+            "children": [
+              {
+                "id": "B3-6-01",
+                "title": "General Information on Liabilities",
+                "node_type": "topic",
+                "section_id": "B3-6-01",
+                "date": "05/04/2022",
+                "page_index": 501
+              },
+              {
+                "id": "B3-6-02",
+                "title": "Debt-to-Income Ratios",
+                "node_type": "topic",
+                "section_id": "B3-6-02",
+                "date": "04/02/2025",
+                "page_index": 503
+              },
+              {
+                "id": "B3-6-03",
+                "title": "Monthly Housing Expense for the Subject Property",
+                "node_type": "topic",
+                "section_id": "B3-6-03",
+                "date": "12/16/2020",
+                "page_index": 507
+              },
+              {
+                "id": "B3-6-04",
+                "title": "Qualifying Payment Requirements",
+                "node_type": "topic",
+                "section_id": "B3-6-04",
+                "date": "02/07/2024",
+                "page_index": 509
+              },
+              {
+                "id": "B3-6-05",
+                "title": "Monthly Debt Obligations",
+                "node_type": "topic",
+                "section_id": "B3-6-05",
+                "date": "05/04/2022",
+                "page_index": 511
+              },
+              {
+                "id": "B3-6-06",
+                "title": "Qualifying Impact of Other Real Estate Owned",
+                "node_type": "topic",
+                "section_id": "B3-6-06",
+                "date": "06/30/2015",
+                "page_index": 518
+              },
+              {
+                "id": "B3-6-07",
+                "title": "Debts Paid Off At or Prior to Closing",
+                "node_type": "topic",
+                "section_id": "B3-6-07",
+                "date": "04/05/2023",
+                "page_index": 519
+              },
+              {
+                "id": "B3-6-08",
+                "title": "DU: Requirements for Liability Assessment",
+                "node_type": "topic",
+                "section_id": "B3-6-08",
+                "date": "01/27/2015",
+                "page_index": 521
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "B4",
+        "title": "B4, Underwriting Property",
+        "node_type": "subpart",
+        "page_index": 522,
+        "children": [
+          {
+            "id": "B4-1",
+            "title": "B4-1, Property Assessment and Valuation",
+            "node_type": "chapter",
+            "page_index": 523,
+            "children": [
+              {
+                "id": "B4-1.1",
+                "title": "B4-1.1, General Appraisal Requirements",
+                "node_type": "section",
+                "page_index": 523,
+                "children": [
+                  {
+                    "id": "B4-1.1-01",
+                    "title": "Definition of Market Value",
+                    "node_type": "topic",
+                    "section_id": "B4-1.1-01",
+                    "date": "06/04/2025",
+                    "page_index": 523
+                  },
+                  {
+                    "id": "B4-1.1-02",
+                    "title": "Lender Responsibilities",
+                    "node_type": "topic",
+                    "section_id": "B4-1.1-02",
+                    "date": "06/04/2025",
+                    "page_index": 524
+                  },
+                  {
+                    "id": "B4-1.1-03",
+                    "title": "Appraiser Selection Criteria",
+                    "node_type": "topic",
+                    "section_id": "B4-1.1-03",
+                    "date": "06/04/2025",
+                    "page_index": 527
+                  },
+                  {
+                    "id": "B4-1.1-04",
+                    "title": "Unacceptable Appraisal Practices",
+                    "node_type": "topic",
+                    "section_id": "B4-1.1-04",
+                    "date": "06/04/2025",
+                    "page_index": 530
+                  },
+                  {
+                    "id": "B4-1.1-05",
+                    "title": "Disclosure of Information to Appraisers",
+                    "node_type": "topic",
+                    "section_id": "B4-1.1-05",
+                    "date": "06/04/2025",
+                    "page_index": 532
+                  },
+                  {
+                    "id": "B4-1.1-06",
+                    "title": "Uniform Appraisal Dataset (UAD) and the Uniform Collateral Data Portal (UCDP)",
+                    "node_type": "topic",
+                    "section_id": "B4-1.1-06",
+                    "date": "06/04/2025",
+                    "page_index": 534
+                  }
+                ]
+              },
+              {
+                "id": "B4-1.2",
+                "title": "B4-1.2, Documentation Standards",
+                "node_type": "section",
+                "page_index": 536,
+                "children": [
+                  {
+                    "id": "B4-1.2-01",
+                    "title": "Appraisal Report Forms and Exhibits",
+                    "node_type": "topic",
+                    "section_id": "B4-1.2-01",
+                    "date": "09/03/2025",
+                    "page_index": 536
+                  },
+                  {
+                    "id": "B4-1.2-02",
+                    "title": "Desktop Appraisals",
+                    "node_type": "topic",
+                    "section_id": "B4-1.2-02",
+                    "date": "12/10/2025",
+                    "page_index": 542
+                  },
+                  {
+                    "id": "B4-1.2-03",
+                    "title": "Hybrid Appraisals",
+                    "node_type": "topic",
+                    "section_id": "B4-1.2-03",
+                    "date": "12/10/2025",
+                    "page_index": 545
+                  },
+                  {
+                    "id": "B4-1.2-04",
+                    "title": "Appraisal Age and Use Requirements",
+                    "node_type": "topic",
+                    "section_id": "B4-1.2-04",
+                    "date": "06/04/2025",
+                    "page_index": 548
+                  },
+                  {
+                    "id": "B4-1.2-05",
+                    "title": "Requirements for Verifying Completion and Postponed Improvements",
+                    "node_type": "topic",
+                    "section_id": "B4-1.2-05",
+                    "date": "12/10/2025",
+                    "page_index": 550
+                  }
+                ]
+              },
+              {
+                "id": "B4-1.3",
+                "title": "B4-1.3, Appraisal Report Assessment",
+                "node_type": "section",
+                "page_index": 557,
+                "children": [
+                  {
+                    "id": "B4-1.3-01",
+                    "title": "Review of the Appraisal Report",
+                    "node_type": "topic",
+                    "section_id": "B4-1.3-01",
+                    "date": "06/04/2025",
+                    "page_index": 558
+                  },
+                  {
+                    "id": "B4-1.3-02",
+                    "title": "Subject and Contract Sections of the Appraisal Report",
+                    "node_type": "topic",
+                    "section_id": "B4-1.3-02",
+                    "date": "06/04/2025",
+                    "page_index": 559
+                  },
+                  {
+                    "id": "B4-1.3-03",
+                    "title": "Neighborhood Section of the Appraisal Report",
+                    "node_type": "topic",
+                    "section_id": "B4-1.3-03",
+                    "date": "06/04/2025",
+                    "page_index": 561
+                  },
+                  {
+                    "id": "B4-1.3-04",
+                    "title": "Site Section of the Appraisal Report",
+                    "node_type": "topic",
+                    "section_id": "B4-1.3-04",
+                    "date": "06/04/2025",
+                    "page_index": 566
+                  },
+                  {
+                    "id": "B4-1.3-05",
+                    "title": "Improvements Section of the Appraisal Report",
+                    "node_type": "topic",
+                    "section_id": "B4-1.3-05",
+                    "date": "06/04/2025",
+                    "page_index": 569
+                  },
+                  {
+                    "id": "B4-1.3-06",
+                    "title": "Property Condition and Quality of Construction of the Improvements",
+                    "node_type": "topic",
+                    "section_id": "B4-1.3-06",
+                    "date": "06/04/2025",
+                    "page_index": 576
+                  },
+                  {
+                    "id": "B4-1.3-07",
+                    "title": "Sales Comparison Approach Section of the Appraisal Report",
+                    "node_type": "topic",
+                    "section_id": "B4-1.3-07",
+                    "date": "06/04/2025",
+                    "page_index": 584
+                  },
+                  {
+                    "id": "B4-1.3-08",
+                    "title": "Comparable Sales",
+                    "node_type": "topic",
+                    "section_id": "B4-1.3-08",
+                    "date": "06/04/2025",
+                    "page_index": 586
+                  },
+                  {
+                    "id": "B4-1.3-09",
+                    "title": "Adjustments to Comparable Sales",
+                    "node_type": "topic",
+                    "section_id": "B4-1.3-09",
+                    "date": "06/04/2025",
+                    "page_index": 590
+                  },
+                  {
+                    "id": "B4-1.3-10",
+                    "title": "Cost and Income Approach to Value",
+                    "node_type": "topic",
+                    "section_id": "B4-1.3-10",
+                    "date": "06/04/2025",
+                    "page_index": 593
+                  },
+                  {
+                    "id": "B4-1.3-11",
+                    "title": "Valuation Analysis and Reconciliation",
+                    "node_type": "topic",
+                    "section_id": "B4-1.3-11",
+                    "date": "06/04/2025",
+                    "page_index": 595
+                  },
+                  {
+                    "id": "B4-1.3-12",
+                    "title": "Appraisal Quality Matters",
+                    "node_type": "topic",
+                    "section_id": "B4-1.3-12",
+                    "date": "09/03/2025",
+                    "page_index": 596
+                  }
+                ]
+              },
+              {
+                "id": "B4-1.4",
+                "title": "B4-1.4, Special Appraisal and Other Valuation Considerations",
+                "node_type": "section",
+                "page_index": 600,
+                "children": [
+                  {
+                    "id": "B4-1.4-01",
+                    "title": "Factory-Built Housing: Manufactured Housing",
+                    "node_type": "topic",
+                    "section_id": "B4-1.4-01",
+                    "date": "02/04/2026",
+                    "page_index": 600
+                  },
+                  {
+                    "id": "B4-1.4-02",
+                    "title": "Factory-Built Housing: Modular, Prefabricated, Panelized, or Sectional Housing",
+                    "node_type": "topic",
+                    "section_id": "B4-1.4-02",
+                    "date": "10/06/2021",
+                    "page_index": 605
+                  },
+                  {
+                    "id": "B4-1.4-03",
+                    "title": "Condo Appraisal Requirements",
+                    "node_type": "topic",
+                    "section_id": "B4-1.4-03",
+                    "date": "04/15/2014",
+                    "page_index": 607
+                  },
+                  {
+                    "id": "B4-1.4-04",
+                    "title": "Co-op Appraisal Requirements",
+                    "node_type": "topic",
+                    "section_id": "B4-1.4-04",
+                    "date": "04/15/2014",
+                    "page_index": 607
+                  },
+                  {
+                    "id": "B4-1.4-05",
+                    "title": "Leasehold Interests Appraisal Requirements",
+                    "node_type": "topic",
+                    "section_id": "B4-1.4-05",
+                    "date": "06/04/2025",
+                    "page_index": 610
+                  },
+                  {
+                    "id": "B4-1.4-06",
+                    "title": "Community Land Trust Appraisal Requirements",
+                    "node_type": "topic",
+                    "section_id": "B4-1.4-06",
+                    "date": "06/04/2025",
+                    "page_index": 612
+                  },
+                  {
+                    "id": "B4-1.4-07",
+                    "title": "Mixed-Use Property Appraisal Requirements",
+                    "node_type": "topic",
+                    "section_id": "B4-1.4-07",
+                    "date": "06/04/2025",
+                    "page_index": 615
+                  },
+                  {
+                    "id": "B4-1.4-08",
+                    "title": "Environmental Hazards Appraisal Requirements",
+                    "node_type": "topic",
+                    "section_id": "B4-1.4-08",
+                    "date": "06/04/2025",
+                    "page_index": 616
+                  },
+                  {
+                    "id": "B4-1.4-09",
+                    "title": "Special Assessment or Community Facilities Districts Appraisal Requirements",
+                    "node_type": "topic",
+                    "section_id": "B4-1.4-09",
+                    "date": "06/04/2025",
+                    "page_index": 618
+                  },
+                  {
+                    "id": "B4-1.4-10",
+                    "title": "Value Acceptance",
+                    "node_type": "topic",
+                    "section_id": "B4-1.4-10",
+                    "date": "12/10/2025",
+                    "page_index": 620
+                  },
+                  {
+                    "id": "B4-1.4-11",
+                    "title": "Value Acceptance + Property Data",
+                    "node_type": "topic",
+                    "section_id": "B4-1.4-11",
+                    "date": "12/10/2025",
+                    "page_index": 624
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "B4-2",
+            "title": "B4-2, Project Standards",
+            "node_type": "chapter",
+            "page_index": 628,
+            "children": [
+              {
+                "id": "B4-2.1",
+                "title": "B4-2.1, General Project Standards",
+                "node_type": "section",
+                "page_index": 628,
+                "children": [
+                  {
+                    "id": "B4-2.1-01",
+                    "title": "General Information on Project Standards",
+                    "node_type": "topic",
+                    "section_id": "B4-2.1-01",
+                    "date": "08/06/2025",
+                    "page_index": 628
+                  },
+                  {
+                    "id": "B4-2.1-02",
+                    "title": "Waiver of Project Review",
+                    "node_type": "topic",
+                    "section_id": "B4-2.1-02",
+                    "date": "07/02/2025",
+                    "page_index": 639
+                  },
+                  {
+                    "id": "B4-2.1-03",
+                    "title": "Ineligible Projects",
+                    "node_type": "topic",
+                    "section_id": "B4-2.1-03",
+                    "date": "08/06/2025",
+                    "page_index": 641
+                  },
+                  {
+                    "id": "B4-2.1-04",
+                    "title": "Environmental Hazard Assessments",
+                    "node_type": "topic",
+                    "section_id": "B4-2.1-04",
+                    "date": "06/03/2020",
+                    "page_index": 655
+                  },
+                  {
+                    "id": "B4-2.1-05",
+                    "title": "Unacceptable Environmental Hazards",
+                    "node_type": "topic",
+                    "section_id": "B4-2.1-05",
+                    "date": "06/03/2020",
+                    "page_index": 658
+                  },
+                  {
+                    "id": "B4-2.1-06",
+                    "title": "Remedial Actions for Environmental Hazard Assessments Below Standards",
+                    "node_type": "topic",
+                    "section_id": "B4-2.1-06",
+                    "date": "06/03/2020",
+                    "page_index": 661
+                  }
+                ]
+              },
+              {
+                "id": "B4-2.2",
+                "title": "B4-2.2, Project Eligibility",
+                "node_type": "section",
+                "page_index": 662,
+                "children": [
+                  {
+                    "id": "B4-2.2-01",
+                    "title": "Limited Review Process",
+                    "node_type": "topic",
+                    "section_id": "B4-2.2-01",
+                    "date": "04/02/2025",
+                    "page_index": 663
+                  },
+                  {
+                    "id": "B4-2.2-02",
+                    "title": "Full Review Process",
+                    "node_type": "topic",
+                    "section_id": "B4-2.2-02",
+                    "date": "04/02/2025",
+                    "page_index": 665
+                  },
+                  {
+                    "id": "B4-2.2-03",
+                    "title": "Full Review: Additional Eligibility Requirements for Units in New and Newly Converted Condo Projects",
+                    "node_type": "topic",
+                    "section_id": "B4-2.2-03",
+                    "date": "06/05/2018",
+                    "page_index": 673
+                  },
+                  {
+                    "id": "B4-2.2-04",
+                    "title": "Geographic-Specific Condo Project Considerations",
+                    "node_type": "topic",
+                    "section_id": "B4-2.2-04",
+                    "date": "03/01/2023",
+                    "page_index": 677
+                  },
+                  {
+                    "id": "B4-2.2-05",
+                    "title": "FHA-Approved Condo Review Eligibility",
+                    "node_type": "topic",
+                    "section_id": "B4-2.2-05",
+                    "date": "09/04/2018",
+                    "page_index": 679
+                  },
+                  {
+                    "id": "B4-2.2-06",
+                    "title": "Project Eligibility Review Service (PERS)",
+                    "node_type": "topic",
+                    "section_id": "B4-2.2-06",
+                    "date": "06/04/2025",
+                    "page_index": 680
+                  },
+                  {
+                    "id": "B4-2.2-07",
+                    "title": "Projects with Special Considerations",
+                    "node_type": "topic",
+                    "section_id": "B4-2.2-07",
+                    "date": "08/06/2025",
+                    "page_index": 689
+                  }
+                ]
+              },
+              {
+                "id": "B4-2.3",
+                "title": "B4-2.3, PUD and Co-op Eligibility Requirements",
+                "node_type": "section",
+                "page_index": 689,
+                "children": [
+                  {
+                    "id": "B4-2.3-01",
+                    "title": "Eligibility Requirements for Units in PUD Projects",
+                    "node_type": "topic",
+                    "section_id": "B4-2.3-01",
+                    "date": "12/10/2025",
+                    "page_index": 689
+                  },
+                  {
+                    "id": "B4-2.3-02",
+                    "title": "Co-op Project Eligibility",
+                    "node_type": "topic",
+                    "section_id": "B4-2.3-02",
+                    "date": "08/06/2025",
+                    "page_index": 691
+                  },
+                  {
+                    "id": "B4-2.3-03",
+                    "title": "Legal Requirements for Co-op Projects",
+                    "node_type": "topic",
+                    "section_id": "B4-2.3-03",
+                    "date": "11/06/2024",
+                    "page_index": 697
+                  },
+                  {
+                    "id": "B4-2.3-04",
+                    "title": "Loan Eligibility for Co-op Share Loans",
+                    "node_type": "topic",
+                    "section_id": "B4-2.3-04",
+                    "date": "08/06/2025",
+                    "page_index": 700
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "B5",
+        "title": "B5, Unique Eligibility and Underwriting Considerations",
+        "node_type": "subpart",
+        "page_index": 703,
+        "children": [
+          {
+            "id": "B5-1",
+            "title": "B5-1, High-Balance Mortgage Loans",
+            "node_type": "chapter",
+            "page_index": 703,
+            "children": [
+              {
+                "id": "B5-1-01",
+                "title": "High-Balance Mortgage Loan Eligibility and Underwriting",
+                "node_type": "topic",
+                "section_id": "B5-1-01",
+                "date": "07/02/2025",
+                "page_index": 703
+              },
+              {
+                "id": "B5-1-02",
+                "title": "High-Balance Pricing, Mortgage Insurance, Special Feature Codes, and Delivery Limitations",
+                "node_type": "topic",
+                "section_id": "B5-1-02",
+                "date": "02/01/2023",
+                "page_index": 704
+              }
+            ]
+          },
+          {
+            "id": "B5-2",
+            "title": "B5-2, Manufactured Housing",
+            "node_type": "chapter",
+            "page_index": 706,
+            "children": [
+              {
+                "id": "B5-2-01",
+                "title": "Manufactured Housing",
+                "node_type": "topic",
+                "section_id": "B5-2-01",
+                "date": "11/06/2024",
+                "page_index": 706
+              },
+              {
+                "id": "B5-2-02",
+                "title": "Manufactured Housing Loan Eligibility",
+                "node_type": "topic",
+                "section_id": "B5-2-02",
+                "date": "12/10/2025",
+                "page_index": 707
+              },
+              {
+                "id": "B5-2-03",
+                "title": "Manufactured Housing Underwriting Requirements",
+                "node_type": "topic",
+                "section_id": "B5-2-03",
+                "date": "10/08/2025",
+                "page_index": 709
+              },
+              {
+                "id": "B5-2-04",
+                "title": "Manufactured Housing Pricing, Mortgage Insurance, and Loan Delivery Requirements",
+                "node_type": "topic",
+                "section_id": "B5-2-04",
+                "date": "12/10/2025",
+                "page_index": 715
+              },
+              {
+                "id": "B5-2-05",
+                "title": "Manufactured Housing Legal Considerations",
+                "node_type": "topic",
+                "section_id": "B5-2-05",
+                "date": "12/10/2025",
+                "page_index": 716
+              }
+            ]
+          },
+          {
+            "id": "B5-3",
+            "title": "B5-3, Construction and Energy Financing",
+            "node_type": "chapter",
+            "page_index": 722,
+            "children": [
+              {
+                "id": "B5-3.1",
+                "title": "B5-3.1, Conversion of Construction-to-Permanent Financing",
+                "node_type": "section",
+                "page_index": 722,
+                "children": [
+                  {
+                    "id": "B5-3.1-01",
+                    "title": "Conversion of Construction-to-Permanent Financing: Overview",
+                    "node_type": "topic",
+                    "section_id": "B5-3.1-01",
+                    "date": "06/04/2025",
+                    "page_index": 722
+                  },
+                  {
+                    "id": "B5-3.1-02",
+                    "title": "Conversion of Construction-to-Permanent Financing: Single-Closing Transactions",
+                    "node_type": "topic",
+                    "section_id": "B5-3.1-02",
+                    "date": "11/05/2025",
+                    "page_index": 724
+                  },
+                  {
+                    "id": "B5-3.1-03",
+                    "title": "Conversion of Construction-to-Permanent Financing: Two-Closing Transactions",
+                    "node_type": "topic",
+                    "section_id": "B5-3.1-03",
+                    "date": "08/07/2019",
+                    "page_index": 730
+                  }
+                ]
+              },
+              {
+                "id": "B5-3.2",
+                "title": "B5-3.2, HomeStyle Renovation Mortgage",
+                "node_type": "section",
+                "page_index": 731,
+                "children": [
+                  {
+                    "id": "B5-3.2-01",
+                    "title": "HomeStyle Renovation Mortgages",
+                    "node_type": "topic",
+                    "section_id": "B5-3.2-01",
+                    "date": "12/10/2025",
+                    "page_index": 732
+                  },
+                  {
+                    "id": "B5-3.2-02",
+                    "title": "HomeStyle Renovation Mortgages: Loan and Borrower Eligibility",
+                    "node_type": "topic",
+                    "section_id": "B5-3.2-02",
+                    "date": "12/10/2025",
+                    "page_index": 735
+                  },
+                  {
+                    "id": "B5-3.2-03",
+                    "title": "HomeStyle Renovation Mortgages: Collateral Considerations",
+                    "node_type": "topic",
+                    "section_id": "B5-3.2-03",
+                    "date": "12/10/2025",
+                    "page_index": 739
+                  },
+                  {
+                    "id": "B5-3.2-04",
+                    "title": "HomeStyle Renovation Mortgages: Costs and Escrow Accounts",
+                    "node_type": "topic",
+                    "section_id": "B5-3.2-04",
+                    "date": "12/10/2025",
+                    "page_index": 741
+                  },
+                  {
+                    "id": "B5-3.2-05",
+                    "title": "HomeStyle Renovation Mortgages: Completion Certification",
+                    "node_type": "topic",
+                    "section_id": "B5-3.2-05",
+                    "date": "06/04/2025",
+                    "page_index": 744
+                  },
+                  {
+                    "id": "B5-3.2-06",
+                    "title": "HomeStyle Renovation: Renovation Contract, Renovation Loan Agreement, and Lien Waiver",
+                    "node_type": "topic",
+                    "section_id": "B5-3.2-06",
+                    "date": "12/11/2024",
+                    "page_index": 745
+                  }
+                ]
+              },
+              {
+                "id": "B5-3.3",
+                "title": "B5-3.3, HomeStyle Refresh Mortgages",
+                "node_type": "section",
+                "page_index": 748,
+                "children": [
+                  {
+                    "id": "B5-3.3-01",
+                    "title": "HomeStyle Refresh for Improvements on Existing Properties",
+                    "node_type": "topic",
+                    "section_id": "B5-3.3-01",
+                    "date": "12/10/2025",
+                    "page_index": 748
+                  }
+                ]
+              },
+              {
+                "id": "B5-3.4",
+                "title": "B5-3.4, Property Assessed Clean Energy Loans",
+                "node_type": "section",
+                "page_index": 753,
+                "children": [
+                  {
+                    "id": "B5-3.4-01",
+                    "title": "Property Assessed Clean Energy Loans",
+                    "node_type": "topic",
+                    "section_id": "B5-3.4-01",
+                    "date": "10/08/2025",
+                    "page_index": 754
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "B5-4",
+            "title": "B5-4, Property-Specific Products",
+            "node_type": "chapter",
+            "page_index": 755,
+            "children": [
+              {
+                "id": "B5-4.1",
+                "title": "B5-4.1, General Requirements of Texas Section 50(a)(6) Loans",
+                "node_type": "section",
+                "page_index": 756,
+                "children": [
+                  {
+                    "id": "B5-4.1-01",
+                    "title": "Texas Section 50(a)(6) Loans",
+                    "node_type": "topic",
+                    "section_id": "B5-4.1-01",
+                    "date": "12/19/2017",
+                    "page_index": 756
+                  },
+                  {
+                    "id": "B5-4.1-02",
+                    "title": "Texas Section 50(a)(6) Loan Eligibility",
+                    "node_type": "topic",
+                    "section_id": "B5-4.1-02",
+                    "date": "12/16/2020",
+                    "page_index": 759
+                  },
+                  {
+                    "id": "B5-4.1-03",
+                    "title": "Texas Section 50(a)(6) Loan Underwriting, Collateral, and Closing Considerations",
+                    "node_type": "topic",
+                    "section_id": "B5-4.1-03",
+                    "date": "09/03/2025",
+                    "page_index": 761
+                  },
+                  {
+                    "id": "B5-4.1-04",
+                    "title": "Texas Section 50(a)(6) Loan Delivery and Servicing Considerations",
+                    "node_type": "topic",
+                    "section_id": "B5-4.1-04",
+                    "date": "12/19/2017",
+                    "page_index": 763
+                  }
+                ]
+              },
+              {
+                "id": "B5-4.2",
+                "title": "B5-4.2, Other Property-Specific Products",
+                "node_type": "section",
+                "page_index": 764,
+                "children": [
+                  {
+                    "id": "B5-4.2-01",
+                    "title": "Native American Conventional Lending Initiative (NACLI)",
+                    "node_type": "topic",
+                    "section_id": "B5-4.2-01",
+                    "date": "06/26/2012",
+                    "page_index": 764
+                  },
+                  {
+                    "id": "B5-4.2-02",
+                    "title": "Disaster-Related Limited Cash-Out Refinance Flexibilities",
+                    "node_type": "topic",
+                    "section_id": "B5-4.2-02",
+                    "date": "10/08/2025",
+                    "page_index": 765
+                  },
+                  {
+                    "id": "B5-4.2-03",
+                    "title": "Loans Secured by HomePath Properties",
+                    "node_type": "topic",
+                    "section_id": "B5-4.2-03",
+                    "date": "05/07/2025",
+                    "page_index": 768
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "B5-5",
+            "title": "B5-5, Community Seconds, Loans with Resale Restrictions, and Shared Equity Transactions",
+            "node_type": "chapter",
+            "page_index": 770,
+            "children": [
+              {
+                "id": "B5-5.1",
+                "title": "B5-5.1, Community Seconds",
+                "node_type": "section",
+                "page_index": 770,
+                "children": [
+                  {
+                    "id": "B5-5.1-01",
+                    "title": "Community Seconds Loans",
+                    "node_type": "topic",
+                    "section_id": "B5-5.1-01",
+                    "date": "05/03/2023",
+                    "page_index": 770
+                  },
+                  {
+                    "id": "B5-5.1-02",
+                    "title": "Community Seconds Loan Eligibility",
+                    "node_type": "topic",
+                    "section_id": "B5-5.1-02",
+                    "date": "05/03/2023",
+                    "page_index": 772
+                  },
+                  {
+                    "id": "B5-5.1-03",
+                    "title": "Community Seconds: Shared Appreciation Transactions",
+                    "node_type": "topic",
+                    "section_id": "B5-5.1-03",
+                    "date": "11/01/2023",
+                    "page_index": 777
+                  }
+                ]
+              },
+              {
+                "id": "B5-5.2",
+                "title": "B5-5.2, Loans with Resale Restrictions",
+                "node_type": "section",
+                "page_index": 781,
+                "children": [
+                  {
+                    "id": "B5-5.2-01",
+                    "title": "Loans With Resale Restrictions: General Information",
+                    "node_type": "topic",
+                    "section_id": "B5-5.2-01",
+                    "date": "05/03/2023",
+                    "page_index": 781
+                  },
+                  {
+                    "id": "B5-5.2-02",
+                    "title": "Loans with Resale Restrictions: Eligibility, Collateral and Delivery Requirements",
+                    "node_type": "topic",
+                    "section_id": "B5-5.2-02",
+                    "date": "05/03/2023",
+                    "page_index": 782
+                  }
+                ]
+              },
+              {
+                "id": "B5-5.3",
+                "title": "B5-5.3, Shared Equity Transactions",
+                "node_type": "section",
+                "page_index": 784,
+                "children": [
+                  {
+                    "id": "B5-5.3-01",
+                    "title": "Shared Equity Overview",
+                    "node_type": "topic",
+                    "section_id": "B5-5.3-01",
+                    "date": "02/05/2025",
+                    "page_index": 784
+                  },
+                  {
+                    "id": "B5-5.3-02",
+                    "title": "Shared Equity Transactions: General Requirements",
+                    "node_type": "topic",
+                    "section_id": "B5-5.3-02",
+                    "date": "02/05/2025",
+                    "page_index": 786
+                  },
+                  {
+                    "id": "B5-5.3-03",
+                    "title": "Shared Equity Transactions: Eligibility, Underwriting and Collateral Requirements",
+                    "node_type": "topic",
+                    "section_id": "B5-5.3-03",
+                    "date": "02/05/2025",
+                    "page_index": 790
+                  },
+                  {
+                    "id": "B5-5.3-04",
+                    "title": "Massachusetts Resale Restriction Loan Eligibility Requirements",
+                    "node_type": "topic",
+                    "section_id": "B5-5.3-04",
+                    "date": "05/03/2023",
+                    "page_index": 795
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "B5-6",
+            "title": "B5-6, HomeReady Mortgage",
+            "node_type": "chapter",
+            "page_index": 796,
+            "children": [
+              {
+                "id": "B5-6-01",
+                "title": "HomeReady Mortgage Loan and Borrower Eligibility",
+                "node_type": "topic",
+                "section_id": "B5-6-01",
+                "date": "06/04/2025",
+                "page_index": 796
+              },
+              {
+                "id": "B5-6-02",
+                "title": "HomeReady Mortgage Underwriting Methods and Requirements",
+                "node_type": "topic",
+                "section_id": "B5-6-02",
+                "date": "11/05/2025",
+                "page_index": 801
+              },
+              {
+                "id": "B5-6-03",
+                "title": "HomeReady Mortgage Loan Pricing, Mortgage Insurance, and Special Feature Codes",
+                "node_type": "topic",
+                "section_id": "B5-6-03",
+                "date": "06/05/2024",
+                "page_index": 806
+              }
+            ]
+          },
+          {
+            "id": "B5-7",
+            "title": "B5-7, High Loan-to-Value Refinance Option",
+            "node_type": "chapter",
+            "page_index": 807,
+            "children": [
+              {
+                "id": "B5-7-01",
+                "title": "High LTV Refinance Loan and Borrower Eligibility",
+                "node_type": "topic",
+                "section_id": "B5-7-01",
+                "date": "08/06/2025",
+                "page_index": 807
+              },
+              {
+                "id": "B5-7-02",
+                "title": "High LTV Refinance Underwriting, Documentation, and Collateral Requirements for the New Loan",
+                "node_type": "topic",
+                "section_id": "B5-7-02",
+                "date": "09/03/2025",
+                "page_index": 812
+              },
+              {
+                "id": "B5-7-03",
+                "title": "High LTV Refinance Alternative Qualification Path",
+                "node_type": "topic",
+                "section_id": "B5-7-03",
+                "date": "06/04/2025",
+                "page_index": 816
+              },
+              {
+                "id": "B5-7-04",
+                "title": "High LTV Refinance Representations and Warranties",
+                "node_type": "topic",
+                "section_id": "B5-7-04",
+                "date": "03/01/2023",
+                "page_index": 821
+              },
+              {
+                "id": "B5-7-05",
+                "title": "High LTV Refinance Pricing, Mortgage Insurance, and Special Feature Codes",
+                "node_type": "topic",
+                "section_id": "B5-7-05",
+                "date": "08/07/2018",
+                "page_index": 822
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "B6",
+        "title": "B6, Government Programs Eligibility and Underwriting Requirements",
+        "node_type": "subpart",
+        "page_index": 824,
+        "children": [
+          {
+            "id": "B6-1",
+            "title": "B6-1, Government Insured and Guaranteed Mortgages",
+            "node_type": "chapter",
+            "page_index": 825,
+            "children": [
+              {
+                "id": "B6-1-01",
+                "title": "General Government Mortgage Loan Requirements",
+                "node_type": "topic",
+                "section_id": "B6-1-01",
+                "date": "07/05/2023",
+                "page_index": 825
+              },
+              {
+                "id": "B6-1-02",
+                "title": "Eligible FHA-Insured Mortgage Loans",
+                "node_type": "topic",
+                "section_id": "B6-1-02",
+                "date": "08/05/2020",
+                "page_index": 828
+              },
+              {
+                "id": "B6-1-03",
+                "title": "Eligible VA-Guaranteed Mortgages",
+                "node_type": "topic",
+                "section_id": "B6-1-03",
+                "date": "02/02/2022",
+                "page_index": 829
+              },
+              {
+                "id": "B6-1-04",
+                "title": "Eligible HUD-Guaranteed Section 184 Mortgages",
+                "node_type": "topic",
+                "section_id": "B6-1-04",
+                "date": "12/14/2022",
+                "page_index": 830
+              },
+              {
+                "id": "B6-1-05",
+                "title": "Eligible RD-Guaranteed Mortgages",
+                "node_type": "topic",
+                "section_id": "B6-1-05",
+                "date": "12/14/2022",
+                "page_index": 832
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "B7",
+        "title": "B7, Insurance",
+        "node_type": "subpart",
+        "page_index": 834,
+        "children": [
+          {
+            "id": "B7-1",
+            "title": "B7-1, Mortgage Insurance/Loan Guaranty",
+            "node_type": "chapter",
+            "page_index": 834,
+            "children": [
+              {
+                "id": "B7-1-01",
+                "title": "Provision of Mortgage Insurance",
+                "node_type": "topic",
+                "section_id": "B7-1-01",
+                "date": "04/02/2025",
+                "page_index": 834
+              },
+              {
+                "id": "B7-1-02",
+                "title": "Mortgage Insurance Coverage Requirements",
+                "node_type": "topic",
+                "section_id": "B7-1-02",
+                "date": "08/07/2019",
+                "page_index": 840
+              },
+              {
+                "id": "B7-1-03",
+                "title": "Lender-Purchased Mortgage Insurance",
+                "node_type": "topic",
+                "section_id": "B7-1-03",
+                "date": "05/27/2010",
+                "page_index": 841
+              },
+              {
+                "id": "B7-1-04",
+                "title": "Financed Borrower-Purchased Mortgage Insurance",
+                "node_type": "topic",
+                "section_id": "B7-1-04",
+                "date": "12/15/2021",
+                "page_index": 843
+              },
+              {
+                "id": "B7-1-05",
+                "title": "Government Mortgage Loan Guaranty or Insurance",
+                "node_type": "topic",
+                "section_id": "B7-1-05",
+                "date": "02/23/2016",
+                "page_index": 845
+              }
+            ]
+          },
+          {
+            "id": "B7-2",
+            "title": "B7-2, Title Insurance",
+            "node_type": "chapter",
+            "page_index": 847,
+            "children": [
+              {
+                "id": "B7-2-01",
+                "title": "Provision of Title Insurance",
+                "node_type": "topic",
+                "section_id": "B7-2-01",
+                "date": "04/06/2022",
+                "page_index": 848
+              },
+              {
+                "id": "B7-2-02",
+                "title": "Title Insurer Requirements",
+                "node_type": "topic",
+                "section_id": "B7-2-02",
+                "date": "06/05/2019",
+                "page_index": 848
+              },
+              {
+                "id": "B7-2-03",
+                "title": "General Title Insurance Coverage",
+                "node_type": "topic",
+                "section_id": "B7-2-03",
+                "date": "07/06/2022",
+                "page_index": 849
+              },
+              {
+                "id": "B7-2-04",
+                "title": "Special Title Insurance Coverage Considerations",
+                "node_type": "topic",
+                "section_id": "B7-2-04",
+                "date": "05/03/2023",
+                "page_index": 851
+              },
+              {
+                "id": "B7-2-05",
+                "title": "Title Exceptions and Impediments",
+                "node_type": "topic",
+                "section_id": "B7-2-05",
+                "date": "07/06/2022",
+                "page_index": 855
+              },
+              {
+                "id": "B7-2-06",
+                "title": "Attorney Title Opinion Letter Requirements",
+                "node_type": "topic",
+                "section_id": "B7-2-06",
+                "date": "12/10/2025",
+                "page_index": 858
+              }
+            ]
+          },
+          {
+            "id": "B7-3",
+            "title": "B7-3, Property and Flood Insurance",
+            "node_type": "chapter",
+            "page_index": 860,
+            "children": [
+              {
+                "id": "B7-3-01",
+                "title": "General Property Insurance Requirements for All Property Types",
+                "node_type": "topic",
+                "section_id": "B7-3-01",
+                "date": "12/14/2022",
+                "page_index": 860
+              },
+              {
+                "id": "B7-3-02",
+                "title": "Property Insurance Requirements for One-to Four-Unit Properties",
+                "node_type": "topic",
+                "section_id": "B7-3-02",
+                "date": "02/07/2024",
+                "page_index": 863
+              },
+              {
+                "id": "B7-3-03",
+                "title": "Master Property Insurance Requirements for Project Developments",
+                "node_type": "topic",
+                "section_id": "B7-3-03",
+                "date": "02/07/2024",
+                "page_index": 866
+              },
+              {
+                "id": "B7-3-04",
+                "title": "Individual Property Insurance Requirements for a Unit in a Project Development",
+                "node_type": "topic",
+                "section_id": "B7-3-04",
+                "date": "12/14/2022",
+                "page_index": 873
+              },
+              {
+                "id": "B7-3-05",
+                "title": "Additional Insurance Requirements",
+                "node_type": "topic",
+                "section_id": "B7-3-05",
+                "date": "12/14/2022",
+                "page_index": 874
+              },
+              {
+                "id": "B7-3-06",
+                "title": "Flood Insurance Requirements for All Property Types",
+                "node_type": "topic",
+                "section_id": "B7-3-06",
+                "date": "02/07/2024",
+                "page_index": 877
+              },
+              {
+                "id": "B7-3-07",
+                "title": "Evidence of Property Insurance",
+                "node_type": "topic",
+                "section_id": "B7-3-07",
+                "date": "12/14/2022",
+                "page_index": 884
+              },
+              {
+                "id": "B7-3-08",
+                "title": "Mortgagee Clause, Named Insured, and Notice of Cancellation Requirements",
+                "node_type": "topic",
+                "section_id": "B7-3-08",
+                "date": "12/14/2022",
+                "page_index": 887
+              }
+            ]
+          },
+          {
+            "id": "B7-4",
+            "title": "B7-4, Liability and Fidelity/Crime Insurance Requirements for Project Developments",
+            "node_type": "chapter",
+            "page_index": 889,
+            "children": [
+              {
+                "id": "B7-4-01",
+                "title": "General Liability Insurance Requirements for Project Developments",
+                "node_type": "topic",
+                "section_id": "B7-4-01",
+                "date": "12/14/2022",
+                "page_index": 889
+              },
+              {
+                "id": "B7-4-02",
+                "title": "Fidelity/Crime Insurance Requirements for Project Developments",
+                "node_type": "topic",
+                "section_id": "B7-4-02",
+                "date": "12/14/2022",
+                "page_index": 891
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "B8",
+        "title": "B8, Closing: Legal Documents",
+        "node_type": "subpart",
+        "page_index": 893,
+        "children": [
+          {
+            "id": "B8-1",
+            "title": "B8-1, General Information on Legal Documents",
+            "node_type": "chapter",
+            "page_index": 893,
+            "children": [
+              {
+                "id": "B8-1-01",
+                "title": "Publication of Legal Documents",
+                "node_type": "topic",
+                "section_id": "B8-1-01",
+                "date": "06/28/2011",
+                "page_index": 893
+              }
+            ]
+          },
+          {
+            "id": "B8-2",
+            "title": "B8-2, Security Instruments",
+            "node_type": "chapter",
+            "page_index": 894,
+            "children": [
+              {
+                "id": "B8-2-01",
+                "title": "Security Instruments for Conventional Mortgages",
+                "node_type": "topic",
+                "section_id": "B8-2-01",
+                "date": "02/06/2019",
+                "page_index": 894
+              },
+              {
+                "id": "B8-2-02",
+                "title": "Special-Purpose Security Instruments",
+                "node_type": "topic",
+                "section_id": "B8-2-02",
+                "date": "12/10/2025",
+                "page_index": 896
+              },
+              {
+                "id": "B8-2-03",
+                "title": "Signature Requirements for Security Instruments",
+                "node_type": "topic",
+                "section_id": "B8-2-03",
+                "date": "10/22/2013",
+                "page_index": 898
+              }
+            ]
+          },
+          {
+            "id": "B8-3",
+            "title": "B8-3, Notes",
+            "node_type": "chapter",
+            "page_index": 899,
+            "children": [
+              {
+                "id": "B8-3-01",
+                "title": "Notes for Conventional Mortgages",
+                "node_type": "topic",
+                "section_id": "B8-3-01",
+                "date": "09/02/2020",
+                "page_index": 899
+              },
+              {
+                "id": "B8-3-02",
+                "title": "Special Note Provisions and Language Requirements",
+                "node_type": "topic",
+                "section_id": "B8-3-02",
+                "date": "06/03/2020",
+                "page_index": 901
+              },
+              {
+                "id": "B8-3-03",
+                "title": "Signature Requirements for Notes",
+                "node_type": "topic",
+                "section_id": "B8-3-03",
+                "date": "02/07/2024",
+                "page_index": 902
+              },
+              {
+                "id": "B8-3-04",
+                "title": "Note Endorsement",
+                "node_type": "topic",
+                "section_id": "B8-3-04",
+                "date": "10/02/2019",
+                "page_index": 903
+              }
+            ]
+          },
+          {
+            "id": "B8-4",
+            "title": "B8-4, Riders and Addenda",
+            "node_type": "chapter",
+            "page_index": 905,
+            "children": [
+              {
+                "id": "B8-4-01",
+                "title": "Riders and Addenda",
+                "node_type": "topic",
+                "section_id": "B8-4-01",
+                "date": "06/05/2018",
+                "page_index": 905
+              }
+            ]
+          },
+          {
+            "id": "B8-5",
+            "title": "B8-5, Special-Purpose Legal Documents",
+            "node_type": "chapter",
+            "page_index": 907,
+            "children": [
+              {
+                "id": "B8-5-01",
+                "title": "General Information on Special-Purpose Legal Documents",
+                "node_type": "topic",
+                "section_id": "B8-5-01",
+                "date": "05/01/2019",
+                "page_index": 908
+              },
+              {
+                "id": "B8-5-02",
+                "title": "Inter Vivos Revocable Trust Mortgage Documentation and Signature Requirements",
+                "node_type": "topic",
+                "section_id": "B8-5-02",
+                "date": "10/31/2017",
+                "page_index": 909
+              },
+              {
+                "id": "B8-5-03",
+                "title": "HomeStyle Renovation Mortgage Documentation Requirements",
+                "node_type": "topic",
+                "section_id": "B8-5-03",
+                "date": "06/05/2018",
+                "page_index": 912
+              },
+              {
+                "id": "B8-5-04",
+                "title": "Sample Legal Documents",
+                "node_type": "topic",
+                "section_id": "B8-5-04",
+                "date": "02/05/2025",
+                "page_index": 913
+              },
+              {
+                "id": "B8-5-05",
+                "title": "Requirements for Use of a Power of Attorney",
+                "node_type": "topic",
+                "section_id": "B8-5-05",
+                "date": "10/05/2022",
+                "page_index": 914
+              }
+            ]
+          },
+          {
+            "id": "B8-6",
+            "title": "B8-6, Mortgage Assignments",
+            "node_type": "chapter",
+            "page_index": 917,
+            "children": [
+              {
+                "id": "B8-6-01",
+                "title": "Authorized Use of Intervening and Blanket Assignments",
+                "node_type": "topic",
+                "section_id": "B8-6-01",
+                "date": "05/04/2022",
+                "page_index": 917
+              }
+            ]
+          },
+          {
+            "id": "B8-7",
+            "title": "B8-7, Mortgage Electronic Registration System (MERS)",
+            "node_type": "chapter",
+            "page_index": 919,
+            "children": [
+              {
+                "id": "B8-7-01",
+                "title": "Mortgage Electronic Registration Systems (MERS), Inc.",
+                "node_type": "topic",
+                "section_id": "B8-7-01",
+                "date": "05/01/2024",
+                "page_index": 919
+              }
+            ]
+          },
+          {
+            "id": "B8-8",
+            "title": "B8-8, Sale of eMortgages to Fannie Mae",
+            "node_type": "chapter",
+            "page_index": 923,
+            "children": [
+              {
+                "id": "B8-8-01",
+                "title": "General Information on eMortgages",
+                "node_type": "topic",
+                "section_id": "B8-8-01",
+                "date": "11/05/2025",
+                "page_index": 923
+              },
+              {
+                "id": "B8-8-02",
+                "title": "Requirements for Creating, Closing, and Correcting eNotes",
+                "node_type": "topic",
+                "section_id": "B8-8-02",
+                "date": "12/13/2023",
+                "page_index": 926
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "C",
+    "title": "C, Selling, Securitizing, and Delivering Loans",
+    "node_type": "part",
+    "page_index": 929,
+    "children": [
+      {
+        "id": "C1",
+        "title": "C1, General Information on Execution Options and Loan Delivery",
+        "node_type": "subpart",
+        "page_index": 930,
+        "children": [
+          {
+            "id": "C1-1",
+            "title": "C1-1, Execution Options Overview",
+            "node_type": "chapter",
+            "page_index": 930,
+            "children": [
+              {
+                "id": "C1-1-01",
+                "title": "Execution Options",
+                "node_type": "topic",
+                "section_id": "C1-1-01",
+                "date": "02/05/2025",
+                "page_index": 930
+              }
+            ]
+          },
+          {
+            "id": "C1-2",
+            "title": "C1-2, Loan Delivery Overview",
+            "node_type": "chapter",
+            "page_index": 934,
+            "children": [
+              {
+                "id": "C1-2-01",
+                "title": "General Information on Delivering Loan Data and Documents",
+                "node_type": "topic",
+                "section_id": "C1-2-01",
+                "date": "05/01/2019",
+                "page_index": 935
+              },
+              {
+                "id": "C1-2-02",
+                "title": "Loan Data and Documentation Delivery Requirements",
+                "node_type": "topic",
+                "section_id": "C1-2-02",
+                "date": "10/04/2023",
+                "page_index": 936
+              },
+              {
+                "id": "C1-2-03",
+                "title": "Ownership of Mortgage Loans Prior to Purchase or Securitization and Third-Party Security Interests",
+                "node_type": "topic",
+                "section_id": "C1-2-03",
+                "date": "04/06/2022",
+                "page_index": 939
+              },
+              {
+                "id": "C1-2-04",
+                "title": "Delivering eMortgages to Fannie Mae",
+                "node_type": "topic",
+                "section_id": "C1-2-04",
+                "date": "12/13/2023",
+                "page_index": 941
+              },
+              {
+                "id": "C1-2-05",
+                "title": "Delivering Green MBS to Fannie Mae",
+                "node_type": "topic",
+                "section_id": "C1-2-05",
+                "date": "09/04/2024",
+                "page_index": 944
+              },
+              {
+                "id": "C1-2-06",
+                "title": "Bailee Letters",
+                "node_type": "topic",
+                "section_id": "C1-2-06",
+                "date": "04/06/2022",
+                "page_index": 945
+              }
+            ]
+          },
+          {
+            "id": "C1-3",
+            "title": "C1-3, Loan Remittance Types Overview",
+            "node_type": "chapter",
+            "page_index": 947,
+            "children": [
+              {
+                "id": "C1-3-01",
+                "title": "General Information on Remittance Types",
+                "node_type": "topic",
+                "section_id": "C1-3-01",
+                "date": "08/26/2014",
+                "page_index": 947
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "C2",
+        "title": "C2, Whole Loan Transactions",
+        "node_type": "subpart",
+        "page_index": 948,
+        "children": [
+          {
+            "id": "C2-1",
+            "title": "C2-1, Mandatory and Best Efforts Commitments to Sell Whole Loans",
+            "node_type": "chapter",
+            "page_index": 948,
+            "children": [
+              {
+                "id": "C2-1.1",
+                "title": "C2-1.1, Mandatory Commitments to Sell Whole Loans",
+                "node_type": "section",
+                "page_index": 949,
+                "children": [
+                  {
+                    "id": "C2-1.1-01",
+                    "title": "Mandatory Commitment Process",
+                    "node_type": "topic",
+                    "section_id": "C2-1.1-01",
+                    "date": "10/30/2009",
+                    "page_index": 949
+                  },
+                  {
+                    "id": "C2-1.1-02",
+                    "title": "General Information about Mandatory Commitment Pricing and Fees",
+                    "node_type": "topic",
+                    "section_id": "C2-1.1-02",
+                    "date": "06/07/2023",
+                    "page_index": 950
+                  },
+                  {
+                    "id": "C2-1.1-03",
+                    "title": "Mandatory Commitment Terms, Amounts, Periods and Other Requirements",
+                    "node_type": "topic",
+                    "section_id": "C2-1.1-03",
+                    "date": "07/05/2023",
+                    "page_index": 952
+                  },
+                  {
+                    "id": "C2-1.1-04",
+                    "title": "Mandatory Commitment Extensions and Pair-Offs",
+                    "node_type": "topic",
+                    "section_id": "C2-1.1-04",
+                    "date": "05/30/2017",
+                    "page_index": 955
+                  },
+                  {
+                    "id": "C2-1.1-05",
+                    "title": "Servicing Fees",
+                    "node_type": "topic",
+                    "section_id": "C2-1.1-05",
+                    "date": "05/01/2019",
+                    "page_index": 957
+                  },
+                  {
+                    "id": "C2-1.1-06",
+                    "title": "Accrued Interest Payments for Regularly Amortizing Mortgages",
+                    "node_type": "topic",
+                    "section_id": "C2-1.1-06",
+                    "date": "06/28/2011",
+                    "page_index": 958
+                  },
+                  {
+                    "id": "C2-1.1-07",
+                    "title": "Standard ARM and Converted ARM Resale Commitments",
+                    "node_type": "topic",
+                    "section_id": "C2-1.1-07",
+                    "date": "05/30/2017",
+                    "page_index": 959
+                  }
+                ]
+              },
+              {
+                "id": "C2-1.2",
+                "title": "C2-1.2, Best Efforts Commitments to Sell Whole Loans",
+                "node_type": "section",
+                "page_index": 961,
+                "children": [
+                  {
+                    "id": "C2-1.2-01",
+                    "title": "Best Efforts Commitment Process",
+                    "node_type": "topic",
+                    "section_id": "C2-1.2-01",
+                    "date": "08/06/2025",
+                    "page_index": 961
+                  },
+                  {
+                    "id": "C2-1.2-02",
+                    "title": "Best Efforts Commitment Pricing, Periods, and Fees",
+                    "node_type": "topic",
+                    "section_id": "C2-1.2-02",
+                    "date": "03/03/2021",
+                    "page_index": 962
+                  },
+                  {
+                    "id": "C2-1.2-03",
+                    "title": "Best Efforts Commitment Terms, Amounts, and Other Requirements",
+                    "node_type": "topic",
+                    "section_id": "C2-1.2-03",
+                    "date": "03/03/2021",
+                    "page_index": 963
+                  }
+                ]
+              },
+              {
+                "id": "C2-1.3",
+                "title": "C2-1.3, Servicing Execution Tool to Sell Whole Loans",
+                "node_type": "section",
+                "page_index": 965,
+                "children": [
+                  {
+                    "id": "C2-1.3-01",
+                    "title": "Servicing Marketplace",
+                    "node_type": "topic",
+                    "section_id": "C2-1.3-01",
+                    "date": "03/03/2021",
+                    "page_index": 965
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "C2-2",
+            "title": "C2-2, Whole Loan Deliveries to and Purchasing by Fannie Mae",
+            "node_type": "chapter",
+            "page_index": 967,
+            "children": [
+              {
+                "id": "C2-2-01",
+                "title": "General Requirements for Good Delivery of Whole Loans",
+                "node_type": "topic",
+                "section_id": "C2-2-01",
+                "date": "08/07/2018",
+                "page_index": 968
+              },
+              {
+                "id": "C2-2-02",
+                "title": "Documentation Requirements for Whole Loan Deliveries",
+                "node_type": "topic",
+                "section_id": "C2-2-02",
+                "date": "05/01/2019",
+                "page_index": 970
+              },
+              {
+                "id": "C2-2-03",
+                "title": "General Information on Whole Loan Purchasing Policies",
+                "node_type": "topic",
+                "section_id": "C2-2-03",
+                "date": "05/04/2022",
+                "page_index": 972
+              },
+              {
+                "id": "C2-2-04",
+                "title": "Timing of Distribution of Whole Loan Purchase Proceeds",
+                "node_type": "topic",
+                "section_id": "C2-2-04",
+                "date": "05/04/2022",
+                "page_index": 974
+              },
+              {
+                "id": "C2-2-05",
+                "title": "Whole Loan Purchasing Process",
+                "node_type": "topic",
+                "section_id": "C2-2-05",
+                "date": "10/04/2023",
+                "page_index": 975
+              },
+              {
+                "id": "C2-2-06",
+                "title": "Authorization to Transfer Funds",
+                "node_type": "topic",
+                "section_id": "C2-2-06",
+                "date": "05/01/2024",
+                "page_index": 977
+              },
+              {
+                "id": "C2-2-07",
+                "title": "Purchase Payee Codes",
+                "node_type": "topic",
+                "section_id": "C2-2-07",
+                "date": "05/01/2024",
+                "page_index": 979
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "C3",
+        "title": "C3, Mortgage-Backed Securities (MBS)",
+        "node_type": "subpart",
+        "page_index": 981,
+        "children": [
+          {
+            "id": "C3-1",
+            "title": "C3-1, MBS Program Overview",
+            "node_type": "chapter",
+            "page_index": 981,
+            "children": [
+              {
+                "id": "C3-1-01",
+                "title": "General Information About Fannie Mae’s MBS Program",
+                "node_type": "topic",
+                "section_id": "C3-1-01",
+                "date": "10/06/2021",
+                "page_index": 981
+              },
+              {
+                "id": "C3-1-02",
+                "title": "Preparing to Pool Loans into MBS",
+                "node_type": "topic",
+                "section_id": "C3-1-02",
+                "date": "05/01/2019",
+                "page_index": 985
+              }
+            ]
+          },
+          {
+            "id": "C3-2",
+            "title": "C3-2, MBS Securitization Process",
+            "node_type": "chapter",
+            "page_index": 986,
+            "children": [
+              {
+                "id": "C3-2-01",
+                "title": "Determining Eligibility for Loans Pooled into MBS",
+                "node_type": "topic",
+                "section_id": "C3-2-01",
+                "date": "09/07/2022",
+                "page_index": 986
+              },
+              {
+                "id": "C3-2-02",
+                "title": "Selecting a Servicing Option",
+                "node_type": "topic",
+                "section_id": "C3-2-02",
+                "date": "04/01/2009",
+                "page_index": 990
+              },
+              {
+                "id": "C3-2-03",
+                "title": "MBS Remittance Type and Selecting a Remittance Cycle",
+                "node_type": "topic",
+                "section_id": "C3-2-03",
+                "date": "10/25/2011",
+                "page_index": 991
+              },
+              {
+                "id": "C3-2-04",
+                "title": "Mandatory MBS Commitments",
+                "node_type": "topic",
+                "section_id": "C3-2-04",
+                "date": "12/06/2016",
+                "page_index": 992
+              }
+            ]
+          },
+          {
+            "id": "C3-3",
+            "title": "C3-3, MBS Guaranty Fees and Guaranty Fee Buyups and Buydowns",
+            "node_type": "chapter",
+            "page_index": 994,
+            "children": [
+              {
+                "id": "C3-3-01",
+                "title": "Determining and Remitting Guaranty Fees",
+                "node_type": "topic",
+                "section_id": "C3-3-01",
+                "date": "10/25/2011",
+                "page_index": 994
+              },
+              {
+                "id": "C3-3-02",
+                "title": "Accessing Buyup and Buydown Ratios and Calculating Payments or Charges",
+                "node_type": "topic",
+                "section_id": "C3-3-02",
+                "date": "12/04/2019",
+                "page_index": 995
+              },
+              {
+                "id": "C3-3-03",
+                "title": "Buying Up and Buying Down the Guaranty Fee for MBS",
+                "node_type": "topic",
+                "section_id": "C3-3-03",
+                "date": "05/07/2025",
+                "page_index": 998
+              }
+            ]
+          },
+          {
+            "id": "C3-4",
+            "title": "C3-4, Pooling Loans into Fixed-Rate MBS",
+            "node_type": "chapter",
+            "page_index": 999,
+            "children": [
+              {
+                "id": "C3-4-01",
+                "title": "Term-Related Fixed-Rate Mortgage Pooling Parameters",
+                "node_type": "topic",
+                "section_id": "C3-4-01",
+                "date": "05/01/2019",
+                "page_index": 999
+              }
+            ]
+          },
+          {
+            "id": "C3-5",
+            "title": "C3-5, Pooling Loans into ARM MBS",
+            "node_type": "chapter",
+            "page_index": 1001,
+            "children": [
+              {
+                "id": "C3-5-01",
+                "title": "Creating Weighted-Average ARM MBS",
+                "node_type": "topic",
+                "section_id": "C3-5-01",
+                "date": "08/26/2014",
+                "page_index": 1001
+              },
+              {
+                "id": "C3-5-02",
+                "title": "Calculating the Weighted-Average Pool Accrual Rates for ARM Flex Pools Using a Fixed MBS Margin",
+                "node_type": "topic",
+                "section_id": "C3-5-02",
+                "date": "04/01/2009",
+                "page_index": 1002
+              },
+              {
+                "id": "C3-5-03",
+                "title": "Calculating the Weighted-Average Pool Accrual Rates for ARM Flex Pools Using a Weighted-Average MBS Margin",
+                "node_type": "topic",
+                "section_id": "C3-5-03",
+                "date": "04/01/2009",
+                "page_index": 1006
+              },
+              {
+                "id": "C3-5-04",
+                "title": "Pooling ARMs with a Conversion Option",
+                "node_type": "topic",
+                "section_id": "C3-5-04",
+                "date": "05/01/2019",
+                "page_index": 1010
+              },
+              {
+                "id": "C3-5-05",
+                "title": "Commingling ARMs in MBS",
+                "node_type": "topic",
+                "section_id": "C3-5-05",
+                "date": "02/23/2016",
+                "page_index": 1011
+              }
+            ]
+          },
+          {
+            "id": "C3-6",
+            "title": "C3-6, Pooling Loans into Fannie Majors",
+            "node_type": "chapter",
+            "page_index": 1012,
+            "children": [
+              {
+                "id": "C3-6-01",
+                "title": "Parameters for Pooling Loans Into Fannie Majors",
+                "node_type": "topic",
+                "section_id": "C3-6-01",
+                "date": "09/04/2024",
+                "page_index": 1012
+              }
+            ]
+          },
+          {
+            "id": "C3-7",
+            "title": "C3-7, Delivering and Trading MBS",
+            "node_type": "chapter",
+            "page_index": 1014,
+            "children": [
+              {
+                "id": "C3-7-01",
+                "title": "Establishing an MBS Trading Account",
+                "node_type": "topic",
+                "section_id": "C3-7-01",
+                "date": "10/06/2021",
+                "page_index": 1015
+              },
+              {
+                "id": "C3-7-02",
+                "title": "Initiating an MBS Sale",
+                "node_type": "topic",
+                "section_id": "C3-7-02",
+                "date": "07/07/2021",
+                "page_index": 1022
+              },
+              {
+                "id": "C3-7-03",
+                "title": "Making Good Delivery",
+                "node_type": "topic",
+                "section_id": "C3-7-03",
+                "date": "05/01/2019",
+                "page_index": 1024
+              },
+              {
+                "id": "C3-7-04",
+                "title": "Delivering MBS Pool Data and Documents",
+                "node_type": "topic",
+                "section_id": "C3-7-04",
+                "date": "05/05/2021",
+                "page_index": 1027
+              },
+              {
+                "id": "C3-7-05",
+                "title": "Confirming Presettlement Information",
+                "node_type": "topic",
+                "section_id": "C3-7-05",
+                "date": "04/01/2009",
+                "page_index": 1031
+              },
+              {
+                "id": "C3-7-06",
+                "title": "Settling the Trade",
+                "node_type": "topic",
+                "section_id": "C3-7-06",
+                "date": "05/05/2021",
+                "page_index": 1033
+              },
+              {
+                "id": "C3-7-07",
+                "title": "Sale of Fannie Mae Securities to Third Parties",
+                "node_type": "topic",
+                "section_id": "C3-7-07",
+                "date": "05/05/2021",
+                "page_index": 1036
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "D",
+    "title": "D, Ensuring Quality Control (QC)",
+    "node_type": "part",
+    "page_index": 1040,
+    "children": [
+      {
+        "id": "D1",
+        "title": "D1, Lender QC Process",
+        "node_type": "subpart",
+        "page_index": 1041,
+        "children": [
+          {
+            "id": "D1-1",
+            "title": "D1-1, Lender Quality Control Process",
+            "node_type": "chapter",
+            "page_index": 1041,
+            "children": [
+              {
+                "id": "D1-1-01",
+                "title": "Lender Quality Control Programs, Plans, and Processes",
+                "node_type": "topic",
+                "section_id": "D1-1-01",
+                "date": "06/04/2025",
+                "page_index": 1041
+              },
+              {
+                "id": "D1-1-02",
+                "title": "Lender Quality Control Staffing and Outsourcing of the Quality Control Process",
+                "node_type": "topic",
+                "section_id": "D1-1-02",
+                "date": "06/04/2025",
+                "page_index": 1047
+              },
+              {
+                "id": "D1-1-03",
+                "title": "Lender Quality Control Reporting",
+                "node_type": "topic",
+                "section_id": "D1-1-03",
+                "date": "08/06/2025",
+                "page_index": 1049
+              }
+            ]
+          },
+          {
+            "id": "D1-2",
+            "title": "D1-2, Lender Prefunding QC Mortgage Review",
+            "node_type": "chapter",
+            "page_index": 1051,
+            "children": [
+              {
+                "id": "D1-2-01",
+                "title": "Lender Prefunding Quality Control Review Process",
+                "node_type": "topic",
+                "section_id": "D1-2-01",
+                "date": "06/04/2025",
+                "page_index": 1051
+              }
+            ]
+          },
+          {
+            "id": "D1-3",
+            "title": "D1-3, Lender Post-Closing QC Mortgage Review",
+            "node_type": "chapter",
+            "page_index": 1055,
+            "children": [
+              {
+                "id": "D1-3-01",
+                "title": "Lender Post-Closing Quality Control Review Process",
+                "node_type": "topic",
+                "section_id": "D1-3-01",
+                "date": "08/06/2025",
+                "page_index": 1055
+              },
+              {
+                "id": "D1-3-02",
+                "title": "Lender Post-Closing Quality Control Review of Approval Conditions, Underwriting Decisions, Data, and Documentation",
+                "node_type": "topic",
+                "section_id": "D1-3-02",
+                "date": "06/04/2025",
+                "page_index": 1058
+              },
+              {
+                "id": "D1-3-03",
+                "title": "Lender Post-Closing Quality Control Reverifications",
+                "node_type": "topic",
+                "section_id": "D1-3-03",
+                "date": "11/05/2025",
+                "page_index": 1062
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "D2",
+        "title": "D2, Fannie Mae QC Process",
+        "node_type": "subpart",
+        "page_index": 1068,
+        "children": [
+          {
+            "id": "D2-1",
+            "title": "D2-1, General Information on Fannie Mae QC Process",
+            "node_type": "chapter",
+            "page_index": 1069,
+            "children": [
+              {
+                "id": "D2-1-01",
+                "title": "General Information on Fannie Mae QC Reviews",
+                "node_type": "topic",
+                "section_id": "D2-1-01",
+                "date": "04/03/2019",
+                "page_index": 1069
+              },
+              {
+                "id": "D2-1-02",
+                "title": "Fannie Mae QC File Request and Submission Requirements",
+                "node_type": "topic",
+                "section_id": "D2-1-02",
+                "date": "03/06/2024",
+                "page_index": 1070
+              },
+              {
+                "id": "D2-1-03",
+                "title": "Outcomes of Fannie Mae QC Reviews",
+                "node_type": "topic",
+                "section_id": "D2-1-03",
+                "date": "11/03/2015",
+                "page_index": 1072
+              },
+              {
+                "id": "D2-1-04",
+                "title": "Identifying and Remedying Origination Defects Under the Remedies Framework",
+                "node_type": "topic",
+                "section_id": "D2-1-04",
+                "date": "08/30/2016",
+                "page_index": 1075
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "E",
+    "title": "E, Quick Reference Materials",
+    "node_type": "part",
+    "page_index": 1079,
+    "children": [
+      {
+        "id": "E-1",
+        "title": "E-1, Selling Guide Resources",
+        "node_type": "chapter",
+        "page_index": 1080,
+        "children": [
+          {
+            "id": "E-1-01",
+            "title": "References to Fannie Mae's Website",
+            "node_type": "topic",
+            "section_id": "E-1-01",
+            "date": "06/04/2025",
+            "page_index": 1080
+          },
+          {
+            "id": "E-1-02",
+            "title": "List of Contacts",
+            "node_type": "topic",
+            "section_id": "E-1-02",
+            "date": "02/04/2026",
+            "page_index": 1081
+          },
+          {
+            "id": "E-1-03",
+            "title": "List of Lender Contracts",
+            "node_type": "topic",
+            "section_id": "E-1-03",
+            "date": "08/05/2020",
+            "page_index": 1087
+          }
+        ]
+      },
+      {
+        "id": "E-2",
+        "title": "E-2, Exhibits",
+        "node_type": "chapter",
+        "page_index": 1089,
+        "children": [
+          {
+            "id": "E-2-01",
+            "title": "Required Custodial Documents",
+            "node_type": "topic",
+            "section_id": "E-2-01",
+            "date": "05/04/2022",
+            "page_index": 1089
+          },
+          {
+            "id": "E-2-02",
+            "title": "Suggested Format for Phase I Environmental Hazard Assessments",
+            "node_type": "topic",
+            "section_id": "E-2-02",
+            "date": "06/04/2025",
+            "page_index": 1092
+          },
+          {
+            "id": "E-2-03",
+            "title": "Revocable Trust Rider (Sample Language)",
+            "node_type": "topic",
+            "section_id": "E-2-03",
+            "date": "01/17/2013",
+            "page_index": 1104
+          },
+          {
+            "id": "E-2-04",
+            "title": "Signature Requirements for Mortgages to Inter Vivos Revocable Trusts",
+            "node_type": "topic",
+            "section_id": "E-2-04",
+            "date": "02/27/2018",
+            "page_index": 1105
+          },
+          {
+            "id": "E-2-05",
+            "title": "Servicing Marketplace — Mortgage Loan Servicing Purchase and Sale Agreement",
+            "node_type": "topic",
+            "section_id": "E-2-05",
+            "date": "12/15/2021",
+            "page_index": 1109
+          },
+          {
+            "id": "E-2-06",
+            "title": "Correcting Errors in eNotes",
+            "node_type": "topic",
+            "section_id": "E-2-06",
+            "date": "12/13/2023",
+            "page_index": 1124
+          },
+          {
+            "id": "E-2-07",
+            "title": "Description of eNote Header, Footer, and eNote Clause",
+            "node_type": "topic",
+            "section_id": "E-2-07",
+            "date": "12/13/2023",
+            "page_index": 1125
+          }
+        ]
+      },
+      {
+        "id": "E-3",
+        "title": "E-3, Acronyms and Glossary of Defined Terms",
+        "node_type": "chapter",
+        "page_index": 1127,
+        "children": [
+          {
+            "id": "E-3-01",
+            "title": "Acronyms and Glossary of Defined Terms: A",
+            "node_type": "topic",
+            "section_id": "E-3-01",
+            "date": "09/03/2025",
+            "page_index": 1127
+          },
+          {
+            "id": "E-3-02",
+            "title": "Acronyms and Glossary of Defined Terms: B",
+            "node_type": "topic",
+            "section_id": "E-3-02",
+            "date": "02/07/2024",
+            "page_index": 1130
+          },
+          {
+            "id": "E-3-03",
+            "title": "Acronyms and Glossary of Defined Terms: C",
+            "node_type": "topic",
+            "section_id": "E-3-03",
+            "date": "02/05/2025",
+            "page_index": 1132
+          },
+          {
+            "id": "E-3-04",
+            "title": "Acronyms and Glossary of Defined Terms: D",
+            "node_type": "topic",
+            "section_id": "E-3-04",
+            "date": "03/01/2023",
+            "page_index": 1137
+          },
+          {
+            "id": "E-3-05",
+            "title": "Acronyms and Glossary of Defined Terms: E",
+            "node_type": "topic",
+            "section_id": "E-3-05",
+            "date": "12/14/2022",
+            "page_index": 1140
+          },
+          {
+            "id": "E-3-06",
+            "title": "Acronyms and Glossary of Defined Terms: F",
+            "node_type": "topic",
+            "section_id": "E-3-06",
+            "date": "09/03/2025",
+            "page_index": 1142
+          },
+          {
+            "id": "E-3-07",
+            "title": "Acronyms and Glossary of Defined Terms: G",
+            "node_type": "topic",
+            "section_id": "E-3-07",
+            "date": "06/04/2025",
+            "page_index": 1146
+          },
+          {
+            "id": "E-3-08",
+            "title": "Acronyms and Glossary of Defined Terms: H",
+            "node_type": "topic",
+            "section_id": "E-3-08",
+            "date": "04/05/2023",
+            "page_index": 1147
+          },
+          {
+            "id": "E-3-09",
+            "title": "Acronyms and Glossary of Defined Terms: I",
+            "node_type": "topic",
+            "section_id": "E-3-09",
+            "date": "02/04/2026",
+            "page_index": 1149
+          },
+          {
+            "id": "E-3-10",
+            "title": "Acronyms and Glossary of Defined Terms: J",
+            "node_type": "topic",
+            "section_id": "E-3-10",
+            "date": "04/01/2009",
+            "page_index": 1152
+          },
+          {
+            "id": "E-3-11",
+            "title": "Acronyms and Glossary of Defined Terms: K",
+            "node_type": "topic",
+            "section_id": "E-3-11",
+            "date": "12/14/2022",
+            "page_index": 1152
+          },
+          {
+            "id": "E-3-12",
+            "title": "Acronyms and Glossary of Defined Terms: L",
+            "node_type": "topic",
+            "section_id": "E-3-12",
+            "date": "10/08/2025",
+            "page_index": 1152
+          },
+          {
+            "id": "E-3-13",
+            "title": "Acronyms and Glossary of Defined Terms: M",
+            "node_type": "topic",
+            "section_id": "E-3-13",
+            "date": "11/06/2024",
+            "page_index": 1155
+          },
+          {
+            "id": "E-3-14",
+            "title": "Acronyms and Glossary of Defined Terms: N",
+            "node_type": "topic",
+            "section_id": "E-3-14",
+            "date": "06/04/2025",
+            "page_index": 1160
+          },
+          {
+            "id": "E-3-15",
+            "title": "Acronyms and Glossary of Defined Terms: O",
+            "node_type": "topic",
+            "section_id": "E-3-15",
+            "date": "11/10/2014",
+            "page_index": 1161
+          },
+          {
+            "id": "E-3-16",
+            "title": "Acronyms and Glossary of Defined Terms: P",
+            "node_type": "topic",
+            "section_id": "E-3-16",
+            "date": "02/07/2024",
+            "page_index": 1162
+          },
+          {
+            "id": "E-3-17",
+            "title": "Acronyms and Glossary of Defined Terms: Q",
+            "node_type": "topic",
+            "section_id": "E-3-17",
+            "date": "04/01/2009",
+            "page_index": 1166
+          },
+          {
+            "id": "E-3-18",
+            "title": "Acronyms and Glossary of Defined Terms: R",
+            "node_type": "topic",
+            "section_id": "E-3-18",
+            "date": "06/04/2025",
+            "page_index": 1167
+          },
+          {
+            "id": "E-3-19",
+            "title": "Acronyms and Glossary of Defined Terms: S",
+            "node_type": "topic",
+            "section_id": "E-3-19",
+            "date": "02/07/2024",
+            "page_index": 1170
+          },
+          {
+            "id": "E-3-20",
+            "title": "Acronyms and Glossary of Defined Terms: T",
+            "node_type": "topic",
+            "section_id": "E-3-20",
+            "date": "02/07/2024",
+            "page_index": 1175
+          },
+          {
+            "id": "E-3-21",
+            "title": "Acronyms and Glossary of Defined Terms: U",
+            "node_type": "topic",
+            "section_id": "E-3-21",
+            "date": "05/01/2019",
+            "page_index": 1177
+          },
+          {
+            "id": "E-3-22",
+            "title": "Acronyms and Glossary of Defined Terms: V",
+            "node_type": "topic",
+            "section_id": "E-3-22",
+            "date": "09/03/2025",
+            "page_index": 1178
+          },
+          {
+            "id": "E-3-23",
+            "title": "Acronyms and Glossary of Defined Terms: W",
+            "node_type": "topic",
+            "section_id": "E-3-23",
+            "date": "11/10/2019",
+            "page_index": 1178
+          },
+          {
+            "id": "E-3-24",
+            "title": "Acronyms and Glossary of Defined Terms: X",
+            "node_type": "topic",
+            "section_id": "E-3-24",
+            "date": "04/01/2009",
+            "page_index": 1179
+          },
+          {
+            "id": "E-3-25",
+            "title": "Acronyms and Glossary of Defined Terms: Y",
+            "node_type": "topic",
+            "section_id": "E-3-25",
+            "date": "05/30/2017",
+            "page_index": 1179
+          },
+          {
+            "id": "E-3-26",
+            "title": "Acronyms and Glossary of Defined Terms: Z",
+            "node_type": "topic",
+            "section_id": "E-3-26",
+            "date": "04/01/2009",
+            "page_index": 1180
+          }
+        ]
+      }
+    ]
+  }
+]

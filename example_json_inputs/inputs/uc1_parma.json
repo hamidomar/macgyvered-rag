@@ -20,9 +20,9 @@
     "loanTermYears": 30,
     "originalLoanAmount": 210000,
     "armResetDate": null,
-    "propertyValue": 25000,
+    "propertyValue": 265000,
     "propertyData": {
-      "estimatedValue": 225000,
+      "estimatedValue": 265000,
       "purchasePrice": 205000,
       "purchaseDate": "08/2020",
       "propertyType": "condominium",

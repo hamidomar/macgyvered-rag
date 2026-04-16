@@ -20,8 +20,14 @@ Extract the following fields from this paystub and return only JSON:
   "gross_this_period": <number>,
   "pay_frequency": "<weekly | biweekly | semimonthly | monthly>",
   "ytd_gross": <number>,
-  "pay_period_end_date": "<YYYY-MM-DD>"
+  "pay_period_end_date": "<YYYY-MM-DD>",
+  "base_pay": <number or null>,
+  "overtime_pay": <number>,
+  "bonus_pay": <number>,
+  "commission_pay": <number>
 }
+If a component is not shown, return 0 for overtime_pay, bonus_pay, and commission_pay.
+Return null for base_pay only when a separate base-pay line cannot be identified.
 """.strip(),
     "w2": """
 Extract the following fields from this W-2 and return only JSON:

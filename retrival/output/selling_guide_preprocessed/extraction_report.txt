@@ -1,0 +1,23 @@
+======================================================================
+SELLING GUIDE PRE-PROCESSING REPORT
+======================================================================
+
+Total bookmarks in outline:      532
+  Parts:      5
+  Subparts:   17
+  Chapters:   63
+  Sections:   41
+  Topics:     403
+  Other:      3
+
+Leaf sections extracted:         403
+Cross-referenced sections:       281
+
+Text length statistics (chars):
+  Min:    83
+  Max:    50395
+  Mean:   6011
+  Median: 4360
+  Total:  2,422,362
+
+======================================================================

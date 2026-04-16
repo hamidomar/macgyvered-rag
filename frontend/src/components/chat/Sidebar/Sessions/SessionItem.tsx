@@ -32,8 +32,7 @@ const SessionItem = ({
   const [, setTurboRefiSessionId] = useQueryState('refi_session')
   const authToken = useStore((state) => state.authToken)
   const { getSession } = useSessionLoader()
-  const { loadSession, deleteSession: deleteTurboRefiSession } =
-    useTurboRefiSession()
+  const { deleteSession: deleteTurboRefiSession } = useTurboRefiSession()
   const { selectedEndpoint, sessionsData, setSessionsData, mode, agents } =
     useStore()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -47,7 +46,6 @@ const SessionItem = ({
     try {
       if (isTurboRefiSelected) {
         onSessionClick()
-        await loadSession(session_id)
         setTurboRefiSessionId(session_id)
         setSessionId(null)
         return

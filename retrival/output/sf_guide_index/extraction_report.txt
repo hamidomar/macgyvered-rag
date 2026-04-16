@@ -1,0 +1,4 @@
+SF GUIDE EXTRACTION REPORT
+Total bookmarks: 1019
+Sections extracted: 781
+Cross-refs: 656
