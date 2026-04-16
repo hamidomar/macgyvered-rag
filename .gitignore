@@ -10,3 +10,5 @@ runtime/traces/*.json
 frontend/node_modules/
 frontend/.next/
 frontend/tsconfig.tsbuildinfo
+
+README.md
