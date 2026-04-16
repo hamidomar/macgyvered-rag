@@ -101,11 +101,21 @@ def parse_received_json(payload: dict[str, Any], *, new_rate: float | None = Non
     current_pi = _payment_component_sum(payment_breakdown)
     escrow_monthly = _first_number(payment_breakdown.get("escrow"))
     pmi_monthly = _first_number(payment_breakdown.get("pmi"))
+    core_property_value = _first_number(core.get("propertyValue"))
+    core_estimated_value = _first_number(property_data.get("estimatedValue"))
+    lookup_estimated_value = _first_number(property_lookup.get("estimatedValue"))
     api_value = _first_number(
-        property_lookup.get("estimatedValue"),
-        core.get("propertyValue"),
-        property_data.get("estimatedValue"),
+        core_property_value,
+        core_estimated_value,
+        lookup_estimated_value,
     )
+
+    if (
+        core_property_value is not None
+        and lookup_estimated_value is not None
+        and abs(core_property_value - lookup_estimated_value) > 1
+    ):
+        warnings.append("property_value_conflict_between_core_and_property_lookup")
 
     if reported_monthly_payment is not None and current_pi is not None:
         if abs(reported_monthly_payment - current_pi) > 1:
@@ -179,4 +189,3 @@ def parse_received_json(payload: dict[str, Any], *, new_rate: float | None = Non
         warnings=warnings,
         unsupported_reason=unsupported_reason,
     )
-

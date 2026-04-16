@@ -16,6 +16,7 @@ from turborefi.services.full_application_resolver import (
 from turborefi.services.gse_analysis import DeterministicGSEAnalyzer
 from turborefi.services.information_firewall import build_loa_visible_session
 from turborefi.services.lars_engine import evaluate_lars
+from turborefi.services.minimal_assessment import calculate_uc1_uc2_outputs
 from turborefi.services.received_input import parse_received_json
 from turborefi.services.session_service import TurboRefiSessionService
 from turborefi.services.uc1_uc2_intake_resolver import (
@@ -104,6 +105,12 @@ def referred_uc1_payload():
         },
         "statement": {"statementDateRaw": "2026-03-15", "borrowerName": "Jamie Smith"},
     }
+
+
+def uc1_parma_payload():
+    return json.loads(
+        Path("example_json_inputs/inputs/uc1_parma.json").read_text(encoding="utf-8")
+    )
 
 
 def complete_json_first_uc1_case(service: TurboRefiSessionService) -> str:
@@ -253,6 +260,47 @@ def test_fico_uncertainty_reply_triggers_b4():
     assert "fico_uncertain" in update.changed_fields
     assert result.final_score == 85
     assert [event.factor_code for event in result.events] == ["B4"]
+
+
+def test_received_json_prefers_core_property_value_for_ltv():
+    parsed = parse_received_json(uc1_parma_payload(), new_rate=6.0)
+    received = parsed.received_mortgage
+
+    assert received.api_value == 265000
+    assert received.estimated_property_value == 265000
+    assert received.ltv == 0.6981
+    assert "property_value_conflict_between_core_and_property_lookup" in parsed.warnings
+
+
+def test_variable_income_components_trigger_u11_and_u12_without_duplicate_b8():
+    state = SessionState(
+        source_mode="received_json_uc1_uc2",
+        use_case="uc1_rate_term_refi",
+        income_type="w2",
+    )
+    state.borrower_facts.tenure_months = 12
+    state.documents.paystubs.append(
+        PaystubData(
+            employer_name="Acme Manufacturing",
+            gross_this_period=4615.39,
+            pay_frequency="biweekly",
+            ytd_gross=30000,
+            pay_period_end_date="2026-04-14",
+            base_pay=3461.54,
+            overtime_pay=769.23,
+            bonus_pay=384.62,
+        )
+    )
+
+    state.calculated_outputs = calculate_uc1_uc2_outputs(state)
+    result = evaluate_lars(state)
+    codes = [event.factor_code for event in result.events]
+
+    assert state.calculated_outputs["gmi"] == 10000.01
+    assert state.calculated_outputs["paystub_annualized"] == 120000.14
+    assert state.calculated_outputs["variable_income_pct"] == 0.3333
+    assert codes == ["U1.1", "U1.2"]
+    assert "B8" not in codes
 
 
 def test_factual_uncertainty_for_fico_also_sets_fico_uncertain():

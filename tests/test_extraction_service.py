@@ -2,6 +2,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from turborefi.config import Settings
+from turborefi.extraction.prompts import EXTRACTION_PROMPTS
 from turborefi.extraction.service import DocumentExtractionService, UnsupportedDocumentError
 
 
@@ -172,3 +173,12 @@ def test_infer_supporting_doc_type_rejects_unknown_documents(tmp_path):
         assert "could not determine" in str(exc).lower()
     else:
         raise AssertionError("Expected UnsupportedDocumentError")
+
+
+def test_paystub_extraction_prompt_requests_variable_income_components():
+    prompt = EXTRACTION_PROMPTS["paystub"]
+
+    assert '"base_pay"' in prompt
+    assert '"overtime_pay"' in prompt
+    assert '"bonus_pay"' in prompt
+    assert '"commission_pay"' in prompt

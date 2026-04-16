@@ -136,6 +136,18 @@ const compactToolResult = (toolCall: ToolCall) => {
   return toolCall.content.slice(0, 96)
 }
 
+const toolCallKey = (toolCall: ToolCall, index: number) => {
+  const identityParts = [
+    toolCall.tool_call_id,
+    toolCall.tool_name,
+    String(toolCall.created_at),
+    toolCall.content ?? '',
+    JSON.stringify(toolCall.tool_args ?? {})
+  ].filter(Boolean)
+
+  return `${identityParts.join('::')}::${index}`
+}
+
 const outputRows = (outputs: JsonRecord | null) => {
   if (!outputs) return []
   const rows = [
@@ -644,10 +656,7 @@ const TurboRefiInsightPanel = () => {
             <div className="space-y-2">
               {importantToolCalls.map((toolCall, index) => (
                 <div
-                  key={
-                    toolCall.tool_call_id ||
-                    `${toolCall.tool_name}-${toolCall.created_at}-${index}`
-                  }
+                  key={toolCallKey(toolCall, index)}
                   className="rounded-lg border border-border p-3"
                 >
                   <div className="flex items-center justify-between gap-3">

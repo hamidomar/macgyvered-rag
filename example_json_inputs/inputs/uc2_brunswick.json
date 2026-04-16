@@ -20,9 +20,9 @@
     "loanTermYears": 30,
     "originalLoanAmount": 330000,
     "armResetDate": null,
-    "propertyValue": 400000,
+    "propertyValue": 415000,
     "propertyData": {
-      "estimatedValue": 400000,
+      "estimatedValue": 415000,
       "purchasePrice": 358000,
       "purchaseDate": "09/2020",
       "propertyType": "single family home",

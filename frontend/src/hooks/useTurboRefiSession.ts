@@ -222,7 +222,6 @@ export const useTurboRefiSession = () => {
             tool_calls: message.tool_calls
           }))
         )
-        setTurboRefiSessionId(session.session_id)
         setTurboRefiSession({
           currentPhase: session.current_phase,
           useCase: session.use_case ?? null,
@@ -257,8 +256,7 @@ export const useTurboRefiSession = () => {
       resetTurboRefiSession,
       setIsTurboRefiLoading,
       setMessages,
-      setTurboRefiSession,
-      setTurboRefiSessionId
+      setTurboRefiSession
     ]
   )
 
