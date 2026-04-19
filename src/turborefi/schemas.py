@@ -13,7 +13,7 @@ IncomeType = Literal["unknown", "w2", "self_employed", "gig_1099", "rental"]
 FicoRange = Literal["below_620", "620_679", "680_719", "720_759", "760_plus", "unknown"]
 PropertyType = Literal["sfr", "townhome", "condo", "unknown"]
 PmiType = Literal["borrower_paid", "lender_paid", "unknown"]
-ReferralDecision = Literal["AUTOMATED", "REFERRED"]
+ReferralDecision = Literal["AUTOMATED", "REFERRAL_A", "REFERRAL_B", "REFERRAL_C"]
 
 
 class MortgageStatementData(BaseModel):

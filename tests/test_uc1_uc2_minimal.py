@@ -236,7 +236,7 @@ def test_uc2_lars_precedence_straddle_not_b10():
     codes = [event.factor_code for event in result.events]
 
     assert result.final_score == 55
-    assert result.decision == "REFERRED"
+    assert result.decision == "REFERRAL_C"
     assert codes == ["U2.1", "U2.2", "U2.3", "U2.4"]
     assert "B10" not in codes
     assert "B4" not in codes
@@ -301,6 +301,38 @@ def test_variable_income_components_trigger_u11_and_u12_without_duplicate_b8():
     assert state.calculated_outputs["variable_income_pct"] == 0.3333
     assert codes == ["U1.1", "U1.2"]
     assert "B8" not in codes
+
+
+def test_lars_decision_bands_map_to_automated_and_referral_tiers():
+    automated = SessionState(source_mode="received_json_uc1_uc2", use_case="uc1_rate_term_refi", income_type="w2")
+    automated.lars_result = evaluate_lars(automated)
+    assert automated.lars_result.final_score == 100
+    assert automated.lars_result.decision == "AUTOMATED"
+
+    referral_a = SessionState(source_mode="received_json_uc1_uc2", use_case="uc1_rate_term_refi", income_type="w2")
+    referral_a.borrower_facts.property_type = "condo"
+    result_a = evaluate_lars(referral_a)
+    assert result_a.final_score == 90
+    assert result_a.decision == "REFERRAL_A"
+
+    referral_b = SessionState(source_mode="received_json_uc1_uc2", use_case="uc1_rate_term_refi", income_type="w2")
+    referral_b.borrower_facts.property_type = "condo"
+    referral_b.borrower_facts.tenure_months = 12
+    result_b = evaluate_lars(referral_b)
+    assert result_b.final_score == 82
+    assert result_b.decision == "REFERRAL_B"
+
+    referral_c = SessionState(source_mode="received_json_uc1_uc2", use_case="uc1_rate_term_refi", income_type="w2")
+    referral_c.borrower_facts.property_type = "condo"
+    referral_c.borrower_facts.tenure_months = 12
+    referral_c.borrower_facts.employment_gap = True
+    result_c = evaluate_lars(referral_c)
+    assert result_c.final_score == 72
+    assert result_c.decision == "REFERRAL_B"
+    referral_c.borrower_facts.factual_uncertainties.append("property_type")
+    result_c = evaluate_lars(referral_c)
+    assert result_c.final_score == 57
+    assert result_c.decision == "REFERRAL_C"
 
 
 def test_factual_uncertainty_for_fico_also_sets_fico_uncertain():
@@ -708,7 +740,7 @@ def test_referred_lars_does_not_stop_conversation_before_intake_complete(tmp_pat
     )
 
     assert state.lars_result.final_score == 60
-    assert state.referral_decision == "REFERRED"
+    assert state.referral_decision == "REFERRAL_C"
     assert state.handoff_package is None
     assert "680 to 719" in response
     assert "approximate" in response

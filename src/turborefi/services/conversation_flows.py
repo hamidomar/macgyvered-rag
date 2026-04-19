@@ -23,6 +23,12 @@ def _format_percent(value: float | None) -> str | None:
     return f"{value:.1f}%"
 
 
+def _decision_label(value: str | None) -> str | None:
+    if not value:
+        return None
+    return value.replace("_", " ").title()
+
+
 def _document_label(doc_type: str) -> str:
     return {
         "identity": "government ID",
@@ -131,7 +137,9 @@ def next_question(state: SessionState) -> str:
         return "This case should be routed to a human loan officer because it is outside the UC1/UC2 minimal build."
     if state.handoff_package is not None:
         reasons = ", ".join(state.handoff_package.referral_reasons)
+        decision_label = _decision_label(state.lars_result.decision if state.lars_result is not None else None)
         return (
+            f"This case is currently {decision_label or 'in referral review'}. "
             "I would like to connect you with a loan officer for a closer review. "
             f"This is not a denial. The items needing review are: {reasons}. "
             "I am packaging everything collected so you will not need to repeat it."
