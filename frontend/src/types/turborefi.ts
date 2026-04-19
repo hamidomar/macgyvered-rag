@@ -22,7 +22,6 @@ export interface TurboRefiSessionCreateResponse {
   current_phase: string
   use_case?: string
   state_machine_state?: string
-  screening_assumptions?: Record<string, unknown>
   lars_result?: Record<string, unknown> | null
   handoff_package?: Record<string, unknown> | null
   tool_trace?: TurboRefiToolTrace
@@ -69,7 +68,6 @@ export interface TurboRefiSessionStatus {
   borrower_facts: Record<string, unknown>
   received_mortgage?: Record<string, unknown> | null
   income_docs: Record<string, unknown>[]
-  screening_assumptions?: Record<string, unknown>
   calculated_outputs?: Record<string, unknown>
   lars_result?: Record<string, unknown> | null
   handoff_package?: Record<string, unknown> | null

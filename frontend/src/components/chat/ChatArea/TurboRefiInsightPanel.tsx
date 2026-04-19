@@ -37,14 +37,6 @@ const formatPercent = (value: unknown) => {
   return `${numberValue.toFixed(1)}%`
 }
 
-const formatPlainNumber = (value: unknown) => {
-  const numberValue = asNumber(value)
-  if (numberValue === null) return null
-  return numberValue.toLocaleString('en-US', {
-    maximumFractionDigits: 2
-  })
-}
-
 const formatRatioPercent = (value: unknown) => {
   const numberValue = asNumber(value)
   return numberValue === null ? null : formatPercent(numberValue * 100)
@@ -54,7 +46,11 @@ const labelFor = (value: string) =>
   value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
 
 const decisionLabel = (value: string | null) =>
-  value ? value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()) : null
+  value
+    ? value
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, (letter) => letter.toUpperCase())
+    : null
 
 type CitationGroup = {
   gse: string
@@ -156,15 +152,11 @@ const outputRows = (outputs: JsonRecord | null) => {
   const rows = [
     ['LTV', formatPercent(outputs.ltv_percent)],
     ['Gross Monthly Income', formatMoney(outputs.gmi)],
-    ['Old PI', formatMoney(outputs.old_pi)],
-    ['New PI', formatMoney(outputs.new_pi)],
-    ['Rate Savings', formatMoney(outputs.rate_savings)],
+    ['PI', formatMoney(outputs.old_pi)],
     ['PMI Savings', formatMoney(outputs.pmi_savings)],
-    ['Total Monthly Savings', formatMoney(outputs.total_monthly_savings)],
     ['PITIA', formatMoney(outputs.pitia_total)],
     ['Front DTI', formatRatioPercent(outputs.front_dti)],
     ['Back DTI', formatRatioPercent(outputs.back_dti)],
-    ['Break Even Months', formatPlainNumber(outputs.break_even_months)],
     ['Original LTV', formatRatioPercent(outputs.original_ltv)],
     ['Combined LTV', formatRatioPercent(outputs.combined_ltv)]
   ]
@@ -188,9 +180,6 @@ const TurboRefiInsightPanel = () => {
   const recommendedGse = asText(recommendationPacket?.recommended_gse)
   const packetIncome = formatMoney(
     recommendationPacket?.qualifying_monthly_income
-  )
-  const packetSavings = formatMoney(
-    recommendationPacket?.monthly_savings_estimate
   )
   const packetLtv = formatPercent(recommendationPacket?.ltv_percent)
   const packetRecommendedReason = asText(
@@ -412,14 +401,6 @@ const TurboRefiInsightPanel = () => {
                     Qualifying Income
                   </span>
                   <span className="text-sm text-primary">{packetIncome}</span>
-                </div>
-              ) : null}
-              {packetSavings ? (
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs text-secondary">
-                    Est. Monthly Savings
-                  </span>
-                  <span className="text-sm text-primary">{packetSavings}</span>
                 </div>
               ) : null}
               {packetLtv ? (

@@ -66,7 +66,6 @@ interface Store {
     borrowerFacts: Record<string, unknown> | null
     receivedMortgage: Record<string, unknown> | null
     incomeDocs: Record<string, unknown>[]
-    screeningAssumptions: Record<string, unknown> | null
     calculatedOutputs: Record<string, unknown> | null
     larsResult: Record<string, unknown> | null
     handoffPackage: Record<string, unknown> | null
@@ -81,8 +80,6 @@ interface Store {
         ) => Partial<Store['turboRefiSession']>)
   ) => void
   resetTurboRefiSession: () => void
-  turboRefiScreeningRate: number | null
-  setTurboRefiScreeningRate: (turboRefiScreeningRate: number | null) => void
   isTurboRefiLoading: boolean
   setIsTurboRefiLoading: (isTurboRefiLoading: boolean) => void
 }
@@ -99,7 +96,6 @@ const initialTurboRefiSession = {
   borrowerFacts: null,
   receivedMortgage: null,
   incomeDocs: [],
-  screeningAssumptions: null,
   calculatedOutputs: null,
   larsResult: null,
   handoffPackage: null,
@@ -168,9 +164,6 @@ export const useStore = create<Store>()(
         })),
       resetTurboRefiSession: () =>
         set(() => ({ turboRefiSession: initialTurboRefiSession })),
-      turboRefiScreeningRate: 6,
-      setTurboRefiScreeningRate: (turboRefiScreeningRate) =>
-        set(() => ({ turboRefiScreeningRate })),
       isTurboRefiLoading: false,
       setIsTurboRefiLoading: (isTurboRefiLoading) =>
         set(() => ({ isTurboRefiLoading }))
@@ -179,8 +172,7 @@ export const useStore = create<Store>()(
       name: 'endpoint-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        selectedEndpoint: state.selectedEndpoint,
-        turboRefiScreeningRate: state.turboRefiScreeningRate
+        selectedEndpoint: state.selectedEndpoint
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated?.()

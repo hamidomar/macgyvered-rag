@@ -36,7 +36,6 @@ export const createTurboRefiSessionFromJsonAPI = async (
   endpoint: string,
   payload: Record<string, unknown>,
   options?: {
-    newRate?: number
     sessionName?: string
     authToken?: string
   }
@@ -49,7 +48,6 @@ export const createTurboRefiSessionFromJsonAPI = async (
     },
     body: JSON.stringify({
       payload,
-      new_rate: options?.newRate,
       session_name: options?.sessionName
     })
   })
