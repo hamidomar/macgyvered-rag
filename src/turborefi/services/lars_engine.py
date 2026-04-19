@@ -65,6 +65,16 @@ def _append_event(events: list[LarsEvent], score: int, code: str, data: dict[str
     return next_score
 
 
+def _decision_for_score(score: int) -> str:
+    if score == 100:
+        return "AUTOMATED"
+    if score >= 90:
+        return "REFERRAL_A"
+    if score >= 70:
+        return "REFERRAL_B"
+    return "REFERRAL_C"
+
+
 def evaluate_lars(state: SessionState, *, score_missing_documents: bool = False) -> LarsResult:
     facts = state.borrower_facts
     outputs = state.calculated_outputs
@@ -148,12 +158,14 @@ def evaluate_lars(state: SessionState, *, score_missing_documents: bool = False)
         if "purchase_price" in facts.factual_uncertainties or outputs.get("score_missing_purchase_price"):
             score = _append_event(events, score, "U2.4", {"purchase_price": purchase_price})
 
+    decision = _decision_for_score(score)
+
     return LarsResult(
         starting_score=100,
         final_score=score,
         events=events,
-        referral_triggered=score < 70,
-        decision="REFERRED" if score < 70 else "AUTOMATED",
+        referral_triggered=decision != "AUTOMATED",
+        decision=decision,
     )
 
 

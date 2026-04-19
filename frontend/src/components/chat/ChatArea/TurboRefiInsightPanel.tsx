@@ -53,6 +53,9 @@ const formatRatioPercent = (value: unknown) => {
 const labelFor = (value: string) =>
   value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
 
+const decisionLabel = (value: string | null) =>
+  value ? value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()) : null
+
 type CitationGroup = {
   gse: string
   entries: JsonRecord[]
@@ -122,7 +125,7 @@ const compactToolResult = (toolCall: ToolCall) => {
       return `${recommendedGse || 'Packet'} ready${ltv !== null ? ` - LTV ${ltv.toFixed(1)}%` : ''}`
     }
     if (parsed.final_score !== undefined && parsed.decision !== undefined) {
-      return `Score ${String(parsed.final_score)} - ${String(parsed.decision)}`
+      return `Score ${String(parsed.final_score)} - ${decisionLabel(String(parsed.decision))}`
     }
     if (parsed.status !== undefined && parsed.field_name !== undefined) {
       return `${String(parsed.field_name)}: ${String(parsed.status)}`
@@ -180,6 +183,7 @@ const TurboRefiInsightPanel = () => {
   const score = asNumber(larsResult?.final_score)
   const startingScore = asNumber(larsResult?.starting_score)
   const decision = asText(larsResult?.decision)
+  const decisionText = decisionLabel(decision)
   const rows = outputRows(calculatedOutputs)
   const recommendedGse = asText(recommendationPacket?.recommended_gse)
   const packetIncome = formatMoney(
@@ -334,7 +338,7 @@ const TurboRefiInsightPanel = () => {
         </div>
         {decision ? (
           <span className="rounded-md border border-border px-2 py-1 text-xs text-primary">
-            {decision}
+            {decisionText}
           </span>
         ) : null}
       </div>
