@@ -24,9 +24,9 @@ const documentLabel = (value: string) =>
             ? 'PMI Statement'
             : value === 'closing_disclosure'
               ? 'Closing Disclosure'
-    : value === 'paystub'
-      ? 'Paystub'
-      : 'W-2'
+              : value === 'paystub'
+                ? 'Paystub'
+                : 'W-2'
 
 const phaseLabel = (value: string | null) =>
   value ? value.replace(/_/g, ' ') : 'awaiting received json'
@@ -57,12 +57,6 @@ const ChatInput = () => {
   const mode = useStore((state) => state.mode)
   const agents = useStore((state) => state.agents)
   const turboRefiSession = useStore((state) => state.turboRefiSession)
-  const turboRefiScreeningRate = useStore(
-    (state) => state.turboRefiScreeningRate
-  )
-  const setTurboRefiScreeningRate = useStore(
-    (state) => state.setTurboRefiScreeningRate
-  )
   const resetTurboRefiSession = useStore((state) => state.resetTurboRefiSession)
   const selectedAgentDetails = agents.find(
     (agent) => agent.id === selectedAgent
@@ -133,7 +127,6 @@ const ChatInput = () => {
           )
         }
         await createSessionFromReceivedJson(payload, {
-          newRate: turboRefiScreeningRate ?? undefined,
           sessionName: 'Received JSON'
         })
         return
@@ -187,10 +180,6 @@ const ChatInput = () => {
   const receivedDocuments = summarizeDocumentCounts(
     turboRefiSession.documentsReceived
   )
-  const activeScreeningRate =
-    typeof turboRefiSession.screeningAssumptions?.new_rate === 'number'
-      ? turboRefiSession.screeningAssumptions.new_rate
-      : null
 
   return (
     <div className="mx-auto w-full max-w-2xl font-geist">
@@ -198,31 +187,6 @@ const ChatInput = () => {
         <span className="text-foreground rounded-full border border-border bg-background px-3 py-1">
           Phase: {phaseLabel(turboRefiSession.currentPhase)}
         </span>
-        {hasActiveTurboRefiSession ? (
-          <span className="text-muted-foreground rounded-full border border-border bg-background px-3 py-1">
-            Screening rate:{' '}
-            {activeScreeningRate === null
-              ? 'not set'
-              : `${activeScreeningRate.toFixed(3)}%`}
-          </span>
-        ) : (
-          <label className="text-muted-foreground flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1">
-            <span>Screening rate</span>
-            <input
-              type="number"
-              min="0"
-              step="0.125"
-              value={turboRefiScreeningRate ?? ''}
-              onChange={(event) => {
-                const value = event.target.value
-                setTurboRefiScreeningRate(value ? Number(value) : null)
-              }}
-              className="text-foreground w-16 border-0 bg-transparent text-right outline-none"
-              disabled={isTurboRefiLoading || isStreaming}
-            />
-            <span>%</span>
-          </label>
-        )}
         {hasActiveTurboRefiSession ? (
           <>
             {turboRefiSession.intakePending.length > 0 && (

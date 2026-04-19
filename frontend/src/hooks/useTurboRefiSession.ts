@@ -29,18 +29,18 @@ const getDocumentLabel = (documentType: string) =>
   documentType === 'schedule_c'
     ? 'Schedule C'
     : documentType === 'tax_bill'
-        ? 'property tax bill'
-        : documentType === 'insurance'
-          ? 'homeowners insurance declaration'
-          : documentType === 'identity'
-            ? 'government ID'
-            : documentType === 'pmi_statement'
-              ? 'PMI statement'
-              : documentType === 'closing_disclosure'
-                ? 'closing disclosure'
-                : documentType === 'paystub'
-                  ? 'paystub'
-                  : 'W-2'
+      ? 'property tax bill'
+      : documentType === 'insurance'
+        ? 'homeowners insurance declaration'
+        : documentType === 'identity'
+          ? 'government ID'
+          : documentType === 'pmi_statement'
+            ? 'PMI statement'
+            : documentType === 'closing_disclosure'
+              ? 'closing disclosure'
+              : documentType === 'paystub'
+                ? 'paystub'
+                : 'W-2'
 
 const TURBO_REFI_DEFAULT_ENDPOINT = 'http://localhost:7777'
 
@@ -129,9 +129,6 @@ export const useTurboRefiSession = () => {
   const setStreamingErrorMessage = useStore(
     (state) => state.setStreamingErrorMessage
   )
-  const turboRefiScreeningRate = useStore(
-    (state) => state.turboRefiScreeningRate
-  )
   const [, setTurboRefiSessionId] = useQueryState('refi_session')
   const { streamResponse } = useAIResponseStream()
 
@@ -171,7 +168,6 @@ export const useTurboRefiSession = () => {
           borrowerFacts: status.borrower_facts,
           receivedMortgage: status.received_mortgage ?? null,
           incomeDocs: status.income_docs,
-          screeningAssumptions: status.screening_assumptions ?? null,
           calculatedOutputs: status.calculated_outputs ?? null,
           larsResult: status.lars_result ?? null,
           handoffPackage: status.handoff_package ?? null,
@@ -234,7 +230,6 @@ export const useTurboRefiSession = () => {
           borrowerFacts: session.borrower_facts,
           receivedMortgage: session.received_mortgage ?? null,
           incomeDocs: session.income_docs,
-          screeningAssumptions: session.screening_assumptions ?? null,
           calculatedOutputs: session.calculated_outputs ?? null,
           larsResult: session.lars_result ?? null,
           handoffPackage: session.handoff_package ?? null,
@@ -358,7 +353,7 @@ export const useTurboRefiSession = () => {
   const createSessionFromReceivedJson = useCallback(
     async (
       payload: Record<string, unknown>,
-      options?: { newRate?: number; sessionName?: string }
+      options?: { sessionName?: string }
     ) => {
       setIsTurboRefiLoading(true)
       try {
@@ -368,14 +363,10 @@ export const useTurboRefiSession = () => {
           payload,
           {
             ...options,
-            newRate: options?.newRate ?? turboRefiScreeningRate ?? undefined,
             authToken
           }
         )
         setTurboRefiSessionId(result.session_id)
-        setTurboRefiSession({
-          screeningAssumptions: result.screening_assumptions ?? null
-        })
         setMessages([
           {
             role: 'user' as const,
@@ -405,8 +396,7 @@ export const useTurboRefiSession = () => {
       refreshStatus,
       setIsTurboRefiLoading,
       setMessages,
-      setTurboRefiSessionId,
-      turboRefiScreeningRate
+      setTurboRefiSessionId
     ]
   )
 
